@@ -20,9 +20,6 @@ export default function AppBar() {
   
   useEffect(() => {
     setPagina(window.location.pathname);
-    if (typeof (window as any).loading === "function") {
-      (window as any).loading();
-    }
   }, []);
 
   return (
