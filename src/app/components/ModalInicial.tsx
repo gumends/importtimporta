@@ -11,7 +11,7 @@ export default function ModalInicial() {
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    const t1 = setTimeout(() => setShowImage(true), 20);
+    const t1 = setTimeout(() => setShowImage(true), 250);
     const t2 = setTimeout(() => setFadingOut(true), 2000);
     const t3 = setTimeout(() => {
       setVisible(false);
@@ -43,7 +43,7 @@ export default function ModalInicial() {
         justifyContent: "center",
         pointerEvents: "none",
         opacity: fadingOut ? 0 : 1,
-        transition: "opacity 400ms ease-in-out",
+        transition: "opacity 2000ms ease-in-out",
       }}
     >
       <Box
@@ -55,7 +55,7 @@ export default function ModalInicial() {
           maxWidth: "88%",
           pointerEvents: "none",
           opacity: showImage ? 1 : 0,
-          transition: "opacity 420ms ease-in-out",
+          transition: "opacity 2000ms ease-in-out",
         }}
       />
     </Box>
