@@ -6,8 +6,10 @@ import "swiper/css/navigation";
 import { Autoplay, Navigation } from "swiper/modules";
 import { useEffect } from "react";
 import ModalInicial from "../components/ModalInicial";
+import promocoes from "../../services/produtos/produtos.json";
 
 interface Promocao {
+  id: number;
   nomeProduto: string;
   image: string;
   precoComDesconto: string;
@@ -18,61 +20,10 @@ interface Promocao {
 export default function Inicio() {
   useEffect(() => {}, []);
 
-  const promocoes: Promocao[] = [
-    {
-      nomeProduto: "Iphone 15",
-      image: "/promocoes/iphone-15.png",
-      precoComDesconto: "R$ 9.999,00",
-      precoSemDesconto: "R$ 10.999,00",
-      descricao: "O melhor iPhone de todos os tempos",
-    },
-    {
-      nomeProduto: "Apple Watch Series 9",
-      image: "/promocoes/apple_watch.png",
-      precoComDesconto: "R$ 1.999,00",
-      precoSemDesconto: "R$ 2.499,00",
-      descricao: "Um relógio inteligente para o seu dia a dia",
-    },
-    {
-      nomeProduto: "AirPods Pro",
-      image: "/promocoes/airpods.png",
-      precoComDesconto: "R$ 299,00",
-      precoSemDesconto: "R$ 399,00",
-      descricao: "Fones de ouvido com cancelamento de ruído",
-    },
-    {
-      nomeProduto: "MacBook Pro",
-      image: "/promocoes/MacBook.png",
-      precoComDesconto: "R$ 4.499,00",
-      precoSemDesconto: "R$ 5.999,00",
-      descricao: "O laptop mais poderoso da Apple",
-    },
-    {
-      nomeProduto: "iPad",
-      image: "/promocoes/ipad.png",
-      precoComDesconto: "R$ 3.499,00",
-      precoSemDesconto: "R$ 4.299,00",
-      descricao: "O tablet mais avançado do mercado",
-    },
-    {
-      nomeProduto: "PlayStation 5",
-      image: "/promocoes/playstation_5.png",
-      precoComDesconto: "R$ 4.499,00",
-      precoSemDesconto: "R$ 5.499,00",
-      descricao: "O console de última geração da Sony",
-    },
-  ];
-
   const produtosVariados: Promocao[] = [
     ...promocoes,
     {
-      nomeProduto: "JBL Caixa de Som",
-      image: "/promocoes/jbl.png",
-      precoComDesconto: "R$ 249,00",
-      precoSemDesconto: "R$ 299,00",
-      descricao: "Som imersivo para jogos e festas",
-    },
-    {
+      id: 6,
       nomeProduto: "Smart TV 4K",
       image: "/promocoes/tv.png",
       precoComDesconto: "R$ 2.999,00",
@@ -247,15 +198,6 @@ export default function Inicio() {
                         >
                           {p.precoComDesconto}
                         </Typography>
-                        <Typography
-                          sx={{
-                            textDecoration: "line-through",
-                            opacity: 0.7,
-                            color: "rgba(255,255,255,0.55)",
-                          }} // riscado mais fraco
-                        >
-                          {p.precoSemDesconto}
-                        </Typography>
                       </Stack>
                       <Button
                         variant="solid"
@@ -265,6 +207,7 @@ export default function Inicio() {
                           color: "#000",
                           mx: { xs: "auto", md: 0 },
                         }}
+                        onClick={() => window.location.href = `/produto?produtoId=${p.id}`}
                       >
                         Comprar
                       </Button>
