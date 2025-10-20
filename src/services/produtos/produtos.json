@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "nomeProduto": "Iphone 15",
+    "image": "/promocoes/iphone-15.png",
+    "precoComDesconto": "R$ 9.999,00",
+    "precoSemDesconto": "R$ 10.999,00",
+    "descricao": "O melhor iPhone de todos os tempos"
+  },
+  {
+    "id": 2,
+    "nomeProduto": "Apple Watch Series 9",
+    "image": "/promocoes/apple_watch.png",
+    "precoComDesconto": "R$ 1.999,00",
+    "precoSemDesconto": "R$ 2.499,00",
+    "descricao": "Um relógio inteligente para o seu dia a dia"
+  },
+  {
+    "id": 3,
+    "nomeProduto": "AirPods Pro",
+    "image": "/promocoes/airpods.png",
+    "precoComDesconto": "R$ 299,00",
+    "precoSemDesconto": "R$ 399,00",
+    "descricao": "Fones de ouvido com cancelamento de ruído"
+  },
+  {
+    "id": 4,
+    "nomeProduto": "MacBook Pro",
+    "image": "/promocoes/MacBook.png",
+    "precoComDesconto": "R$ 4.499,00",
+    "precoSemDesconto": "R$ 5.999,00",
+    "descricao": "O laptop mais poderoso da Apple"
+  },
+  {
+    "id": 5,
+    "nomeProduto": "PlayStation 5",
+    "image": "/promocoes/playstation_5.png",
+    "precoComDesconto": "R$ 4.499,00",
+    "precoSemDesconto": "R$ 5.499,00",
+    "descricao": "O console de última geração da Sony"
+  }
+]
