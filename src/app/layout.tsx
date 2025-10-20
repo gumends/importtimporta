@@ -5,7 +5,6 @@ import "@fontsource/inter";
 import AppBar from "./components/AppBar";
 import { Box } from "@mui/joy";
 import Footer from "./components/Footer";
-import ModalInicial from "./components/ModalInicial";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -59,7 +58,6 @@ export default function RootLayout({
               textAlign: "center",
             }}
           >
-            <ModalInicial />
             <AppBar />
             {children}
           </Box>

@@ -5,6 +5,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { Autoplay, Navigation } from "swiper/modules";
 import { useEffect } from "react";
+import ModalInicial from "../components/ModalInicial";
 
 interface Promocao {
   nomeProduto: string;
@@ -82,6 +83,7 @@ export default function Inicio() {
 
   return (
     <Box sx={{ bgcolor: "#0a0a0a", color: "#fff", width: "100%" }}>
+      <ModalInicial />
       {/* HERO */}
       <Container maxWidth="lg" sx={{ py: 6, textAlign: "center" }}>
         <Typography
@@ -214,7 +216,14 @@ export default function Inicio() {
                         color: "rgba(255,255,255,0.96)", // nome do produto - branco mais forte
                       }}
                     >
-                      <Typography level="h4" sx={{ mb: 1, fontWeight: 600, color: "rgba(255,255,255,0.95)" }}>
+                      <Typography
+                        level="h4"
+                        sx={{
+                          mb: 1,
+                          fontWeight: 600,
+                          color: "rgba(255,255,255,0.95)",
+                        }}
+                      >
                         {p.nomeProduto}
                       </Typography>
                       <Typography
