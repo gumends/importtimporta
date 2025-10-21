@@ -5,23 +5,32 @@
     "image": "/promocoes/iphone-15.png",
     "precoComDesconto": "R$ 9.999,00",
     "precoSemDesconto": "R$ 10.999,00",
-    "descricao": "O melhor iPhone de todos os tempos"
+    "descricao": "O melhor iPhone de todos os tempos",
+    "tipoProduto": 1,
+    "novoLançamento": false,
+    "colors": null
   },
   {
     "id": 2,
     "nomeProduto": "Apple Watch Series 9",
     "image": "/promocoes/apple_watch.png",
     "precoComDesconto": "R$ 1.999,00",
-    "precoSemDesconto": "R$ 2.499,00",
-    "descricao": "Um relógio inteligente para o seu dia a dia"
+    "precoSemDesconto": null,
+    "descricao": "Um relógio inteligente para o seu dia a dia",
+    "tipoProduto": 2,
+    "novoLançamento": false,
+    "colors": null
   },
   {
     "id": 3,
     "nomeProduto": "AirPods Pro",
     "image": "/promocoes/airpods.png",
-    "precoComDesconto": "R$ 299,00",
+    "precoComDesconto": null,
     "precoSemDesconto": "R$ 399,00",
-    "descricao": "Fones de ouvido com cancelamento de ruído"
+    "descricao": "Fones de ouvido com cancelamento de ruído",
+    "tipoProduto": 3,
+    "novoLançamento": false,
+    "colors": null
   },
   {
     "id": 4,
@@ -29,7 +38,10 @@
     "image": "/promocoes/MacBook.png",
     "precoComDesconto": "R$ 4.499,00",
     "precoSemDesconto": "R$ 5.999,00",
-    "descricao": "O laptop mais poderoso da Apple"
+    "descricao": "O laptop mais poderoso da Apple",
+    "tipoProduto": 4,
+    "novoLançamento": false,
+    "colors": null
   },
   {
     "id": 5,
@@ -37,6 +49,97 @@
     "image": "/promocoes/playstation_5.png",
     "precoComDesconto": "R$ 4.499,00",
     "precoSemDesconto": "R$ 5.499,00",
-    "descricao": "O console de última geração da Sony"
+    "descricao": "O console de última geração da Sony",
+    "tipoProduto": 5,
+    "novoLançamento": true,
+    "colors": null
+  },
+  {
+    "id": 6,
+    "nomeProduto": "Iphone 15 pro max",
+    "image": "/promocoes/iphone-15.png",
+    "precoComDesconto": null,
+    "precoSemDesconto": "R$ 10.999,00",
+    "descricao": "O melhor iPhone de todos os tempos",
+    "tipoProduto": 1,
+    "novaGeracao": true,
+    "colors": null
+  },
+  {
+    "id": 7,
+    "nomeProduto": "Iphone 15 pro",
+    "image": "/promocoes/iphone-15-pro.png",
+    "precoComDesconto": "R$ 11.999,00",
+    "precoSemDesconto": "R$ 12.999,00",
+    "descricao": "O iPhone mais poderoso de todos os tempos",
+    "tipoProduto": 1,
+    "novaGeracao": true,
+    "colors": null
+  },
+  {
+    "id": 8,
+    "nomeProduto": "Iphone 14",
+    "image": "/promocoes/iphone-14.png",
+    "precoComDesconto": "R$ 7.999,00",
+    "precoSemDesconto": null,
+    "descricao": "O iPhone que revolucionou o mercado",
+    "tipoProduto": 1,
+    "novaGeracao": false,
+    "colors": null
+  },
+  {
+    "id": 9,
+    "nomeProduto": "Iphone SE",
+    "image": "/promocoes/iphone-se.png",
+    "precoComDesconto": "R$ 3.999,00",
+    "precoSemDesconto": null,
+    "descricao": "O iPhone compacto e acessível",
+    "tipoProduto": 1,
+    "novaGeracao": false,
+    "colors": null
+  },
+  {
+    "id": 10,
+    "nomeProduto": "Iphone 17",
+    "image": "/iphone_17.png",
+    "precoComDesconto": null,
+    "precoSemDesconto": "R$ 6.999,00",
+    "descricao": "O iPhone com câmera avançada",
+    "tipoProduto": 1,
+    "novaGeracao": true,
+    "colors": ["#DFCEEA", "#96AED1", "#A9B689", "#353839", "#F5F5F5"]
+  },
+  {
+    "id": 11,
+    "nomeProduto": "Iphone 17 Pro",
+    "image": "/iphone_17_pro.png",
+    "precoComDesconto": "R$ 12.999,00",
+    "precoSemDesconto": "R$ 13.999,00",
+    "descricao": "O iPhone com desempenho excepcional",
+    "tipoProduto": 1,
+    "novaGeracao": true,
+    "colors": ["#32374A", "#F77E2D", "#F5F5F5"]
+  },
+  {
+    "id": 12,
+    "nomeProduto": "Iphone 17 Pro Max",
+    "image": "/iphone_17_pro_max_silver.png",
+    "precoComDesconto": "R$ 14.999,00",
+    "precoSemDesconto": "R$ 15.999,00",
+    "descricao": "O iPhone com a melhor bateria e tela",
+    "tipoProduto": 1,
+    "novaGeracao": true,
+    "colors": ["#32374A", "#F77E2D", "#F5F5F5"]
+  },
+  {
+    "id": 13,
+    "nomeProduto": "Iphone Air",
+    "image": "/iphone_air.png",
+    "precoComDesconto": "R$ 8.999,00",
+    "precoSemDesconto": "R$ 9.499,00",
+    "descricao": "O iPhone leve e elegante",
+    "tipoProduto": 1,
+    "novaGeracao": true,
+    "colors": ["#F0F9FF", "#FFFCF5", "#000000", "#FCFCFC"]
   }
 ]
