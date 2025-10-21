@@ -7,30 +7,22 @@ import { Autoplay, Navigation } from "swiper/modules";
 import { useEffect } from "react";
 import ModalInicial from "../components/ModalInicial";
 import promocoes from "../../services/produtos/produtos.json";
-
-interface Promocao {
-  id: number;
-  nomeProduto: string;
-  image: string;
-  precoComDesconto: string;
-  precoSemDesconto: string;
-  descricao: string;
-}
+import { getProduto } from "@/services/produtos/produtos.service";
+import { useState } from "react";
+import { Produto } from "@/types/produto.type";
 
 export default function Inicio() {
   useEffect(() => {}, []);
+  const [produtoNovaGeracao, setProdutoNovaGeracao] = useState<Produto | null>(
+    null
+  );
 
-  const produtosVariados: Promocao[] = [
-    ...promocoes,
-    {
-      id: 6,
-      nomeProduto: "Smart TV 4K",
-      image: "/promocoes/tv.png",
-      precoComDesconto: "R$ 2.999,00",
-      precoSemDesconto: "R$ 3.499,00",
-      descricao: "Imagem cristalina em 4K UHD",
-    },
-  ];
+  async function buscaProduto(id: number) {
+    await getProduto(id).then((prod: Produto | undefined) => {
+      console.log(prod);
+      setProdutoNovaGeracao(prod ? prod : null);
+    });
+  }
 
   return (
     <Box sx={{ bgcolor: "#0a0a0a", color: "#fff", width: "100%" }}>
@@ -43,25 +35,159 @@ export default function Inicio() {
             fontSize: { xs: "2.2rem", md: "3.5rem" },
             fontWeight: "700",
             mb: 3,
-            color: "rgba(255,255,255,0.96)", // título mais forte (branco forte)
+            color: "rgba(255,255,255,0.96)",
           }}
         >
-          iPhone 17 Pro
+          Geração 17
         </Typography>
+        <Stack
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            mb: 6,
+            mt: 6,
+          }}
+        >
+          <Typography
+            level="body-lg"
+            sx={{
+              color: "rgba(255,255,255,0.72)",
+              border: "1px solid rgba(255,255,255,0.36)",
+              borderTop: "none",
+              borderLeft: "none",
+              px: 2,
+              py: 1,
+              width: "200px",
+              cursor: "pointer",
+              "&:hover": { backgroundColor: "rgba(255,255,255,0.08)" },
+              borderTopLeftRadius: "8px",
+              backgroundColor:
+                produtoNovaGeracao?.id === 12
+                  ? "rgba(255,255,255,0.08)"
+                  : "transparent",
+            }}
+            onClick={() => buscaProduto(12)}
+          >
+            Iphone 17 Pro Max
+          </Typography>
+          <Typography
+            level="body-lg"
+            sx={{
+              color: "rgba(255,255,255,0.72)",
+              border: "1px solid rgba(255,255,255,0.36)",
+              borderTop: "none",
+              px: 2,
+              py: 1,
+              width: "200px",
+              cursor: "pointer",
+              "&:hover": { backgroundColor: "rgba(255,255,255,0.08)" },
+              backgroundColor:
+                produtoNovaGeracao?.id === 11
+                  ? "rgba(255,255,255,0.08)"
+                  : "transparent",
+            }}
+            onClick={() => buscaProduto(11)}
+          >
+            Iphone 17 Pro
+          </Typography>
+          <Typography
+            level="body-lg"
+            sx={{
+              color: "rgba(255,255,255,0.72)",
+              border: "1px solid rgba(255,255,255,0.36)",
+              borderTop: "none",
+              px: 2,
+              py: 1,
+              width: "200px",
+              cursor: "pointer",
+              "&:hover": { backgroundColor: "rgba(255,255,255,0.08)" },
+              backgroundColor:
+                produtoNovaGeracao?.id === 10
+                  ? "rgba(255,255,255,0.08)"
+                  : "transparent",
+            }}
+            onClick={() => buscaProduto(10)}
+          >
+            Iphone 17
+          </Typography>
+          <Typography
+            level="body-lg"
+            sx={{
+              color: "rgba(255,255,255,0.72)",
+              border: "1px solid rgba(255,255,255,0.36)",
+              borderTop: "none",
+              borderRight: "none",
+              px: 2,
+              py: 1,
+              width: "200px",
+              cursor: "pointer",
+              "&:hover": { backgroundColor: "rgba(255,255,255,0.08)" },
+              borderTopRightRadius: "8px",
+              backgroundColor:
+                produtoNovaGeracao?.id === 13
+                  ? "rgba(255,255,255,0.08)"
+                  : "transparent",
+            }}
+            onClick={() => buscaProduto(13)}
+          >
+            Iphone Air
+          </Typography>
+        </Stack>
         <Box
-          component="img"
-          src="/iphone-17.png"
-          alt="Produto destaque"
           sx={{
             width: "100%",
-            maxWidth: 1000,
-            height: "auto",
-            objectFit: "contain",
+            maxWidth: 1200,
+            height: 700,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
             mx: "auto",
             mb: 3,
           }}
-        />
-        <Stack direction="row" spacing={2} justifyContent="center">
+        >
+          <Box
+            component="img"
+            src={produtoNovaGeracao ? produtoNovaGeracao.image : "/atual.png"}
+            alt={
+              produtoNovaGeracao
+                ? produtoNovaGeracao.nomeProduto
+                : "Produto destaque"
+            }
+            sx={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              transition: "opacity 1s ease-in-out",
+              opacity: produtoNovaGeracao ? 1 : 1,
+            }}
+          />
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+            }}
+          >
+            {produtoNovaGeracao?.colors?.map((color, index) => (
+              <Box
+                key={index}
+                sx={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: "50%",
+                  bgcolor: color,
+                  border: "2px solid rgba(255,255,255,0.36)",
+                  "&:not(:last-child)": { mr: 1 },
+                  cursor: "pointer",
+                  "&:hover": { filter: "brightness(0.8)" },
+                }}
+              />
+            ))}
+          </Box>
+        </Box>
+        {/* <Stack direction="row" spacing={2} justifyContent="center">
           <Button
             variant="solid"
             sx={{ borderRadius: "50px", px: 3, bgcolor: "#fff", color: "#000" }}
@@ -79,7 +205,7 @@ export default function Inicio() {
           >
             Comprar
           </Button>
-        </Stack>
+        </Stack> */}
       </Container>
 
       {/* PRODUTOS VARIADOS (carrossel alinhado ao container) */}
@@ -92,7 +218,7 @@ export default function Inicio() {
               mb: 4,
               fontSize: "2rem",
               fontWeight: 700,
-              color: "rgba(255,255,255,0.96)", // título mais forte
+              color: "rgba(255,255,255,0.96)",
             }}
           >
             Produtos variados
@@ -133,7 +259,7 @@ export default function Inicio() {
               speed={900}
               style={{ width: "100%", height: "400px" }}
             >
-              {produtosVariados.map((p, i) => (
+              {promocoes.map((p, i) => (
                 <SwiperSlide key={i}>
                   <Box
                     sx={{
@@ -207,7 +333,9 @@ export default function Inicio() {
                           color: "#000",
                           mx: { xs: "auto", md: 0 },
                         }}
-                        onClick={() => window.location.href = `/produto?produtoId=${p.id}`}
+                        onClick={() =>
+                          (window.location.href = `/produto?produtoId=${p.id}`)
+                        }
                       >
                         Comprar
                       </Button>

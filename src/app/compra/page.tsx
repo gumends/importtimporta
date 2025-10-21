@@ -1,31 +1,22 @@
 "use client";
 
 import React from "react";
-import produtos from "../../services/produtos/produtos.json";
 import { Button } from "@mui/joy";
-
-interface Promocao {
-  id: number;
-  nomeProduto: string;
-  image: string;
-  precoComDesconto: string;
-  precoSemDesconto: string;
-  descricao: string;
-}
-
+import { Produto as p } from "../../types/produto.type";
+import { getProduto } from "@/services/produtos/produtos.service";
 export default function Produto() {
-  const [produto, setProduto] = React.useState<Promocao | null>(null);
+  const [produto, setProduto] = React.useState<p | null>(null);
 
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const produtoParam = urlParams.get("produtoId");
-
-    if (!produtoParam) return;
-    const produtoEncontrado = produtos.find(
-      (p) => p.id === Number(produtoParam)
-    );
-    if (produtoEncontrado) {
-      setProduto(produtoEncontrado);
+    const produtoParam = urlParams.get("id");
+    if (produtoParam) {
+      const produtoId = parseInt(produtoParam, 10);
+      getProduto(produtoId).then((prod) => {
+        if (prod) {
+          setProduto(prod);
+        }
+      });
     }
   }, [produto]);
 
