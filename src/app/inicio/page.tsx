@@ -18,6 +18,7 @@ import promocoes from "../../services/produtos/produtos.json";
 import {
   getCoresProduto,
   getProduto,
+  getprodutosAleatorios,
   getProdutosNovaGeracao,
   getProdutosPorIdECor,
 } from "@/services/produtos/produtos.service";
@@ -27,6 +28,7 @@ import { ModelosOption, Produto } from "@/types/produto.type";
 export default function Inicio() {
   useEffect(() => {
     getNovaGeracao();
+    buscaProdutoAleatoros();
   }, []);
 
   const [produtoNovaGeracao, setProdutoNovaGeracao] = useState<Produto | null>(
@@ -34,6 +36,16 @@ export default function Inicio() {
   );
   const [cores, setCores] = useState<ModelosOption[] | null>(null);
   const [novaGeracao, setNovaGeracao] = useState<Produto[] | null>(null);
+  const [produtosAleatorios, setProdutosAleatorios] = useState<
+    Produto[] | null
+  >(null);
+
+  async function buscaProdutoAleatoros() {
+    await getprodutosAleatorios().then((prod) => {
+      console.log(prod);
+      setProdutosAleatorios(prod);
+    });
+  }
 
   async function buscaProdutoPorCor(id: number, cor: string) {
     const prod = await getProdutosPorIdECor(id, cor);
@@ -137,7 +149,12 @@ export default function Inicio() {
             alt={produtoNovaGeracao?.nomeProduto ?? "Produto destaque"}
             sx={{
               width: "100%",
-              height: produtoNovaGeracao?.id === 7 ? "100%" : produtoNovaGeracao?.id === 10 ? "95%" : "90%",
+              height:
+                produtoNovaGeracao?.id === 7
+                  ? "100%"
+                  : produtoNovaGeracao?.id === 10
+                  ? "95%"
+                  : "90%",
               objectFit: "contain",
               animation: "fadeIn 1s ease-in-out",
               "@keyframes fadeIn": {
@@ -183,25 +200,6 @@ export default function Inicio() {
             ))}
           </Box>
         </Box>
-        {/* <Stack direction="row" spacing={2} justifyContent="center">
-          <Button
-            variant="solid"
-            sx={{ borderRadius: "50px", px: 3, bgcolor: "#fff", color: "#000" }}
-          >
-            Saiba mais
-          </Button>
-          <Button
-            variant="outlined"
-            sx={{
-              borderRadius: "50px",
-              px: 3,
-              borderColor: "#fff",
-              color: "#fff",
-            }}
-          >
-            Comprar
-          </Button>
-        </Stack> */}
       </Container>
 
       {/* PRODUTOS VARIADOS (carrossel alinhado ao container) */}
@@ -255,38 +253,52 @@ export default function Inicio() {
               speed={900}
               style={{ width: "100%", height: "400px" }}
             >
-              {promocoes.map((p, i) => (
+              {produtosAleatorios?.map((p, i) => (
                 <SwiperSlide key={i}>
                   <Box
                     sx={{
                       display: "flex",
                       flexDirection: { xs: "column", md: "row" },
                       alignItems: "center",
-                      justifyContent: "space-between",
+                      justifyContent: "center",
                       gap: 4,
                       width: "100%",
                       maxWidth: 980,
                       mx: "auto",
                       px: { xs: 2, md: 0 },
-                      height: "100%",
+                      py: 4,
                     }}
                   >
+                    {/* LADO ESQUERDO - IMAGEM */}
                     <Box
-                      component="img"
-                      // src={"p.image"}
-                      alt={p.nomeProduto}
                       sx={{
-                        width: "100%",
-                        maxWidth: 620,
-                        height: "auto",
-                        objectFit: "contain",
-                        mx: "auto",
+                        flex: 1,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        height: { xs: 300, md: 400 }, // altura fixa proporcional
                       }}
-                    />
+                    >
+                      <Box
+                        component="img"
+                        src={p.modelos?.[0]?.image || "/placeholder.png"} // imagem padrão se faltar
+                        alt={p.nomeProduto}
+                        sx={{
+                          width: "100%",
+                          maxWidth: 400,
+                          height: "100%",
+                          objectFit: "contain", // mantém proporção sem distorcer
+                          borderRadius: 2,
+                        }}
+                      />
+                    </Box>
+
+                    {/* LADO DIREITO - INFORMAÇÕES */}
                     <Box
                       sx={{
+                        flex: 1,
                         textAlign: { xs: "center", md: "left" },
-                        color: "rgba(255,255,255,0.96)", // nome do produto - branco mais forte
+                        color: "rgba(255,255,255,0.96)",
                       }}
                     >
                       <Typography
@@ -299,12 +311,14 @@ export default function Inicio() {
                       >
                         {p.nomeProduto}
                       </Typography>
+
                       <Typography
                         level="body-sm"
-                        sx={{ mb: 2, color: "rgba(255,255,255,0.72)" }} // descrição mais fraca
+                        sx={{ mb: 2, color: "rgba(255,255,255,0.72)" }}
                       >
                         {p.descricao}
                       </Typography>
+
                       <Stack
                         direction="row"
                         spacing={1}
@@ -316,11 +330,12 @@ export default function Inicio() {
                             fontWeight: 700,
                             fontSize: "1.15rem",
                             color: "rgba(255,255,255,0.95)",
-                          }} // preço principal
+                          }}
                         >
                           {p.precoComDesconto}
                         </Typography>
                       </Stack>
+
                       <Button
                         variant="solid"
                         sx={{
