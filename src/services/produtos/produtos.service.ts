@@ -39,3 +39,13 @@ export async function getProdutosNovaGeracao(): Promise<Produto[] | undefined> {
   const produtos = produtosData.filter((p) => p.novaGeracao === true);
   return produtos ?? [];
 }
+
+export async function getprodutosAleatorios() {
+  const produtosData: Produto[] = (await import("./produtos.json")).default;
+  
+  const produtosAleatorios = produtosData
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 5);
+
+  return produtosAleatorios;
+}
