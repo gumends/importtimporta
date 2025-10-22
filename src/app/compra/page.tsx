@@ -27,7 +27,7 @@ export default function Produto() {
       <p>Preço com desconto: {produto?.precoComDesconto}</p>
       <p>Preço sem desconto: {produto?.precoSemDesconto}</p>
       <img
-        src={produto?.image}
+        src={"produto?.image"}
         alt={produto?.nomeProduto}
         style={{ maxWidth: "300px" }}
       />

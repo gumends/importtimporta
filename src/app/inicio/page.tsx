@@ -1,5 +1,13 @@
 "use client";
-import { Box, Button, Container, Typography, Stack, Card } from "@mui/joy";
+import {
+  Box,
+  Button,
+  Container,
+  Typography,
+  Stack,
+  Card,
+  Tooltip,
+} from "@mui/joy";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -7,20 +15,48 @@ import { Autoplay, Navigation } from "swiper/modules";
 import { useEffect } from "react";
 import ModalInicial from "../components/ModalInicial";
 import promocoes from "../../services/produtos/produtos.json";
-import { getProduto } from "@/services/produtos/produtos.service";
+import {
+  getCoresProduto,
+  getProduto,
+  getProdutosNovaGeracao,
+  getProdutosPorIdECor,
+} from "@/services/produtos/produtos.service";
 import { useState } from "react";
-import { Produto } from "@/types/produto.type";
+import { ModelosOption, Produto } from "@/types/produto.type";
 
 export default function Inicio() {
-  useEffect(() => {}, []);
+  useEffect(() => {
+    getNovaGeracao();
+  }, []);
+
   const [produtoNovaGeracao, setProdutoNovaGeracao] = useState<Produto | null>(
     null
   );
+  const [cores, setCores] = useState<ModelosOption[] | null>(null);
+  const [novaGeracao, setNovaGeracao] = useState<Produto[] | null>(null);
+
+  async function buscaProdutoPorCor(id: number, cor: string) {
+    const prod = await getProdutosPorIdECor(id, cor);
+    if (prod) {
+      setProdutoNovaGeracao(prod);
+    }
+  }
 
   async function buscaProduto(id: number) {
     await getProduto(id).then((prod: Produto | undefined) => {
-      console.log(prod);
       setProdutoNovaGeracao(prod ? prod : null);
+    });
+  }
+
+  async function getCores(id: number) {
+    await getCoresProduto(id).then((cores: ModelosOption[] | undefined) => {
+      setCores(cores ? cores : null);
+    });
+  }
+
+  async function getNovaGeracao() {
+    await getProdutosNovaGeracao().then((prod: Produto[] | undefined) => {
+      setNovaGeracao(prod ? prod : null);
     });
   }
 
@@ -38,7 +74,7 @@ export default function Inicio() {
             color: "rgba(255,255,255,0.96)",
           }}
         >
-          Geração 17
+          Nova Geração
         </Typography>
         <Stack
           sx={{
@@ -50,90 +86,36 @@ export default function Inicio() {
             mt: 6,
           }}
         >
-          <Typography
-            level="body-lg"
-            sx={{
-              color: "rgba(255,255,255,0.72)",
-              border: "1px solid rgba(255,255,255,0.36)",
-              borderTop: "none",
-              borderLeft: "none",
-              px: 2,
-              py: 1,
-              width: "200px",
-              cursor: "pointer",
-              "&:hover": { backgroundColor: "rgba(255,255,255,0.08)" },
-              borderTopLeftRadius: "8px",
-              backgroundColor:
-                produtoNovaGeracao?.id === 12
-                  ? "rgba(255,255,255,0.08)"
-                  : "transparent",
-            }}
-            onClick={() => buscaProduto(12)}
-          >
-            Iphone 17 Pro Max
-          </Typography>
-          <Typography
-            level="body-lg"
-            sx={{
-              color: "rgba(255,255,255,0.72)",
-              border: "1px solid rgba(255,255,255,0.36)",
-              borderTop: "none",
-              px: 2,
-              py: 1,
-              width: "200px",
-              cursor: "pointer",
-              "&:hover": { backgroundColor: "rgba(255,255,255,0.08)" },
-              backgroundColor:
-                produtoNovaGeracao?.id === 11
-                  ? "rgba(255,255,255,0.08)"
-                  : "transparent",
-            }}
-            onClick={() => buscaProduto(11)}
-          >
-            Iphone 17 Pro
-          </Typography>
-          <Typography
-            level="body-lg"
-            sx={{
-              color: "rgba(255,255,255,0.72)",
-              border: "1px solid rgba(255,255,255,0.36)",
-              borderTop: "none",
-              px: 2,
-              py: 1,
-              width: "200px",
-              cursor: "pointer",
-              "&:hover": { backgroundColor: "rgba(255,255,255,0.08)" },
-              backgroundColor:
-                produtoNovaGeracao?.id === 10
-                  ? "rgba(255,255,255,0.08)"
-                  : "transparent",
-            }}
-            onClick={() => buscaProduto(10)}
-          >
-            Iphone 17
-          </Typography>
-          <Typography
-            level="body-lg"
-            sx={{
-              color: "rgba(255,255,255,0.72)",
-              border: "1px solid rgba(255,255,255,0.36)",
-              borderTop: "none",
-              borderRight: "none",
-              px: 2,
-              py: 1,
-              width: "200px",
-              cursor: "pointer",
-              "&:hover": { backgroundColor: "rgba(255,255,255,0.08)" },
-              borderTopRightRadius: "8px",
-              backgroundColor:
-                produtoNovaGeracao?.id === 13
-                  ? "rgba(255,255,255,0.08)"
-                  : "transparent",
-            }}
-            onClick={() => buscaProduto(13)}
-          >
-            Iphone Air
-          </Typography>
+          {novaGeracao?.map((ng, index) => (
+            <Typography
+              key={index}
+              level="body-lg"
+              sx={{
+                color: "rgba(255,255,255,0.72)",
+                border: "1px solid rgba(255,255,255,0.36)",
+                borderTop: "none",
+                borderRight: "none",
+                borderLeft:
+                  index === 0 ? "none" : "1px solid rgba(255,255,255,0.36)",
+                px: 2,
+                py: 1,
+                width: "200px",
+                cursor: "pointer",
+                "&:hover": { backgroundColor: "rgba(255,255,255,0.08)" },
+                borderTopRightRadius: index === 3 ? "8px" : "0px",
+                borderTopLeftRadius: index === 0 ? "8px" : "0px",
+                backgroundColor:
+                  produtoNovaGeracao?.id === ng.id
+                    ? "rgba(255,255,255,0.08)"
+                    : "transparent",
+              }}
+              onClick={() => {
+                buscaProduto(ng.id), getCores(ng.id);
+              }}
+            >
+              {ng.nomeProduto}
+            </Typography>
+          ))}
         </Stack>
         <Box
           sx={{
@@ -150,40 +132,54 @@ export default function Inicio() {
         >
           <Box
             component="img"
-            src={produtoNovaGeracao ? produtoNovaGeracao.image : "/atual.png"}
-            alt={
-              produtoNovaGeracao
-                ? produtoNovaGeracao.nomeProduto
-                : "Produto destaque"
-            }
+            key={produtoNovaGeracao?.modelos?.[0]?.image ?? "/atual.png"} // força re-render e reanimação
+            src={produtoNovaGeracao?.modelos?.[0]?.image ?? "/atual.png"}
+            alt={produtoNovaGeracao?.nomeProduto ?? "Produto destaque"}
             sx={{
               width: "100%",
               height: "100%",
               objectFit: "contain",
-              transition: "opacity 1s ease-in-out",
-              opacity: produtoNovaGeracao ? 1 : 1,
+              animation: "fadeIn 1s ease-in-out",
+              "@keyframes fadeIn": {
+                from: { opacity: 0 },
+                to: { opacity: 1 },
+              },
             }}
           />
+
           <Box
             sx={{
               display: "flex",
               flexDirection: "row",
             }}
           >
-            {produtoNovaGeracao?.colors?.map((color, index) => (
-              <Box
+            {cores?.map((color, index) => (
+              <Tooltip
                 key={index}
-                sx={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: "50%",
-                  bgcolor: color,
-                  border: "2px solid rgba(255,255,255,0.36)",
-                  "&:not(:last-child)": { mr: 1 },
-                  cursor: "pointer",
-                  "&:hover": { filter: "brightness(0.8)" },
-                }}
-              />
+                title={color.colorName}
+                arrow
+                placement="top"
+              >
+                <Box
+                  key={index}
+                  sx={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: "50%",
+                    bgcolor: color.color,
+                    border: "2px solid rgba(255,255,255,0.36)",
+                    "&:not(:last-child)": { mr: 1 },
+                    cursor: "pointer",
+                    "&:hover": { filter: "brightness(0.8)" },
+                  }}
+                  onClick={() => {
+                    buscaProdutoPorCor(
+                      produtoNovaGeracao?.id ?? 0,
+                      color.color
+                    );
+                  }}
+                />
+              </Tooltip>
             ))}
           </Box>
         </Box>
@@ -277,7 +273,7 @@ export default function Inicio() {
                   >
                     <Box
                       component="img"
-                      src={p.image}
+                      // src={"p.image"}
                       alt={p.nomeProduto}
                       sx={{
                         width: "100%",
@@ -391,7 +387,7 @@ export default function Inicio() {
             >
               <Box
                 component="img"
-                src={promocao.image}
+                // src={"promocao.image"}
                 alt={promocao.nomeProduto}
                 sx={{
                   width: "100%",
