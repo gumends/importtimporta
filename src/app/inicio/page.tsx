@@ -132,12 +132,12 @@ export default function Inicio() {
         >
           <Box
             component="img"
-            key={produtoNovaGeracao?.modelos?.[0]?.image ?? "/atual.png"} // força re-render e reanimação
+            key={produtoNovaGeracao?.modelos?.[0]?.image ?? "/atual.png"}
             src={produtoNovaGeracao?.modelos?.[0]?.image ?? "/atual.png"}
             alt={produtoNovaGeracao?.nomeProduto ?? "Produto destaque"}
             sx={{
               width: "100%",
-              height: "100%",
+              height: produtoNovaGeracao?.id === 7 ? "100%" : produtoNovaGeracao?.id === 10 ? "95%" : "90%",
               objectFit: "contain",
               animation: "fadeIn 1s ease-in-out",
               "@keyframes fadeIn": {

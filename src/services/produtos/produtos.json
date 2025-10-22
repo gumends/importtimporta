@@ -66,39 +66,7 @@
     "modelos": []
   },
   {
-    "id": 10,
-    "nomeProduto": "Iphone 17",
-    "precoComDesconto": null,
-    "precoSemDesconto": "R$ 6.999,00",
-    "descricao": "O iPhone com câmera avançada",
-    "tipoProduto": 1,
-    "novoLançamento": false,
-    "novaGeracao": true,
-    "modelos": [
-      { "color": "#DFCEEA", "image": "/iphones_17/iphone_17_lavender.png", "colorName": "Lavanda" },
-      { "color": "#96AED1", "image": "/iphones_17/iphone_17_blue.png", "colorName": "Azul" },
-      { "color": "#A9B689", "image": "/iphones_17/iphone_17_sage.png", "colorName": "Verde" },
-      { "color": "#353839", "image": "/iphones_17/iphone_17_black.png", "colorName": "Preto" },
-      { "color": "#F5F5F5", "image": "/iphones_17/iphone_17_white.png", "colorName": "Branco" }
-    ]
-  },
-  {
-    "id": 11,
-    "nomeProduto": "Iphone 17 Pro",
-    "precoComDesconto": "R$ 12.999,00",
-    "precoSemDesconto": "R$ 13.999,00",
-    "descricao": "O iPhone com desempenho excepcional",
-    "tipoProduto": 1,
-    "novoLançamento": false,
-    "novaGeracao": true,
-    "modelos": [
-      { "color": "#F77E2D", "image": "/iphones_17/iphone_17_pro_orange.png", "colorName": "Laranja" },
-      { "color": "#32374A", "image": "/iphones_17/iphone_17_pro_black.png", "colorName": "Preto" },
-      { "color": "#F5F5F5", "image": "/iphones_17/iphone_17_pro_silver.png", "colorName": "Prata" }
-    ]
-  },
-  {
-    "id": 12,
+    "id": 7,
     "nomeProduto": "Iphone 17 Pro Max",
     "precoComDesconto": "R$ 14.999,00",
     "precoSemDesconto": "R$ 15.999,00",
@@ -107,13 +75,90 @@
     "novoLançamento": false,
     "novaGeracao": true,
     "modelos": [
-      { "color": "#32374A", "image": "/iphones_17/iphone_17_pro_black.png", "colorName": "Preto" },
-      { "color": "#F77E2D", "image": "/iphones_17/iphone_17_pro_orange.png", "colorName": "Laranja" },
-      { "color": "#F5F5F5", "image": "/iphones_17/iphone_17_pro_silver.png", "colorName": "Prata" }
+      {
+        "color": "#32374A",
+        "image": "/iphones_17/iphone_17_pro_black.png",
+        "colorName": "Preto"
+      },
+      {
+        "color": "#F77E2D",
+        "image": "/iphones_17/iphone_17_pro_orange.png",
+        "colorName": "Laranja"
+      },
+      {
+        "color": "#F5F5F5",
+        "image": "/iphones_17/iphone_17_pro_silver.png",
+        "colorName": "Prata"
+      }
     ]
   },
   {
-    "id": 13,
+    "id": 8,
+    "nomeProduto": "Iphone 17 Pro",
+    "precoComDesconto": "R$ 12.999,00",
+    "precoSemDesconto": "R$ 13.999,00",
+    "descricao": "O iPhone com desempenho excepcional",
+    "tipoProduto": 1,
+    "novoLançamento": false,
+    "novaGeracao": true,
+    "modelos": [
+      {
+        "color": "#F77E2D",
+        "image": "/iphones_17/iphone_17_pro_orange.png",
+        "colorName": "Laranja"
+      },
+      {
+        "color": "#32374A",
+        "image": "/iphones_17/iphone_17_pro_black.png",
+        "colorName": "Preto"
+      },
+      {
+        "color": "#F5F5F5",
+        "image": "/iphones_17/iphone_17_pro_silver.png",
+        "colorName": "Prata"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "nomeProduto": "Iphone 17",
+    "precoComDesconto": null,
+    "precoSemDesconto": "R$ 6.999,00",
+    "descricao": "O iPhone com câmera avançada",
+    "tipoProduto": 1,
+    "novoLançamento": false,
+    "novaGeracao": true,
+    "modelos": [
+      {
+        "color": "#DFCEEA",
+        "image": "/iphones_17/iphone_17_lavender.png",
+        "colorName": "Lavanda"
+      },
+      {
+        "color": "#96AED1",
+        "image": "/iphones_17/iphone_17_blue.png",
+        "colorName": "Azul"
+      },
+      {
+        "color": "#A9B689",
+        "image": "/iphones_17/iphone_17_sage.png",
+        "colorName": "Verde"
+      },
+      {
+        "color": "#353839",
+        "image": "/iphones_17/iphone_17_black.png",
+        "colorName": "Preto"
+      },
+      {
+        "color": "#F5F5F5",
+        "image": "/iphones_17/iphone_17_white.png",
+        "colorName": "Branco"
+      }
+    ]
+  },
+
+  {
+    "id": 10,
     "nomeProduto": "Iphone Air",
     "precoComDesconto": "R$ 8.999,00",
     "precoSemDesconto": "R$ 9.499,00",
@@ -122,10 +167,26 @@
     "novoLançamento": false,
     "novaGeracao": true,
     "modelos": [
-      { "color": "#F0F9FF", "image": "/iphones_17/iphone_air_blue.png", "colorName": "Azul" },
-      { "color": "#000000", "image": "/iphones_17/iphone_air_black.png", "colorName": "Preto" },
-      { "color": "#FCFCFC", "image": "/iphones_17/iphone_air_white.png", "colorName": "Branco" },
-      { "color": "#FDE4A4", "image": "/iphones_17/iphone_air_gold.png", "colorName": "Dourado" }
+      {
+        "color": "#F0F9FF",
+        "image": "/iphones_17/iphone_air_blue.png",
+        "colorName": "Azul"
+      },
+      {
+        "color": "#000000",
+        "image": "/iphones_17/iphone_air_black.png",
+        "colorName": "Preto"
+      },
+      {
+        "color": "#FCFCFC",
+        "image": "/iphones_17/iphone_air_white.png",
+        "colorName": "Branco"
+      },
+      {
+        "color": "#FDE4A4",
+        "image": "/iphones_17/iphone_air_gold.png",
+        "colorName": "Dourado"
+      }
     ]
   }
 ]
