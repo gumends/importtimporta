@@ -1,14 +1,19 @@
 export interface Produto {
   id: number;
   nomeProduto: string;
-  image: string;
   precoComDesconto: string | null;
   precoSemDesconto: string | null;
   descricao: string;
   novaGeracao?: boolean;
-  colors?: string[] | null;
+  modelos?: ModelosOption[];
 }
 
 export interface Produtos {
   produtos: Produto[];
+}
+
+export interface ModelosOption {
+  color: string;
+  image: string;
+  colorName: string;
 }

@@ -1,11 +1,41 @@
-import { Produto } from "@/types/produto.type";
+import { ModelosOption, Produto } from "@/types/produto.type";
 
 export async function getProduto(id: number): Promise<Produto | undefined> {
   const produtosData = (await import("./produtos.json")).default;
-  return produtosData.find(p => p.id === id);
+  return produtosData.find((p) => p.id === id);
+}
+
+export async function getProdutosPorIdECor(
+  id: number,
+  cor: string
+): Promise<Produto | undefined> {
+  const produtosData = (await import("./produtos.json")).default;
+
+  const produto = produtosData.find((p) => p.id === id);
+  if (!produto) return undefined;
+
+  const coresOrdenadas = [...produto.modelos].sort((a, b) => {
+    if (a.color === cor) return -1;
+    if (b.color === cor) return 1;
+    return 0;
+  });
+
+  return {
+    ...produto,
+    modelos: coresOrdenadas,
+  };
+}
+
+export async function getCoresProduto(
+  id: number
+): Promise<ModelosOption[] | undefined> {
+  const produtosData = (await import("./produtos.json")).default;
+  const cores = produtosData.find((p) => p.id === id)?.modelos ?? [];
+  return cores;
 }
 
 export async function getProdutosNovaGeracao(): Promise<Produto[] | undefined> {
-  const produtosData = (await import("./produtos.json")).default;
-  return produtosData.filter(p => p.novaGeracao === true);
+  const produtosData: Produto[] = (await import("./produtos.json")).default;
+  const produtos = produtosData.filter((p) => p.novaGeracao === true);
+  return produtos ?? [];
 }
