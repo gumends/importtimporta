@@ -13,7 +13,7 @@ export default function AppBar() {
 
   const menu = [
     { label: "Iphones", path: "/iphones" },
-    { label: "Relogios", path: "/relogios" },
+    { label: "Macs", path: "/macs" },
     { label: "Acessórios", path: "/acessorios" },
     { label: "Outros", path: "/outros" },
   ];

@@ -21,14 +21,18 @@ import {
   getprodutosAleatorios,
   getProdutosNovaGeracao,
   getProdutosPorIdECor,
+  getProdutosPromocoes,
 } from "@/services/produtos/produtos.service";
 import { useState } from "react";
 import { ModelosOption, Produto } from "@/types/produto.type";
+import { formatarDinheiro } from "@/utils/mascara_dinheiro";
+import { match } from "assert";
 
 export default function Inicio() {
   useEffect(() => {
     getNovaGeracao();
     buscaProdutoAleatoros();
+    getProdutosPromo();
   }, []);
 
   const [produtoNovaGeracao, setProdutoNovaGeracao] = useState<Produto | null>(
@@ -39,6 +43,9 @@ export default function Inicio() {
   const [produtosAleatorios, setProdutosAleatorios] = useState<
     Produto[] | null
   >(null);
+  const [produtosPromocoes, setProdutosPromocoes] = useState<Produto[] | null>(
+    null
+  );
 
   async function buscaProdutoAleatoros() {
     await getprodutosAleatorios().then((prod) => {
@@ -69,6 +76,12 @@ export default function Inicio() {
   async function getNovaGeracao() {
     await getProdutosNovaGeracao().then((prod: Produto[] | undefined) => {
       setNovaGeracao(prod ? prod : null);
+    });
+  }
+
+  async function getProdutosPromo() {
+    getProdutosPromocoes().then((p) => {
+      setProdutosPromocoes(p);
     });
   }
 
@@ -199,6 +212,16 @@ export default function Inicio() {
               </Tooltip>
             ))}
           </Box>
+          <Button
+            sx={{
+              mt: 5,
+              bgcolor: "#fff",
+              color: "#000",
+              mx: { xs: "auto", md: 0 },
+            }}
+          >
+            Comprar
+          </Button>
         </Box>
       </Container>
 
@@ -269,31 +292,28 @@ export default function Inicio() {
                       py: 4,
                     }}
                   >
-                    {/* LADO ESQUERDO - IMAGEM */}
                     <Box
                       sx={{
                         flex: 1,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        height: { xs: 300, md: 400 }, // altura fixa proporcional
+                        height: { xs: 300, md: 400 },
                       }}
                     >
                       <Box
                         component="img"
-                        src={p.modelos?.[0]?.image || "/placeholder.png"} // imagem padrão se faltar
+                        src={p.modelos?.[0]?.image || "/placeholder.png"}
                         alt={p.nomeProduto}
                         sx={{
                           width: "100%",
                           maxWidth: 400,
                           height: "100%",
-                          objectFit: "contain", // mantém proporção sem distorcer
+                          objectFit: "contain",
                           borderRadius: 2,
                         }}
                       />
                     </Box>
-
-                    {/* LADO DIREITO - INFORMAÇÕES */}
                     <Box
                       sx={{
                         flex: 1,
@@ -332,7 +352,7 @@ export default function Inicio() {
                             color: "rgba(255,255,255,0.95)",
                           }}
                         >
-                          {p.precoComDesconto}
+                          {formatarDinheiro(p.valor)}
                         </Typography>
                       </Stack>
 
@@ -374,7 +394,7 @@ export default function Inicio() {
           level="h2"
           sx={{ mb: 4, fontWeight: "bold", color: "rgba(255,255,255,0.96)" }}
         >
-          Produtos em desconto
+          Promoções
         </Typography>
 
         <Box
@@ -385,7 +405,7 @@ export default function Inicio() {
             gap: 4,
           }}
         >
-          {promocoes.map((promocao, index) => (
+          {produtosPromocoes?.map((promocao, index) => (
             <Card
               key={index}
               sx={{
@@ -402,7 +422,7 @@ export default function Inicio() {
             >
               <Box
                 component="img"
-                // src={"promocao.image"}
+                src={promocao.modelos ? promocao.modelos[0].image : ""}
                 alt={promocao.nomeProduto}
                 sx={{
                   width: "100%",
@@ -421,7 +441,7 @@ export default function Inicio() {
               </Typography>
               <Stack direction="row" spacing={1}>
                 <Typography sx={{ color: "rgba(255,255,255,0.95)" }}>
-                  {promocao.precoComDesconto}
+                  {formatarDinheiro(promocao.valor)}
                 </Typography>
                 <Typography
                   sx={{
@@ -430,7 +450,7 @@ export default function Inicio() {
                     color: "rgba(255,255,255,0.55)",
                   }}
                 >
-                  {promocao.precoSemDesconto}
+                  {formatarDinheiro(promocao.valorOriginal)}
                 </Typography>
               </Stack>
               <Button

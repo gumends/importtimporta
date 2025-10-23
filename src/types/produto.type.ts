@@ -1,9 +1,12 @@
 export interface Produto {
   id: number;
   nomeProduto: string;
-  precoComDesconto: string | null;
-  precoSemDesconto: string | null;
+  valor: number;
+  valorOriginal: number;
+  desconto: number;
   descricao: string;
+  tipoProduto: number;
+  novoLançamento: boolean;
   novaGeracao?: boolean;
   modelos?: ModelosOption[];
 }
