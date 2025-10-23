@@ -52,7 +52,7 @@ export async function getprodutosAleatorios() {
 
 export async function getProdutosPromocoes() {
   const produtosData: Produto[] = (await import("./produtos.json")).default;
-  var produtosComDesconto = produtosData.filter((p) => (
+  const produtosComDesconto = produtosData.filter((p) => (
     p.desconto > 0 || p.desconto != null
   ))
   return produtosComDesconto;
