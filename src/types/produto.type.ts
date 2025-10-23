@@ -16,6 +16,7 @@ export interface Produtos {
 }
 
 export interface ModelosOption {
+  id: number
   color: string;
   image: string;
   colorName: string;

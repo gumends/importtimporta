@@ -7,6 +7,7 @@ import {
   Stack,
   Card,
   Tooltip,
+  colors,
 } from "@mui/joy";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -20,7 +21,7 @@ import {
   getProduto,
   getprodutosAleatorios,
   getProdutosNovaGeracao,
-  getProdutosPorIdECor,
+  getProdutosPorProdutoIdEModeloId,
   getProdutosPromocoes,
 } from "@/services/produtos/produtos.service";
 import { useState } from "react";
@@ -54,8 +55,8 @@ export default function Inicio() {
     });
   }
 
-  async function buscaProdutoPorCor(id: number, cor: string) {
-    const prod = await getProdutosPorIdECor(id, cor);
+  async function buscaProdutoPorCor(id: number, produtoId: number) {
+    const prod = await getProdutosPorProdutoIdEModeloId(id, produtoId);
     if (prod) {
       setProdutoNovaGeracao(prod);
     }
@@ -203,25 +204,35 @@ export default function Inicio() {
                     "&:hover": { filter: "brightness(0.8)" },
                   }}
                   onClick={() => {
-                    buscaProdutoPorCor(
-                      produtoNovaGeracao?.id ?? 0,
-                      color.color
-                    );
+                    buscaProdutoPorCor(produtoNovaGeracao?.id ?? 0, color.id);
                   }}
                 />
               </Tooltip>
             ))}
           </Box>
-          <Button
-            sx={{
-              mt: 5,
-              bgcolor: "#fff",
-              color: "#000",
-              mx: { xs: "auto", md: 0 },
-            }}
-          >
-            Comprar
-          </Button>
+          {produtoNovaGeracao ? (
+            <Button
+              onClick={() =>
+                (window.location.href = `/c?produtoId=${
+                  produtoNovaGeracao.id
+                }&modeloId=${
+                  produtoNovaGeracao.modelos
+                    ? produtoNovaGeracao.modelos[0].id
+                    : ""
+                }`)
+              }
+              sx={{
+                mt: 5,
+                bgcolor: "#fff",
+                color: "#000",
+                mx: { xs: "auto", md: 0 },
+              }}
+            >
+              Comprar
+            </Button>
+          ) : (
+            <></>
+          )}
         </Box>
       </Container>
 
@@ -365,7 +376,11 @@ export default function Inicio() {
                           mx: { xs: "auto", md: 0 },
                         }}
                         onClick={() =>
-                          (window.location.href = `/produto?produtoId=${p.id}`)
+                          (window.location.href = `/compra?produtoId=${
+                            p.id
+                          }&modeloId=${
+                            p.modelos ? p.modelos[0].id : ""
+                          }`)
                         }
                       >
                         Comprar
@@ -454,6 +469,11 @@ export default function Inicio() {
                 </Typography>
               </Stack>
               <Button
+                onClick={() =>
+                  (window.location.href = `/compra?produtoId=${
+                    promocao.id
+                  }&modeloId=${promocao.modelos ? promocao.modelos[0].id : ""}`)
+                }
                 variant="solid"
                 sx={{
                   bgcolor: "#fff",

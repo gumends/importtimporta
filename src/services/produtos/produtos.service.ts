@@ -5,18 +5,18 @@ export async function getProduto(id: number): Promise<Produto | undefined> {
   return produtosData.find((p) => p.id === id);
 }
 
-export async function getProdutosPorIdECor(
-  id: number,
-  cor: string
+export async function getProdutosPorProdutoIdEModeloId(
+  produtoId: number,
+  modeloId: number
 ): Promise<Produto | undefined> {
   const produtosData = (await import("./produtos.json")).default;
 
-  const produto = produtosData.find((p) => p.id === id);
+  const produto = produtosData.find((p) => p.id === produtoId);
   if (!produto) return undefined;
 
   const coresOrdenadas = [...produto.modelos].sort((a, b) => {
-    if (a.color === cor) return -1;
-    if (b.color === cor) return 1;
+    if (a.id === modeloId) return -1;
+    if (b.id === modeloId) return 1;
     return 0;
   });
 
