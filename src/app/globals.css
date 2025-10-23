@@ -1,5 +1,8 @@
 @import "tailwindcss";
-
+@import "swiper/css";
+@import "swiper/css/effect-fade";
+@import "swiper/css/navigation";
+@import "swiper/css/pagination";
 :root {
   --max-width: 1200px;
   --background: linear-gradient(180deg, #0a0a0a 0%, #0a0a0a 100%);
