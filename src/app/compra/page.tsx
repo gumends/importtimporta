@@ -24,8 +24,8 @@ export default function Produto() {
     <div>
       <h1>{produto?.nomeProduto}</h1>
       <p>{produto?.descricao}</p>
-      <p>Preço com desconto: {produto?.precoComDesconto}</p>
-      <p>Preço sem desconto: {produto?.precoSemDesconto}</p>
+      <p>Preço com desconto: {produto?.valor}</p>
+      <p>Preço sem desconto: {produto?.valor}</p>
       <img
         src={"produto?.image"}
         alt={produto?.nomeProduto}
