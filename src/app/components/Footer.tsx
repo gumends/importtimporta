@@ -1,6 +1,21 @@
 "use client";
-import { Phone, Mail, Facebook, Instagram, Twitter } from "@mui/icons-material";
-import { Box, Container, Stack, Typography, Link, Divider, IconButton } from "@mui/joy";
+import {
+  Phone,
+  Mail,
+  Facebook,
+  Instagram,
+  Twitter,
+  WhatsApp,
+} from "@mui/icons-material";
+import {
+  Box,
+  Container,
+  Stack,
+  Typography,
+  Link,
+  Divider,
+  IconButton,
+} from "@mui/joy";
 
 export default function Footer() {
   return (
@@ -20,70 +35,119 @@ export default function Footer() {
           spacing={4}
           sx={{ pb: 4 }}
         >
-          {/* Coluna 1 - Logo e Descrição */}
           <Box sx={{ maxWidth: 320 }}>
-            <Typography level="h4" sx={{ mb: 1, fontWeight: 700, color: "background.body" }}>
-              SmartCell Store
-            </Typography>
-            <Typography level="body-sm" sx={{ opacity: 0.7, color: "background.tooltip" }}>
-              Sua loja de tecnologia com os melhores produtos Apple, Sony e muito mais. 
-              Encontre ofertas exclusivas e atendimento especializado.
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+              }}
+            >
+              <Typography
+                level="h4"
+                sx={{ mb: 1, fontWeight: 700, color: "background.body" }}
+              >
+                IMPORT
+              </Typography>
+              <Box
+                component="img"
+                src={"logo-import.png"}
+                alt={"Logo"}
+                sx={{
+                  width: "10%",
+                  height: "10%",
+                }}
+              />
+              <Typography
+                level="h4"
+                sx={{ mb: 1, fontWeight: 700, color: "background.body" }}
+              >
+                IMPORTA
+              </Typography>
+            </Box>
+
+            <Typography
+              level="body-sm"
+              sx={{ opacity: 0.7, color: "background.tooltip" }}
+            >
+              Sua loja de tecnologia com os melhores produtos Apple, Sony e
+              muito mais. Encontre ofertas exclusivas e atendimento
+              especializado.
             </Typography>
           </Box>
-
-          {/* Coluna 2 - Links */}
           <Stack spacing={1}>
-            <Typography level="title-md" sx={{ mb: 1, fontWeight: 600, color: "background.body" }}>
+            <Typography
+              level="title-md"
+              sx={{ mb: 1, fontWeight: 600, color: "background.body" }}
+            >
               Navegação
             </Typography>
-            <Link href="/" underline="none" sx={{ color: "rgba(255,255,255,0.8)" }}>
+            <Link
+              href="/inicio"
+              underline="none"
+              sx={{ color: "rgba(255,255,255,0.8)" }}
+            >
               Início
             </Link>
-            <Link href="/produtos" underline="none" sx={{ color: "rgba(255,255,255,0.8)" }}>
-              Produtos
+            <Link
+              href="/iphones"
+              underline="none"
+              sx={{ color: "rgba(255,255,255,0.8)" }}
+            >
+              Iphones
             </Link>
-            <Link href="/promocoes" underline="none" sx={{ color: "rgba(255,255,255,0.8)" }}>
-              Promoções
+            <Link
+              href="/macs"
+              underline="none"
+              sx={{ color: "rgba(255,255,255,0.8)" }}
+            >
+              Macs
             </Link>
-            <Link href="/contato" underline="none" sx={{ color: "rgba(255,255,255,0.8)" }}>
-              Contato
+            <Link
+              href="/acessorios"
+              underline="none"
+              sx={{ color: "rgba(255,255,255,0.8)" }}
+            >
+              Acessórios
+            </Link>
+            <Link
+              href="/outros"
+              underline="none"
+              sx={{ color: "rgba(255,255,255,0.8)" }}
+            >
+              Outros
             </Link>
           </Stack>
-
-          {/* Coluna 3 - Contato */}
           <Stack spacing={1}>
-            <Typography level="title-md" sx={{ mb: 1, fontWeight: 600, color: "background.body" }}>
+            <Typography
+              level="title-md"
+              sx={{ mb: 1, fontWeight: 600, color: "background.body" }}
+            >
               Contato
             </Typography>
             <Stack direction="row" alignItems="center" spacing={1}>
               <Mail fontSize="small" />
-              <Typography level="body-sm" sx={{ color: "background.body" }}>suporte@smartcell.com.br</Typography>
+              <Typography level="body-sm" sx={{ color: "background.body" }}>
+                importtimporta@gmail.com.br
+              </Typography>
             </Stack>
             <Stack direction="row" alignItems="center" spacing={1}>
               <Phone fontSize="small" />
-              <Typography level="body-sm" sx={{ color: "background.body" }}>(11) 99999-9999</Typography>
+              <Typography level="body-sm" sx={{ color: "background.body" }}>
+                (11) 95166-3573
+              </Typography>
             </Stack>
           </Stack>
-
-          {/* Coluna 4 - Redes sociais */}
           <Stack spacing={1}>
-            <Typography level="title-md" sx={{ mb: 1, fontWeight: 600, color: "background.body" }}>
+            <Typography
+              level="title-md"
+              sx={{ mb: 1, fontWeight: 600, color: "background.body" }}
+            >
               Siga-nos
             </Typography>
             <Stack direction="row" spacing={1}>
               <IconButton
                 component="a"
-                href="#"
-                sx={{
-                  bgcolor: "background.body",
-                  "&:hover": { bgcolor: "background.level2" },
-                }}
-              >
-                <Facebook/>
-              </IconButton>
-              <IconButton
-                component="a"
-                href="#"
+                href="https://www.instagram.com/importtimporta"
                 sx={{
                   bgcolor: "background.body",
                   "&:hover": { bgcolor: "background.level2" },
@@ -93,21 +157,19 @@ export default function Footer() {
               </IconButton>
               <IconButton
                 component="a"
-                href="#"
+                href="https://wa.me/5511951663573"
                 sx={{
                   bgcolor: "background.body",
                   "&:hover": { bgcolor: "background.level2" },
                 }}
               >
-                <Twitter />
+                <WhatsApp />
               </IconButton>
             </Stack>
           </Stack>
         </Stack>
 
         <Divider sx={{ borderColor: "rgba(255,255,255,0.1)", mb: 2 }} />
-
-        {/* Rodapé inferior */}
         <Typography
           level="body-xs"
           sx={{
@@ -115,7 +177,8 @@ export default function Footer() {
             color: "background.body",
           }}
         >
-          © {new Date().getFullYear()} importtimporta Store — Todos os direitos reservados.
+          © {new Date().getFullYear()} importtimporta — Todos os direitos
+          reservados.
         </Typography>
       </Container>
     </Box>
