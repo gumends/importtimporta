@@ -3,28 +3,23 @@
 import React from "react";
 import {
   Box,
-  Typography,
   Button,
-  Divider,
-  Chip,
+  Container,
+  Typography,
   Stack,
-  Modal,
-  Sheet,
-  ModalClose,
-  AspectRatio,
-  IconButton,
-  ModalDialog,
+  Divider,
+  Input,
+  Card,
+  Chip,
 } from "@mui/joy";
-import { Produto as p } from "../../types/produto.type";
+import { Produto as p } from "@/types/produto.type";
 import { getProdutosPorProdutoIdEModeloId } from "@/services/produtos/produtos.service";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, EffectFade, Navigation } from "swiper/modules";
+import { formatarDinheiro } from "@/utils/mascara_dinheiro";
 
 export default function Produto() {
   const [produto, setProduto] = React.useState<p | null>(null);
-  const [open, setOpen] = React.useState<boolean>(false);
-  const [imagemSelecionada, setImagemSelecionada] = React.useState<number>(0);
+  const [modeloSelecionado, setModeloSelecionado] = React.useState<number>(0);
+  const [cep, setCep] = React.useState("");
 
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -36,9 +31,7 @@ export default function Produto() {
       const modeloId = parseInt(modeloParam, 10);
 
       getProdutosPorProdutoIdEModeloId(produtoId, modeloId).then((prod) => {
-        if (prod) {
-          setProduto(prod);
-        }
+        if (prod) setProduto(prod);
       });
     }
   }, []);
@@ -47,11 +40,12 @@ export default function Produto() {
     return (
       <Box
         sx={{
-          height: "80vh",
+          height: "100vh",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          color: "neutral.500",
+          bgcolor: "#0a0a0a",
+          color: "#fff",
         }}
       >
         <Typography level="body-lg">Carregando produto...</Typography>
@@ -59,7 +53,7 @@ export default function Produto() {
     );
   }
 
-  const precoComDesconto = produto.valor.toLocaleString("pt-BR", {
+  const preco = produto.valor.toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
   });
@@ -76,347 +70,243 @@ export default function Produto() {
     )}`;
   };
 
-  const imagens = produto.modelos?.map((m) => m.image) || [
-    produto.modelos?.[0]?.image,
-  ];
-
   return (
-    <main>
-      <Box
-        component="section"
+    <Box
+      sx={{
+        bgcolor: "#0a0a0a",
+        color: "#fff",
+        width: "100%",
+      }}
+    >
+      <Container
+        maxWidth="lg"
         sx={{
-          maxWidth: 1100,
-          mx: "auto",
-          px: 3,
-          py: { xs: 4, md: 8 },
+          height: "100%",
           display: "flex",
           flexDirection: { xs: "column", md: "row" },
+          justifyContent: "center",
           alignItems: "center",
-          justifyContent: "space-between",
-          gap: 6,
+          px: 4,
+          gap: 4,
+          mt: 10,
         }}
       >
-        {/* IMAGEM PRINCIPAL */}
+        {/* Lado esquerdo — imagem */}
         <Box
-          component="img"
-          src={produto.modelos?.[0]?.image}
-          alt={produto.nomeProduto}
-          onClick={() => setOpen(true)}
           sx={{
-            width: "50%",
-            height: "auto",
-            objectFit: "contain",
-            borderRadius: "lg",
-            boxShadow: "md",
-            transition: "transform 0.3s ease",
-            "&:hover": {
-              transform: "scale(1.03)",
-            },
-            cursor: "zoom-in",
+            flex: 1,
+            height: "100%",
           }}
-        />
-
-        {/* DETALHES */}
-        <Box sx={{ flex: 1 }}>
+        >
           <Typography
-            level="h2"
             sx={{
-              textAlign: "center",
-              mb: 4,
-              fontSize: "2rem",
-              fontWeight: 400,
-              color: "rgba(255,255,255,0.96)",
+              mb: 2,
+              fontSize: { xs: "1.3rem", md: "2.2rem" },
+              color: "#fff",
             }}
           >
             {produto.nomeProduto}
           </Typography>
-          <Typography level="body-lg" color="neutral" sx={{ mb: 3 }}>
-            {produto.descricao}
-          </Typography>
-
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Typography
-              level="h3"
-              sx={{ color: "success.600", fontWeight: 600 }}
-            >
-              {precoComDesconto}
-            </Typography>
-            {produto.desconto > 0 && (
-              <Typography
-                level="body-md"
-                sx={{
-                  textDecoration: "line-through",
-                  color: "neutral.500",
-                }}
-              >
-                {precoOriginal}
-              </Typography>
-            )}
-          </Stack>
-
-          {produto.desconto > 0 && (
-            <Chip
-              color="success"
-              variant="soft"
-              sx={{ mt: 1, fontWeight: 600 }}
-            >
-              -
-              {produto.desconto.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}{" "}
-              de desconto
-            </Chip>
-          )}
-
-          <Divider sx={{ my: 4 }} />
-
-          {/* SELEÇÃO DE CORES */}
-          {produto.modelos && produto.modelos.length > 1 && (
-            <Box
-              sx={{
-                mb: 3,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Typography level="body-md" sx={{ mb: 1 }}>
-                Cores disponíveis:
-              </Typography>
-              <Stack direction="row" spacing={1} flexWrap="wrap">
-                {produto.modelos.map((modelo) => (
-                  <Box
-                    key={modelo.id}
-                    sx={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: "50%",
-                      bgcolor: modelo.color,
-                      border: "2px solid #ddd",
-                      cursor: "pointer",
-                      transition: "transform 0.2s ease",
-                      "&:hover": {
-                        transform: "scale(1.15)",
-                        borderColor: "primary.solidBg",
-                      },
-                    }}
-                    title={modelo.colorName}
-                  />
-                ))}
-              </Stack>
-            </Box>
-          )}
-
-          <Button
-            size="lg"
-            color="primary"
-            variant="solid"
-            onClick={handleComprar}
+          <Box
+            component="img"
+            src={
+              produto.modelos?.[modeloSelecionado]?.image ?? "/placeholder.png"
+            }
+            alt={produto.nomeProduto}
             sx={{
-              mt: 2,
-              px: 5,
-              fontWeight: 600,
-              borderRadius: "lg",
-              textTransform: "none",
-              boxShadow: "sm",
-              "&:hover": {
-                boxShadow: "md",
-                backgroundColor: "#fff",
-                opacity: 0.8
+              width: "100%",
+              objectFit: "contain",
+              animation: "fadeIn 1s ease-in-out",
+              "@keyframes fadeIn": {
+                from: { opacity: 0 },
+                to: { opacity: 1 },
               },
-              bgcolor: "#fff",
-              color: "#000"
-            }}
-          >
-            Comprar via WhatsApp
-          </Button>
-        </Box>
-      </Box>
-
-      {/* MODAL DE IMAGEM */}
-      <Modal
-        open={open}
-        onClose={() => setOpen(false)}
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          backdropFilter: "blur(6px)",
-          bgcolor: "rgba(0,0,0,0.85)",
-          p: { xs: 1, sm: 3 },
-        }}
-      >
-        <ModalDialog
-          variant="solid"
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            gap: 4,
-            bgcolor: "#121212",
-            borderRadius: "xl",
-            boxShadow: "lg",
-            maxWidth: "95vw",
-            maxHeight: "90vh",
-            p: { xs: 2, sm: 4 },
-            color: "#fff",
-            overflow: "hidden",
-          }}
-        >
-          <ModalClose
-            sx={{
-              color: "#fff",
-              bgcolor: "rgba(255,255,255,0.1)",
-              backdropFilter: "blur(4px)",
-              "&:hover": { bgcolor: "rgba(255,255,255,0.2)" },
             }}
           />
+        </Box>
 
-          {/* MINIATURAS */}
-          <Stack
-            spacing={1.5}
+        {/* Lado direito — informações */}
+        <Box
+          sx={{
+            flex: 1,
+          }}
+        >
+          <Typography
             sx={{
-              maxHeight: "80vh",
-              overflowY: "auto",
-              pr: 1,
-              "&::-webkit-scrollbar": {
-                width: 6,
-              },
-              "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "rgba(255,255,255,0.2)",
-                borderRadius: 3,
-              },
+              textAlign: "justify",
+              color: "#aaa",
+              fontSize: "1rem",
+              lineHeight: 1.8,
+              maxWidth: 900,
+              mx: "auto",
             }}
           >
-            {imagens.map((img, index) => (
-              <AspectRatio
-                key={index}
-                ratio="1/1"
-                sx={{
-                  width: 90,
-                  borderRadius: "md",
-                  overflow: "hidden",
-                  border:
-                    imagemSelecionada === index
-                      ? "2px solid var(--joy-palette-primary-solidBg)"
-                      : "2px solid rgba(255,255,255,0.15)",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  "&:hover": {
-                    transform: "scale(1.08)",
-                    borderColor: "var(--joy-palette-primary-solidBg)",
-                  },
-                }}
-                onClick={() => setImagemSelecionada(index)}
-              >
-                <img
-                  src={img}
-                  alt={`imagem ${index}`}
-                  style={{ objectFit: "cover", width: "100%", height: "100%" }}
-                />
-              </AspectRatio>
-            ))}
+            {produto.descricao}
+          </Typography>
+          {produto.desconto > 0 && (
+            <Typography
+              sx={{
+                textAlign: "left",
+                textDecoration: "line-through",
+                color: "#777",
+                fontSize: "13px",
+              }}
+            >
+              {precoOriginal}
+            </Typography>
+          )}
+          <Typography
+            sx={{
+              fontSize: "1.8rem",
+              fontWeight: 800,
+              color: "#fff",
+              mb: 1,
+              textAlign: "left",
+            }}
+          >
+            {preco}
+          </Typography>
+
+          <Typography sx={{ mb: 4, color: "#ccc", textAlign: "left" }}>
+            ou em até <b>10x</b> sem juros de{" "}
+            {formatarDinheiro(produto.valorParcelado)}
+          </Typography>
+
+          {/* Botões */}
+          <Stack spacing={2} sx={{ mb: 4 }}>
+            <Button
+              onClick={handleComprar}
+              sx={{
+                bgcolor: "#fff",
+                color: "#000",
+                fontWeight: 700,
+                "&:hover": { bgcolor: "#f5f5f5" },
+                textTransform: "none",
+              }}
+            >
+              COMPRAR AGORA
+            </Button>
+            <Button
+              variant="outlined"
+              sx={{
+                borderColor: "#fff",
+                color: "#fff",
+                fontWeight: 600,
+                textTransform: "none",
+                "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
+              }}
+            >
+              SIMULAR PAGAMENTO
+            </Button>
           </Stack>
+          <Chip color={produto.disponivel ? "success" : "danger"}>
+            {produto.disponivel ? "Produto Disponivel" : "Produto Indisponivel"}
+          </Chip>
+        </Box>
+      </Container>
+      <Container>
+        <Divider sx={{ mt: 7, mb: 5, bgcolor: "rgba(255,255,255,0.12)" }} />
 
-          {/* IMAGEM PRINCIPAL (agora com Swiper) */}
-          <Box
-            sx={{
-              position: "relative",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: { xs: "85vw", md: "75vw" },
-              maxHeight: "80vh",
-            }}
-          >
-            {/* Botão esquerda */}
-            <IconButton
-              className="prev-btn"
-              size="lg"
-              variant="soft"
-              color="neutral"
-              sx={{
-                position: "absolute",
-                left: 10,
-                top: "50%",
-                transform: "translateY(-50%)",
-                bgcolor: "rgba(255,255,255,0.1)",
-                color: "#fff",
-                zIndex: 10,
-                "&:hover": { bgcolor: "rgba(255,255,255,0.2)" },
-              }}
-            >
-              <ChevronLeft />
-            </IconButton>
+        <Typography
+          sx={{
+            textAlign: "center",
+            color: "#fff",
+            fontSize: "1.8rem",
+            fontWeight: 700,
+            mb: 3,
+          }}
+        >
+          Descrição do produto
+        </Typography>
 
-            {/* Swiper apenas na imagem principal */}
-            <Swiper
-              modules={[Navigation]}
-              navigation={{
-                nextEl: ".next-btn",
-                prevEl: ".prev-btn",
-              }}
-              slidesPerView={1}
-              loop={true}
-              speed={800}
-              style={{
-                width: "100%",
-                maxWidth: 900,
-                height: "100%",
-                borderRadius: "1rem",
-                overflow: "hidden",
-              }}
-              onSlideChange={(swiper) => setImagemSelecionada(swiper.realIndex)}
-            >
-              {imagens.map((img, index) => (
-                <SwiperSlide
-                  key={index}
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "#000",
-                  }}
-                >
-                  <img
-                    src={img}
-                    alt={`Imagem ${index}`}
-                    style={{
-                      width: "100%",
-                      height: "auto",
-                      maxHeight: "80vh",
-                      objectFit: "contain",
-                      borderRadius: "1rem",
-                      transition: "transform 0.4s ease",
-                    }}
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
-
-            {/* Botão direita */}
-            <IconButton
-              className="next-btn"
-              size="lg"
-              variant="soft"
-              color="neutral"
-              sx={{
-                position: "absolute",
-                right: 10,
-                top: "50%",
-                transform: "translateY(-50%)",
-                bgcolor: "rgba(255,255,255,0.1)",
-                color: "#fff",
-                zIndex: 10,
-                "&:hover": { bgcolor: "rgba(255,255,255,0.2)" },
-              }}
-            >
-              <ChevronRight />
-            </IconButton>
-          </Box>
-        </ModalDialog>
-      </Modal>
-    </main>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+            gap: 3,
+            color: "#ccc",
+            fontSize: "1rem",
+            lineHeight: 1.8,
+            mb: 8,
+          }}
+        >
+          {produto.informacoesAdicionais?.marca && (
+            <Typography>
+              Marca: <b>{produto.informacoesAdicionais.marca}</b>
+            </Typography>
+          )}
+          {produto.informacoesAdicionais?.armazenamentoInterno && (
+            <Typography>
+              Armazenamento Interno:{" "}
+              <b>{produto.informacoesAdicionais.armazenamentoInterno}</b>
+            </Typography>
+          )}
+          {produto.informacoesAdicionais?.tipoTela && (
+            <Typography>
+              Tipo de Tela: <b>{produto.informacoesAdicionais.tipoTela}</b>
+            </Typography>
+          )}
+          {produto.informacoesAdicionais?.tamanhoTela && (
+            <Typography>
+              Tamanho da Tela:{" "}
+              <b>{produto.informacoesAdicionais.tamanhoTela}</b>
+            </Typography>
+          )}
+          {produto.informacoesAdicionais?.resolucaoTela && (
+            <Typography>
+              Resolução da Tela:{" "}
+              <b>{produto.informacoesAdicionais.resolucaoTela}</b>
+            </Typography>
+          )}
+          {produto.informacoesAdicionais?.tecnologia && (
+            <Typography>
+              Tecnologia: <b>{produto.informacoesAdicionais.tecnologia}</b>
+            </Typography>
+          )}
+          {produto.informacoesAdicionais?.processador && (
+            <Typography>
+              Processador: <b>{produto.informacoesAdicionais.processador}</b>
+            </Typography>
+          )}
+          {produto.informacoesAdicionais?.sistemaOperacional && (
+            <Typography>
+              Sistema Operacional:{" "}
+              <b>{produto.informacoesAdicionais.sistemaOperacional}</b>
+            </Typography>
+          )}
+          {produto.informacoesAdicionais?.cameraTraseira && (
+            <Typography>
+              Câmera Traseira:{" "}
+              <b>{produto.informacoesAdicionais.cameraTraseira}</b>
+            </Typography>
+          )}
+          {produto.informacoesAdicionais?.cameraFrontal && (
+            <Typography>
+              Câmera Frontal:{" "}
+              <b>{produto.informacoesAdicionais.cameraFrontal}</b>
+            </Typography>
+          )}
+          {produto.informacoesAdicionais?.bateria && (
+            <Typography>
+              Bateria: <b>{produto.informacoesAdicionais.bateria}</b>
+            </Typography>
+          )}
+          {produto.informacoesAdicionais?.quantidadeChips && (
+            <Typography>
+              Quantidade de Chips:{" "}
+              <b>{produto.informacoesAdicionais.quantidadeChips}</b>
+            </Typography>
+          )}
+          {produto.informacoesAdicionais?.material && (
+            <Typography>
+              Material: <b>{produto.informacoesAdicionais.material}</b>
+            </Typography>
+          )}
+          <Typography>
+            Garantia: <b>{produto.mesesGarantia} meses</b>
+          </Typography>
+        </Box>
+      </Container>
+    </Box>
   );
 }
