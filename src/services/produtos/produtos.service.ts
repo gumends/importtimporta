@@ -57,3 +57,20 @@ export async function getProdutosPromocoes() {
   ))
   return produtosComDesconto;
 }
+
+export async function buscaProdutosPorNome(nome: string): Promise<Produto[]> {
+  const produtosData: Produto[] = (await import("./produtos.json")).default;
+
+  // Remove espaços extras e converte tudo pra minúsculas
+  const termo = nome.trim().toLowerCase();
+
+  // Se o campo estiver vazio, retorna lista vazia
+  if (!termo) return [];
+
+  // Busca parcial (contém em qualquer parte do nome)
+  const produtosFiltrados = produtosData.filter((p) =>
+    p.nomeProduto.toLowerCase().includes(termo)
+  );
+
+  return produtosFiltrados;
+}
