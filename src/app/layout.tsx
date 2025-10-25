@@ -5,6 +5,8 @@ import "@fontsource/inter";
 import AppBar from "./components/AppBar";
 import { Box } from "@mui/joy";
 import Footer from "./components/Footer";
+import { CssVarsProvider } from "@mui/joy/styles";
+import React from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ImporttImporta",
+  title: "Import Importa",
   description: "Seu portal de tecnologia e lançamentos",
 };
 
@@ -26,44 +28,35 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        style={{
-          margin: 0,
-          padding: 0,
-          minHeight: "100vh",
-          color: "#f8fafc",
-        }}
-      >
-        <Box
-          sx={{
+      <CssVarsProvider defaultMode="dark" modeStorageKey="theme-mode">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          style={{
+            margin: 0,
+            padding: 0,
             minHeight: "100vh",
-            width: "100vw",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            overflowX: "hidden",
-            color: "var(--foreground)",
+            backgroundColor: "#0a0a0a",
+            color: "#f8fafc",
           }}
         >
           <Box
             sx={{
-              bgcolor: "#0a0a0a",
-              color: "#fff",
-              width: "100%",
+              minHeight: "100vh",
+              width: "100vw",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              justifyContent: "center",
-              textAlign: "center",
+              overflowX: "hidden",
+              bgcolor: "#0a0a0a",
+              color: "#fff",
             }}
           >
             <AppBar />
             {children}
           </Box>
-        </Box>
-        <Footer />
-      </body>
+          <Footer />
+        </body>
+      </CssVarsProvider>
     </html>
   );
 }
