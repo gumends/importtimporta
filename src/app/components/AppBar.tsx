@@ -248,7 +248,7 @@ export default function AppBar() {
                   key={p.id}
                   onClick={() => {
                     router.push(
-                      `/compra?produtoId=${p.id}&modeloId=${p.modelos?.[0]?.id}`
+                      `/compra?produtoId=${p.id}&modeloId=${p.id}`
                     );
                     setBusca("");
                     setProdutos([]);
@@ -271,7 +271,7 @@ export default function AppBar() {
                 >
                   <Box
                     component="img"
-                    src={p.modelos?.[0]?.image || "/placeholder.png"}
+                    src={p.imagem || "/placeholder.png"}
                     alt={p.nomeProduto}
                     sx={{
                       width: 40,

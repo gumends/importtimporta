@@ -37,9 +37,8 @@ export default function Inicio() {
     getProdutosPromo();
   }, []);
 
-  const [produtoNovaGeracao, setProdutoNovaGeracao] = useState<ProdutoAtual | null>(
-    null
-  );
+  const [produtoNovaGeracao, setProdutoNovaGeracao] =
+    useState<ProdutoAtual | null>(null);
   const [cores, setCores] = useState<ModelosOption[] | null>(null);
   const [novaGeracao, setNovaGeracao] = useState<ProdutoAtual[] | null>(null);
   const [produtosAleatorios, setProdutosAleatorios] = useState<
@@ -214,9 +213,7 @@ export default function Inicio() {
           {produtoNovaGeracao ? (
             <Button
               onClick={() =>
-                (window.location.href = `/compra?produtoId=${
-                  produtoNovaGeracao?.modelos?.[0]?.idProduto
-                }`)
+                (window.location.href = `/compra?produtoId=${produtoNovaGeracao?.modelos?.[0]?.idProduto}`)
               }
               sx={{
                 mt: 5,
@@ -372,6 +369,9 @@ export default function Inicio() {
                           color: "#000",
                           mx: { xs: "auto", md: 0 },
                         }}
+                        onClick={() =>
+                          (window.location.href = `/compra?produtoId=${p.id}`)
+                        }
                       >
                         Comprar
                       </Button>
@@ -459,11 +459,9 @@ export default function Inicio() {
                 </Typography>
               </Stack>
               <Button
-                // onClick={() =>
-                //   (window.location.href = `/compra?produtoId=${
-                //     promocao.id
-                //   }&modeloId=${promocao.modelos ? promocao.modelos[0].id : ""}`)
-                // }
+                onClick={() =>
+                  (window.location.href = `/compra?produtoId=${promocao.id}`)
+                }
                 variant="solid"
                 sx={{
                   bgcolor: "#fff",
