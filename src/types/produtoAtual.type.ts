@@ -1,4 +1,4 @@
-export interface Produto {
+export interface ProdutoAtual {
   id: number;
   nomeProduto: string;
   valor: number;
@@ -9,16 +9,13 @@ export interface Produto {
   tipoProduto: number;
   novoLançamento: boolean;
   novaGeracao?: boolean;
+  modelos?: ModelosOption[];
   disponivel: boolean;
-  mesesGarantia: number;
-  informacoesAdicionais: Informacoes | null;
-  color: string;
-  colorName: string;
-  imagem: string;
-  imagens: IIMagens[] | null
+  mesesGarantia: number
+  informacoesAdicionais: InformacoesAtual | null;
 }
 
-export interface Informacoes {
+export interface InformacoesAtual {
   marca: string;
   armazenamentoInterno: string | null;
   tipoTela: string | null;
@@ -34,10 +31,14 @@ export interface Informacoes {
   material: string | null;
 }
 
-export interface Produtos {
-  produtos: Produto[];
+export interface ProdutosAtual {
+  produtos: ProdutoAtual[];
 }
 
-export interface IIMagens {
-  caminho: string;
+export interface ModelosOption {
+  id: number
+  color: string;
+  image: string;
+  colorName: string;
+  idProduto: number;
 }

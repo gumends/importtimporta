@@ -21,7 +21,7 @@ import {
   Option,
 } from "@mui/joy";
 import { Produto as p } from "@/types/produto.type";
-import { getProdutosPorProdutoIdEModeloId } from "@/services/produtos/produtos.service";
+import { buscaProduto, getProdutosPorProdutoIdEModeloId } from "@/services/produtos/produtos.service";
 import {
   formatarDinheiro,
   mascaraDinheiro,
@@ -53,13 +53,11 @@ export default function Produto() {
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const produtoParam = urlParams.get("produtoId");
-    const modeloParam = urlParams.get("modeloId");
 
-    if (produtoParam && modeloParam) {
+    if (produtoParam) {
       const produtoId = parseInt(produtoParam, 10);
-      const modeloId = parseInt(modeloParam, 10);
 
-      getProdutosPorProdutoIdEModeloId(produtoId, modeloId).then((prod) => {
+      buscaProduto(produtoId).then((prod) => {
         if (prod) {
           setProduto(prod);
         }
@@ -161,7 +159,7 @@ export default function Produto() {
           <Box
             component="img"
             src={
-              produto.modelos?.[modeloSelecionado]?.image ?? "/placeholder.png"
+              produto.imagem ?? "/placeholder.png"
             }
             alt={produto.nomeProduto}
             sx={{
@@ -394,7 +392,7 @@ export default function Produto() {
             <Box
               component="img"
               src={
-                produto.modelos?.[modeloSelecionado]?.image ??
+                produto.imagem ??
                 "/placeholder.png"
               }
               alt={produto.nomeProduto}

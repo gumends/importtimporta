@@ -1,0 +1,231 @@
+[
+  {
+    "id": 7,
+    "nomeProduto": "Iphone 17 Pro Max",
+    "valor": 7800.0,
+    "valorOriginal": 8000.0,
+    "valorParcelado": 8000.0,
+    "desconto": 200.0,
+    "descricao": "O iPhone com a melhor bateria e tela",
+    "tipoProduto": 1,
+    "novoLançamento": false,
+    "novaGeracao": true,
+    "disponivel": true,
+    "mesesGarantia": 12,
+    "informacoesAdicionais": {
+      "marca": "Apple",
+      "armazenamentoInterno": "128GB",
+      "tipoTela": "Super Retina XDR",
+      "tamanhoTela": "6,1",
+      "resolucaoTela": "2566x1179",
+      "tecnologia": "5G",
+      "processador": "A16 Bionic",
+      "sistemaOperacional": "iOS 17",
+      "cameraTraseira": "48MP + 12MP + 12MP",
+      "cameraFrontal": "12MP",
+      "bateria": "Íon de lítio recarregável",
+      "quantidadeChips": "Dual SIM (eSIM e nano SIM)",
+      "material": "Alumínio"
+    },
+    "modelos": [
+      {
+        "id": 1,
+        "color": "#32374A",
+        "image": "/iphones_17/iphone_17_pro_black.png",
+        "colorName": "Preto",
+        "idProduto": 7
+      },
+      {
+        "id": 2,
+        "color": "#F77E2D",
+        "image": "/iphones_17/iphone_17_pro_orange.png",
+        "colorName": "Laranja",
+        "idProduto": 8
+      },
+      {
+        "id": 3,
+        "color": "#F5F5F5",
+        "image": "/iphones_17/iphone_17_pro_silver.png",
+        "colorName": "Prata",
+        "idProduto": 9
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "nomeProduto": "Iphone 17 Pro",
+    "valor": 12999.0,
+    "valorOriginal": 12999.0,
+    "valorParcelado": 12999.0,
+    "desconto": 0.0,
+    "descricao": "O iPhone com desempenho excepcional",
+    "tipoProduto": 1,
+    "novoLançamento": false,
+    "novaGeracao": true,
+    "disponivel": true,
+    "mesesGarantia": 12,
+    "informacoesAdicionais": {
+      "marca": "Apple",
+      "armazenamentoInterno": "128GB",
+      "tipoTela": "Super Retina XDR",
+      "tamanhoTela": "6,1",
+      "resolucaoTela": "2566x1179",
+      "tecnologia": "5G",
+      "processador": "A16 Bionic",
+      "sistemaOperacional": "iOS 17",
+      "cameraTraseira": "48MP + 12MP + 12MP",
+      "cameraFrontal": "12MP",
+      "bateria": "Íon de lítio recarregável",
+      "quantidadeChips": "Dual SIM (eSIM e nano SIM)",
+      "material": "Alumínio"
+    },
+    "modelos": [
+      {
+        "id": 1,
+        "color": "#F77E2D",
+        "image": "/iphones_17/iphone_17_pro_orange.png",
+        "colorName": "Laranja",
+        "idProduto": 10
+      },
+      {
+        "id": 2,
+        "color": "#32374A",
+        "image": "/iphones_17/iphone_17_pro_black.png",
+        "colorName": "Preto",
+        "idProduto": 11
+      },
+      {
+        "id": 3,
+        "color": "#F5F5F5",
+        "image": "/iphones_17/iphone_17_pro_silver.png",
+        "colorName": "Prata",
+        "idProduto": 12
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "nomeProduto": "Iphone 17",
+    "valor": 6999.0,
+    "valorOriginal": 6999.0,
+    "valorParcelado": 6999.0,
+    "desconto": 0.0,
+    "descricao": "O iPhone com câmera avançada",
+    "tipoProduto": 1,
+    "novoLançamento": false,
+    "novaGeracao": true,
+    "disponivel": true,
+    "mesesGarantia": 12,
+    "informacoesAdicionais": {
+      "marca": "Apple",
+      "armazenamentoInterno": "128GB",
+      "tipoTela": "Super Retina XDR",
+      "tamanhoTela": "6,1",
+      "resolucaoTela": "2566x1179",
+      "tecnologia": "5G",
+      "processador": "A16 Bionic",
+      "sistemaOperacional": "iOS 17",
+      "cameraTraseira": "48MP + 12MP + 12MP",
+      "cameraFrontal": "12MP",
+      "bateria": "Íon de lítio recarregável",
+      "quantidadeChips": "Dual SIM (eSIM e nano SIM)",
+      "material": "Alumínio"
+    },
+    "modelos": [
+      {
+        "id": 1,
+        "color": "#DFCEEA",
+        "image": "/iphones_17/iphone_17_lavender.png",
+        "colorName": "Lavanda",
+        "idProduto": 13
+      },
+      {
+        "id": 2,
+        "color": "#96AED1",
+        "image": "/iphones_17/iphone_17_blue.png",
+        "colorName": "Azul",
+        "idProduto": 14
+      },
+      {
+        "id": 3,
+        "color": "#A9B689",
+        "image": "/iphones_17/iphone_17_sage.png",
+        "colorName": "Verde",
+        "idProduto": 15
+      },
+      {
+        "id": 4,
+        "color": "#353839",
+        "image": "/iphones_17/iphone_17_black.png",
+        "colorName": "Preto",
+        "idProduto": 16
+      },
+      {
+        "id": 5,
+        "color": "#F5F5F5",
+        "image": "/iphones_17/iphone_17_white.png",
+        "colorName": "Branco",
+        "idProduto": 17
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "nomeProduto": "Iphone Air",
+    "valor": 8999.0,
+    "valorOriginal": 8999.0,
+    "valorParcelado": 8999.0,
+    "desconto": 0.0,
+    "descricao": "O iPhone leve e elegante",
+    "tipoProduto": 1,
+    "novoLançamento": false,
+    "novaGeracao": true,
+    "disponivel": true,
+    "mesesGarantia": 12,
+    "informacoesAdicionais": {
+      "marca": "Apple",
+      "armazenamentoInterno": "128GB",
+      "tipoTela": "Super Retina XDR",
+      "tamanhoTela": "6,1",
+      "resolucaoTela": "2566x1179",
+      "tecnologia": "5G",
+      "processador": "A16 Bionic",
+      "sistemaOperacional": "iOS 17",
+      "cameraTraseira": "48MP + 12MP + 12MP",
+      "cameraFrontal": "12MP",
+      "bateria": "Íon de lítio recarregável",
+      "quantidadeChips": "Dual SIM (eSIM e nano SIM)",
+      "material": "Alumínio"
+    },
+    "modelos": [
+      {
+        "id": 1,
+        "color": "#F0F9FF",
+        "image": "/iphones_17/iphone_air_blue.png",
+        "colorName": "Azul",
+        "idProduto": 18
+      },
+      {
+        "id": 2,
+        "color": "#000000",
+        "image": "/iphones_17/iphone_air_black.png",
+        "colorName": "Preto",
+        "idProduto": 19
+      },
+      {
+        "id": 3,
+        "color": "#FCFCFC",
+        "image": "/iphones_17/iphone_air_white.png",
+        "colorName": "Branco",
+        "idProduto": 20
+      },
+      {
+        "id": 4,
+        "color": "#FDE4A4",
+        "image": "/iphones_17/iphone_air_gold.png",
+        "colorName": "Dourado",
+        "idProduto": 21
+      }
+    ]
+  }
+]

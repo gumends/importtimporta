@@ -25,7 +25,8 @@ import {
   getProdutosPromocoes,
 } from "@/services/produtos/produtos.service";
 import { useState } from "react";
-import { ModelosOption, Produto } from "@/types/produto.type";
+import { Produto } from "@/types/produto.type";
+import { ModelosOption, ProdutoAtual } from "@/types/produtoAtual.type";
 import { formatarDinheiro } from "@/utils/mascara_dinheiro";
 import { match } from "assert";
 
@@ -36,11 +37,10 @@ export default function Inicio() {
     getProdutosPromo();
   }, []);
 
-  const [produtoNovaGeracao, setProdutoNovaGeracao] = useState<Produto | null>(
-    null
-  );
+  const [produtoNovaGeracao, setProdutoNovaGeracao] =
+    useState<ProdutoAtual | null>(null);
   const [cores, setCores] = useState<ModelosOption[] | null>(null);
-  const [novaGeracao, setNovaGeracao] = useState<Produto[] | null>(null);
+  const [novaGeracao, setNovaGeracao] = useState<ProdutoAtual[] | null>(null);
   const [produtosAleatorios, setProdutosAleatorios] = useState<
     Produto[] | null
   >(null);
@@ -63,7 +63,7 @@ export default function Inicio() {
   }
 
   async function buscaProduto(id: number) {
-    await getProduto(id).then((prod: Produto | undefined) => {
+    await getProduto(id).then((prod: ProdutoAtual | undefined) => {
       setProdutoNovaGeracao(prod ? prod : null);
     });
   }
@@ -75,7 +75,7 @@ export default function Inicio() {
   }
 
   async function getNovaGeracao() {
-    await getProdutosNovaGeracao().then((prod: Produto[] | undefined) => {
+    await getProdutosNovaGeracao().then((prod: ProdutoAtual[] | undefined) => {
       setNovaGeracao(prod ? prod : null);
     });
   }
@@ -213,13 +213,7 @@ export default function Inicio() {
           {produtoNovaGeracao ? (
             <Button
               onClick={() =>
-                (window.location.href = `/c?produtoId=${
-                  produtoNovaGeracao.id
-                }&modeloId=${
-                  produtoNovaGeracao.modelos
-                    ? produtoNovaGeracao.modelos[0].id
-                    : ""
-                }`)
+                (window.location.href = `/compra?produtoId=${produtoNovaGeracao?.modelos?.[0]?.idProduto}`)
               }
               sx={{
                 mt: 5,
@@ -314,7 +308,7 @@ export default function Inicio() {
                     >
                       <Box
                         component="img"
-                        src={p.modelos?.[0]?.image || "/placeholder.png"}
+                        src={p?.imagem || "/placeholder.png"}
                         alt={p.nomeProduto}
                         sx={{
                           width: "100%",
@@ -376,11 +370,7 @@ export default function Inicio() {
                           mx: { xs: "auto", md: 0 },
                         }}
                         onClick={() =>
-                          (window.location.href = `/compra?produtoId=${
-                            p.id
-                          }&modeloId=${
-                            p.modelos ? p.modelos[0].id : ""
-                          }`)
+                          (window.location.href = `/compra?produtoId=${p.id}`)
                         }
                       >
                         Comprar
@@ -437,7 +427,7 @@ export default function Inicio() {
             >
               <Box
                 component="img"
-                src={promocao.modelos ? promocao.modelos[0].image : ""}
+                src={promocao ? promocao.imagem : ""}
                 alt={promocao.nomeProduto}
                 sx={{
                   width: "100%",
@@ -470,9 +460,7 @@ export default function Inicio() {
               </Stack>
               <Button
                 onClick={() =>
-                  (window.location.href = `/compra?produtoId=${
-                    promocao.id
-                  }&modeloId=${promocao.modelos ? promocao.modelos[0].id : ""}`)
+                  (window.location.href = `/compra?produtoId=${promocao.id}`)
                 }
                 variant="solid"
                 sx={{
