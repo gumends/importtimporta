@@ -37,7 +37,6 @@ interface ResponseParcela {
 
 export default function Produto() {
   const [produto, setProduto] = React.useState<p | null>(null);
-  const [modeloSelecionado, setModeloSelecionado] = React.useState<number>(0);
   const [variant, setVariant] = React.useState<
     ModalDialogProps["variant"] | undefined
   >(undefined);
