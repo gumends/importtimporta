@@ -22,7 +22,6 @@ export default function Footer() {
     <Box
       sx={{
         bgcolor: "#0a0a0a",
-        color: "background.body",
         pt: 6,
         pb: 3,
         borderTop: "1px solid rgba(255,255,255,0.1)",
@@ -44,7 +43,7 @@ export default function Footer() {
             >
               <Typography
                 level="h4"
-                sx={{ mb: 1, fontWeight: 700, color: "background.body" }}
+                sx={{ mb: 1, fontWeight: 700,  }}
               >
                 IMPORT
               </Typography>
@@ -59,7 +58,7 @@ export default function Footer() {
               />
               <Typography
                 level="h4"
-                sx={{ mb: 1, fontWeight: 700, color: "background.body" }}
+                sx={{ mb: 1, fontWeight: 700,  }}
               >
                 IMPORTA
               </Typography>
@@ -67,7 +66,7 @@ export default function Footer() {
 
             <Typography
               level="body-sm"
-              sx={{ opacity: 0.7, color: "background.tooltip" }}
+              sx={{ opacity: 0.7 }}
             >
               Sua loja de tecnologia com os melhores produtos Apple, Sony e
               muito mais. Encontre ofertas exclusivas e atendimento
@@ -77,7 +76,7 @@ export default function Footer() {
           <Stack spacing={1}>
             <Typography
               level="title-md"
-              sx={{ mb: 1, fontWeight: 600, color: "background.body" }}
+              sx={{ mb: 1, fontWeight: 600,  }}
             >
               Navegação
             </Typography>
@@ -120,19 +119,19 @@ export default function Footer() {
           <Stack spacing={1}>
             <Typography
               level="title-md"
-              sx={{ mb: 1, fontWeight: 600, color: "background.body" }}
+              sx={{ mb: 1, fontWeight: 600}}
             >
               Contato
             </Typography>
             <Stack direction="row" alignItems="center" spacing={1}>
               <Mail fontSize="small" />
-              <Typography level="body-sm" sx={{ color: "background.body" }}>
+              <Typography level="body-sm" >
                 importtimporta@gmail.com.br
               </Typography>
             </Stack>
             <Stack direction="row" alignItems="center" spacing={1}>
               <Phone fontSize="small" />
-              <Typography level="body-sm" sx={{ color: "background.body" }}>
+              <Typography level="body-sm" >
                 (11) 95166-3573
               </Typography>
             </Stack>
@@ -140,7 +139,7 @@ export default function Footer() {
           <Stack spacing={1}>
             <Typography
               level="title-md"
-              sx={{ mb: 1, fontWeight: 600, color: "background.body" }}
+              sx={{ mb: 1, fontWeight: 600,  }}
             >
               Siga-nos
             </Typography>
@@ -149,7 +148,6 @@ export default function Footer() {
                 component="a"
                 href="https://www.instagram.com/importtimporta"
                 sx={{
-                  bgcolor: "background.body",
                   "&:hover": { bgcolor: "background.level2" },
                 }}
               >
@@ -159,7 +157,6 @@ export default function Footer() {
                 component="a"
                 href="https://wa.me/5511951663573"
                 sx={{
-                  bgcolor: "background.body",
                   "&:hover": { bgcolor: "background.level2" },
                 }}
               >
@@ -174,7 +171,6 @@ export default function Footer() {
           level="body-xs"
           sx={{
             textAlign: "center",
-            color: "background.body",
           }}
         >
           © {new Date().getFullYear()} importtimporta — Todos os direitos
