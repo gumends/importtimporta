@@ -26,7 +26,7 @@ export default function ProdutosLista() {
       }
       setprodutos(produtos);
     });
-  });
+  }, []);
 
   return (
     <Box
@@ -159,7 +159,7 @@ export default function ProdutosLista() {
                     textTransform: "none",
                   }}
                   onClick={() => {
-                    window.location.href = `https://wa.me/5511951663573?text=${p.id}`;
+                    router.push(`/compra?produtoId=${p.id}&modeloId=${p.id}`);
                   }}
                 >
                   Comprar agora
