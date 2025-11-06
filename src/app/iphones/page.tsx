@@ -46,7 +46,7 @@ export default function ProdutosLista() {
           color: "#fff",
         }}
       >
-        Produtos em destaque
+        Iphones disponíveis
       </Typography>
 
       <Box
