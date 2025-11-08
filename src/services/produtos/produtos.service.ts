@@ -1,6 +1,7 @@
 import { ColorOption, Colors } from "@/types/cores.type";
 import { Produto } from "@/types/produto.type";
 import { ModelosOption, ProdutoAtual } from "@/types/produtoAtual.type";
+import { ProdutosPaginados } from "@/types/produtosPaginados";
 
 export async function getProduto(
   id: number
@@ -91,12 +92,31 @@ export async function buscaProduto(
   return produto;
 }
 
-export async function buscaTipoProduto(tipoProduto: number): Promise<Produto[] | undefined> {
-  const produtosData: Produto[] = (await import("./produtos.json")).default;
+export async function buscaTipoProduto(
+  tipoProduto: number,
+  pagina: number = 1,
+  limite: number = 8
+): Promise<ProdutosPaginados[]> {
+  const produtosData: ProdutosPaginados[] = (await import("./produtos.json")).default;
 
-  if (!produtosData || produtosData.length === 0) return undefined;
+  if (!produtosData || produtosData.length === 0) return [];
+  
+  const produtosFiltrados = produtosData.filter(
+    (pr) => pr.tipoProduto === tipoProduto
+  );
 
-  const produto = produtosData.filter((pr) => pr.tipoProduto === tipoProduto);
+  const totalItens = produtosFiltrados.length;
+  const totalPaginas = Math.ceil(totalItens / limite);
 
-  return produto;
+  const inicio = (pagina - 1) * limite;
+  const fim = inicio + limite;
+
+  const produtosPaginados = produtosFiltrados.slice(inicio, fim);
+
+  const produtosComTotal = produtosPaginados.map((p) => ({
+    ...p,
+    totalPaginas,
+  }));
+
+  return produtosComTotal;
 }

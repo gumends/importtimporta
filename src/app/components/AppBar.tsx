@@ -22,7 +22,6 @@ export default function AppBar() {
   const [pagina, setPagina] = React.useState("");
   const [produtos, setProdutos] = React.useState<Produto[]>([]);
 
-  // referências para detectar clique fora
   const inputRef = useRef<HTMLDivElement | null>(null);
   const resultsRef = useRef<HTMLDivElement | null>(null);
 
@@ -44,7 +43,6 @@ export default function AppBar() {
     });
   }
 
-  // debounce (espera o usuário parar de digitar)
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       buscaProduto(busca);
@@ -52,8 +50,6 @@ export default function AppBar() {
 
     return () => clearTimeout(delayDebounce);
   }, [busca]);
-
-  // fecha a caixa ao clicar fora
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -82,7 +78,6 @@ export default function AppBar() {
         mt: 2,
       }}
     >
-      {/* Barra principal */}
       <Sheet
         variant="soft"
         sx={{
@@ -145,8 +140,6 @@ export default function AppBar() {
             </Button>
           ))}
         </Box>
-
-        {/* Campo de busca */}
         <Box
           ref={inputRef}
           sx={{
@@ -206,8 +199,6 @@ export default function AppBar() {
           >
             <Menu size={20} color="#fff" />
           </IconButton>
-
-          {/* Resultados da busca */}
           {busca && produtos.length > 0 && (
             <Sheet
               ref={resultsRef}

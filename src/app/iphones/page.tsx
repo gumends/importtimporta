@@ -9,24 +9,32 @@ import {
   CardOverflow,
   AspectRatio,
   Button,
+  Stack,
 } from "@mui/joy";
 import { useRouter } from "next/navigation";
-import { Produto } from "@/types/produto.type";
+import { ProdutosPaginados } from "@/types/produtosPaginados";
 import { buscaTipoProduto } from "@/services/produtos/produtos.service";
 import { formatarDinheiro } from "@/utils/mascara_dinheiro";
 
 export default function ProdutosLista() {
   const router = useRouter();
-  const [produtos, setprodutos] = useState<Produto[] | undefined>();
+  const [produtos, setProdutos] = useState<ProdutosPaginados[]>([]);
+  const [pagina, setPagina] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(1);
 
   useEffect(() => {
-    buscaTipoProduto(1).then((produtos: Produto[] | undefined) => {
-      if (produtos === undefined) {
-        return null;
+    async function carregarProdutos() {
+      const resultado = await buscaTipoProduto(1, pagina);
+      if (resultado.length > 0) {
+        setProdutos(resultado);
+        setTotalPaginas(resultado[0].totalPaginas ?? 1);
+      } else {
+        setProdutos([]);
       }
-      setprodutos(produtos);
-    });
-  }, []);
+    }
+
+    carregarProdutos();
+  }, [pagina]);
 
   return (
     <Box
@@ -46,9 +54,8 @@ export default function ProdutosLista() {
           color: "#fff",
         }}
       >
-        Iphones disponíveis
+        iPhones disponíveis
       </Typography>
-
       <Box
         sx={{
           display: "grid",
@@ -61,116 +68,145 @@ export default function ProdutosLista() {
           gap: 4,
         }}
       >
-        {produtos ? (
-          produtos.map((p) => (
-            <Card
-              key={p.id}
-              variant="outlined"
-              sx={{
-                bgcolor: "#121212",
-                borderColor: "#1f1f1f",
-                borderRadius: "xl",
-                transition: "all 0.3s ease",
-                "&:hover": {
-                  transform: "translateY(-6px)",
-                  boxShadow: "0 8px 25px rgba(255, 255, 255, 0.2)",
-                },
-              }}
-            >
-              <CardOverflow>
-                <AspectRatio ratio="1" sx={{ bgcolor: "#000" }}>
-                  <img
-                    src={p.imagem}
-                    alt={p.nomeProduto}
-                    loading="lazy"
-                    style={{
-                      objectFit: "contain",
-                      backgroundColor: "#000",
-                      padding: "10px",
+        {produtos.map((p) => (
+          <Card
+            key={p.id}
+            variant="outlined"
+            sx={{
+              bgcolor: "#121212",
+              borderColor: "#1f1f1f",
+              borderRadius: "xl",
+              transition: "all 0.3s ease",
+              minWidth: "300px",
+              minHeight: "500px",
+              "&:hover": {
+                transform: "translateY(-6px)",
+                boxShadow: "0 8px 25px rgba(255, 255, 255, 0.2)",
+              },
+            }}
+          >
+            <CardOverflow>
+              <AspectRatio ratio="1" sx={{ bgcolor: "#000" }}>
+                <img
+                  src={p.imagem}
+                  alt={p.nomeProduto}
+                  loading="lazy"
+                  style={{
+                    objectFit: "contain",
+                    backgroundColor: "#000",
+                    padding: "10px",
+                  }}
+                />
+              </AspectRatio>
+            </CardOverflow>
+
+            <CardContent>
+              <Typography
+                level="title-md"
+                sx={{
+                  color: "#fff",
+                  fontWeight: 500,
+                  mb: 1,
+                  textOverflow: "ellipsis",
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {p.nomeProduto}
+              </Typography>
+
+              <Typography
+                level="body-sm"
+                sx={{ color: "rgba(255,255,255,0.6)", mb: 1 }}
+              >
+                {p.descricao}
+              </Typography>
+
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+                {p.valorOriginal > p.valor && (
+                  <Typography
+                    level="body-sm"
+                    sx={{
+                      color: "rgba(255,255,255,0.5)",
+                      textDecoration: "line-through",
                     }}
-                  />
-                </AspectRatio>
-              </CardOverflow>
+                  >
+                    {formatarDinheiro(p.valorOriginal)}
+                  </Typography>
+                )}
 
-              <CardContent>
-                <Typography
-                  level="title-md"
-                  sx={{
-                    color: "#fff",
-                    fontWeight: 500,
-                    mb: 1,
-                    textOverflow: "ellipsis",
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {p.nomeProduto}
-                </Typography>
+                {p.desconto > 0 && (
+                  <Typography level="body-xs">
+                    - {formatarDinheiro(p.desconto)}
+                  </Typography>
+                )}
+              </Box>
 
-                <Typography
-                  level="body-sm"
-                  sx={{ color: "rgba(255,255,255,0.6)", mb: 1 }}
-                >
-                  {p.descricao}
-                </Typography>
+              <Typography
+                level="title-lg"
+                sx={{
+                  color: "#fff",
+                  fontWeight: 700,
+                  mb: 1,
+                }}
+              >
+                {formatarDinheiro(p.valor)}
+              </Typography>
 
-                <Box
-                  sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
-                >
-                  {p.valorOriginal > p.valor && (
-                    <Typography
-                      level="body-sm"
-                      sx={{
-                        color: "rgba(255,255,255,0.5)",
-                        textDecoration: "line-through",
-                      }}
-                    >
-                      {formatarDinheiro(p.valorOriginal)}
-                    </Typography>
-                  )}
-
-                  {p.desconto > 0 && (
-                    <Typography level="body-xs">
-                      - {formatarDinheiro(p.desconto)}
-                    </Typography>
-                  )}
-                </Box>
-
-                <Typography
-                  level="title-lg"
-                  sx={{
-                    color: "#fff",
-                    fontWeight: 700,
-                    mb: 1,
-                  }}
-                >
-                  {formatarDinheiro(p.valor)}
-                </Typography>
-
-                <Button
-                  fullWidth
-                  variant="solid"
-                  sx={{
-                    mt: 1,
-                    bgcolor: "#fff",
-                    color: "#000",
-                    fontWeight: 700,
-                    "&:hover": { bgcolor: "#f5f5f5" },
-                    textTransform: "none",
-                  }}
-                  onClick={() => {
-                    router.push(`/compra?produtoId=${p.id}&modeloId=${p.id}`);
-                  }}
-                >
-                  Comprar agora
-                </Button>
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          <></>
-        )}
+              <Button
+                fullWidth
+                variant="solid"
+                sx={{
+                  mt: 1,
+                  bgcolor: "#fff",
+                  color: "#000",
+                  fontWeight: 700,
+                  "&:hover": { bgcolor: "#f5f5f5" },
+                  textTransform: "none",
+                }}
+                onClick={() =>
+                  router.push(`/compra?produtoId=${p.id}&modeloId=${p.id}`)
+                }
+              >
+                Comprar agora
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
       </Box>
+      {totalPaginas > 1 && (
+        <Stack
+          direction="row"
+          justifyContent="center"
+          alignItems="center"
+          spacing={2}
+          sx={{ mt: 6 }}
+        >
+          <Button
+            variant="outlined"
+            color="neutral"
+            onClick={() => setPagina((p) => Math.max(1, p - 1))}
+            disabled={pagina === 1}
+          >
+            Anterior
+          </Button>
+
+          <Typography level="body-md" sx={{ color: "#fff" }}>
+            Página {pagina} de {totalPaginas}
+          </Typography>
+
+          <Button
+            variant="outlined"
+            color="neutral"
+            onClick={() =>
+              setPagina((p) => Math.min(totalPaginas, p + 1))
+            }
+            disabled={pagina === totalPaginas}
+          >
+            Próxima
+          </Button>
+        </Stack>
+      )}
     </Box>
   );
 }

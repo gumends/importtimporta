@@ -7,7 +7,6 @@ import {
   Stack,
   Card,
   Tooltip,
-  colors,
 } from "@mui/joy";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -15,7 +14,6 @@ import "swiper/css/navigation";
 import { Autoplay, Navigation } from "swiper/modules";
 import { useEffect } from "react";
 import ModalInicial from "../components/ModalInicial";
-import promocoes from "../../services/produtos/produtos.json";
 import {
   getCoresProduto,
   getProduto,
@@ -28,7 +26,6 @@ import { useState } from "react";
 import { Produto } from "@/types/produto.type";
 import { ModelosOption, ProdutoAtual } from "@/types/produtoAtual.type";
 import { formatarDinheiro } from "@/utils/mascara_dinheiro";
-import { match } from "assert";
 
 export default function Inicio() {
   useEffect(() => {
@@ -89,7 +86,6 @@ export default function Inicio() {
   return (
     <Box sx={{ bgcolor: "#0a0a0a", color: "#fff", width: "100%" }}>
       <ModalInicial />
-      {/* HERO */}
       <Container maxWidth="lg" sx={{ py: 6, textAlign: "center" }}>
         <Typography
           level="h1"
@@ -229,8 +225,6 @@ export default function Inicio() {
           )}
         </Box>
       </Container>
-
-      {/* PRODUTOS VARIADOS (carrossel alinhado ao container) */}
       <Box sx={{ width: "100%", backgroundColor: "#0a0a0a", py: 8 }}>
         <Container maxWidth="lg" sx={{ position: "relative" }}>
           <Typography
@@ -383,8 +377,6 @@ export default function Inicio() {
           </Box>
         </Container>
       </Box>
-
-      {/* PRODUTOS EM DESCONTO */}
       <Container
         maxWidth="lg"
         sx={{

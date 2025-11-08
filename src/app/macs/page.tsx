@@ -9,24 +9,33 @@ import {
   CardOverflow,
   AspectRatio,
   Button,
+  Stack,
 } from "@mui/joy";
 import { useRouter } from "next/navigation";
 import { Produto } from "@/types/produto.type";
 import { buscaTipoProduto } from "@/services/produtos/produtos.service";
 import { formatarDinheiro } from "@/utils/mascara_dinheiro";
+import { ProdutosPaginados } from "@/types/produtosPaginados";
 
 export default function ProdutosLista() {
   const router = useRouter();
-  const [produtos, setprodutos] = useState<Produto[] | undefined>();
+  const [produtos, setProdutos] = useState<ProdutosPaginados[]>([]);
+  const [pagina, setPagina] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(1);
 
   useEffect(() => {
-    buscaTipoProduto(4).then((produtos: Produto[] | undefined) => {
-      if (produtos === undefined) {
-        return null;
+    async function carregarProdutos() {
+      const resultado = await buscaTipoProduto(4, pagina);
+      if (resultado.length > 0) {
+        setProdutos(resultado);
+        setTotalPaginas(resultado[0].totalPaginas ?? 1);
+      } else {
+        setProdutos([]);
       }
-      setprodutos(produtos);
-    });
-  }, []);
+    }
+
+    carregarProdutos();
+  }, [pagina]);
 
   return (
     <Box
@@ -171,6 +180,37 @@ export default function ProdutosLista() {
           <></>
         )}
       </Box>
+      {totalPaginas > 0 && (
+        <Stack
+          direction="row"
+          justifyContent="center"
+          alignItems="center"
+          spacing={2}
+          sx={{ mt: 6 }}
+        >
+          <Button
+            variant="outlined"
+            color="neutral"
+            onClick={() => setPagina((p) => Math.max(1, p - 1))}
+            disabled={pagina === 1}
+          >
+            Anterior
+          </Button>
+
+          <Typography level="body-md" sx={{ color: "#fff" }}>
+            Página {pagina} de {totalPaginas}
+          </Typography>
+
+          <Button
+            variant="outlined"
+            color="neutral"
+            onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
+            disabled={pagina === totalPaginas}
+          >
+            Próxima
+          </Button>
+        </Stack>
+      )}
     </Box>
   );
 }

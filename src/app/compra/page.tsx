@@ -139,7 +139,6 @@ export default function Produto() {
           mt: 10,
         }}
       >
-        {/* Lado esquerdo — imagem */}
         <Box
           sx={{
             flex: 1,
@@ -172,8 +171,6 @@ export default function Produto() {
             }}
           />
         </Box>
-
-        {/* Lado direito — informações */}
         <Box
           sx={{
             flex: 1,
@@ -234,8 +231,6 @@ export default function Produto() {
             )}{" "}
             sem juros
           </Typography>
-
-          {/* Botões */}
           <Stack spacing={2} sx={{ mb: 4 }}>
             <Button
               onClick={handleComprar}
@@ -443,7 +438,6 @@ export default function Produto() {
                     const valorFormatado = mascaraDinheiro(e.target.value);
                     setValor(valorFormatado);
 
-                    // calcula novamente com o valor numérico
                     const valorNumerico =
                       removerMascaraDinheiro(valorFormatado);
                     valorTotalSimulacao(valorNumerico);
