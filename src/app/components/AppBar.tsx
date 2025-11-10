@@ -99,7 +99,7 @@ export default function AppBar() {
           <Box
             onClick={() => router.push("/inicio")}
             component="img"
-            src="/logo-import.png"
+            src="/identidades/logo-import.png"
             alt="Import Importa"
             sx={{
               width: "5%",
