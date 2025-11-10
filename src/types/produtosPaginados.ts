@@ -1,4 +1,4 @@
-export interface ProdutosPaginados {
+export interface Produtos {
   id: number;
   nomeProduto: string;
   valor: number;
@@ -35,8 +35,10 @@ export interface Informacoes {
   material: string | null;
 }
 
-export interface Produtos {
-  produtos: ProdutosPaginados[];
+export interface ProdutoPaginados {
+  produtos: Produtos[];
+  totalPaginas: number;
+  paginaAtual: number;
 }
 
 export interface IIMagens {

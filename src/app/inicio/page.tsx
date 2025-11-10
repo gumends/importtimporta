@@ -7,6 +7,7 @@ import {
   Stack,
   Card,
   Tooltip,
+  Sheet,
 } from "@mui/joy";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -26,12 +27,13 @@ import { useState } from "react";
 import { Produto } from "@/types/produto.type";
 import { ModelosOption, ProdutoAtual } from "@/types/produtoAtual.type";
 import { formatarDinheiro } from "@/utils/mascara_dinheiro";
+import { ProdutoPaginados } from "@/types/produtosPaginados";
 
 export default function Inicio() {
   useEffect(() => {
     getNovaGeracao();
     buscaProdutoAleatoros();
-    getProdutosPromo();
+    carregarPromocoes();
   }, []);
 
   const [produtoNovaGeracao, setProdutoNovaGeracao] =
@@ -41,13 +43,26 @@ export default function Inicio() {
   const [produtosAleatorios, setProdutosAleatorios] = useState<
     Produto[] | null
   >(null);
-  const [produtosPromocoes, setProdutosPromocoes] = useState<Produto[] | null>(
-    null
-  );
+  const [produtosPromocoes, setProdutosPromocoes] = useState<
+    ProdutoPaginados
+  >();
+
+  
+  async function carregarPromocoes(pagina: number = 1) {
+    const resultado: ProdutoPaginados = await getProdutosPromocoes(pagina, 3);
+    if (resultado) {
+      setProdutosPromocoes(resultado);
+      setTotalPaginas(resultado.totalPaginas);
+      setPagina(pagina);
+    } else {
+      setProdutosPromocoes(undefined);
+    }
+  }
+  const [pagina, setPagina] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(1);
 
   async function buscaProdutoAleatoros() {
     await getprodutosAleatorios().then((prod) => {
-      console.log(prod);
       setProdutosAleatorios(prod);
     });
   }
@@ -74,12 +89,6 @@ export default function Inicio() {
   async function getNovaGeracao() {
     await getProdutosNovaGeracao().then((prod: ProdutoAtual[] | undefined) => {
       setNovaGeracao(prod ? prod : null);
-    });
-  }
-
-  async function getProdutosPromo() {
-    getProdutosPromocoes().then((p) => {
-      setProdutosPromocoes(p);
     });
   }
 
@@ -396,75 +405,136 @@ export default function Inicio() {
 
         <Box
           sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: 4,
+            color: "#fff",
+            py: 6,
+            px: { xs: 2, md: 6 },
           }}
         >
-          {produtosPromocoes?.map((promocao, index) => (
-            <Card
-              key={index}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 2,
-                p: 3,
-                width: "100%",
-                maxWidth: 320,
-                bgcolor: "#121212",
-                borderRadius: "24px",
-              }}
-            >
-              <Box
-                component="img"
-                src={promocao ? promocao.imagem : ""}
-                alt={promocao.nomeProduto}
+          {/* Grid de promoções */}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "repeat(1, 1fr)",
+                sm: "repeat(2, 1fr)",
+                md: "repeat(3, 1fr)",
+              },
+              justifyContent: "center",
+              gap: 4,
+            }}
+          >
+            {produtosPromocoes?.produtos.map((promocao, index) => (
+              <Card
+                key={index}
                 sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 2,
+                  p: 3,
                   width: "100%",
-                  height: 180,
-                  objectFit: "contain",
+                  maxWidth: 320,
+                  bgcolor: "#121212",
+                  borderRadius: "24px",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    transform: "translateY(-6px)",
+                    boxShadow: "0 8px 25px rgba(255, 255, 255, 0.2)",
+                  },
                 }}
-              />
-              <Typography level="h4" sx={{ color: "rgba(255,255,255,0.95)" }}>
-                {promocao.nomeProduto}
-              </Typography>
-              <Typography
-                level="body-sm"
-                sx={{ opacity: 0.8, color: "rgba(255,255,255,0.72)" }}
               >
-                {promocao.descricao}
-              </Typography>
-              <Stack direction="row" spacing={1}>
-                <Typography sx={{ color: "rgba(255,255,255,0.95)" }}>
-                  {formatarDinheiro(promocao.valor)}
+                <Box
+                  component="img"
+                  src={promocao?.imagem ?? ""}
+                  alt={promocao.nomeProduto}
+                  sx={{
+                    width: "100%",
+                    height: 180,
+                    objectFit: "contain",
+                  }}
+                />
+                <Typography level="h4" sx={{ color: "rgba(255,255,255,0.95)" }}>
+                  {promocao.nomeProduto}
                 </Typography>
                 <Typography
+                  level="body-sm"
+                  sx={{ opacity: 0.8, color: "rgba(255,255,255,0.72)" }}
+                >
+                  {promocao.descricao}
+                </Typography>
+                <Stack direction="row" spacing={1}>
+                  <Typography sx={{ color: "rgba(255,255,255,0.95)" }}>
+                    {formatarDinheiro(promocao.valor)}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      textDecoration: "line-through",
+                      opacity: 0.6,
+                      color: "rgba(255,255,255,0.55)",
+                    }}
+                  >
+                    {formatarDinheiro(promocao.valorOriginal)}
+                  </Typography>
+                </Stack>
+                <Button
+                  onClick={() =>
+                    (window.location.href = `/compra?produtoId=${promocao.id}`)
+                  }
+                  variant="solid"
                   sx={{
-                    textDecoration: "line-through",
-                    opacity: 0.6,
-                    color: "rgba(255,255,255,0.55)",
+                    bgcolor: "#fff",
+                    color: "#000",
+                    "&:hover": { bgcolor: "#f2f2f2" },
                   }}
                 >
-                  {formatarDinheiro(promocao.valorOriginal)}
-                </Typography>
-              </Stack>
-              <Button
-                onClick={() =>
-                  (window.location.href = `/compra?produtoId=${promocao.id}`)
-                }
-                variant="solid"
+                  Comprar
+                </Button>
+              </Card>
+            ))}
+          </Box>
+          {totalPaginas >= 0 && (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                mt: 5,
+                pb: 4,
+                width: "100%",
+              }}
+            >
+              <Stack
+                direction="row"
+                spacing={1.5}
                 sx={{
-                  bgcolor: "#fff",
-                  color: "#000",
-                  "&:hover": { bgcolor: "#f2f2f2" },
+                  bottom: 0,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
-                Comprar
-              </Button>
-            </Card>
-          ))}
+                {Array.from({ length: totalPaginas }).map((_, index) => (
+                  <Box
+                    key={index}
+                    onClick={() => carregarPromocoes(index + 1)}
+                    sx={{
+                      width: pagina === index + 1 ? 16 : 12,
+                      height: pagina === index + 1 ? 16 : 12,
+                      borderRadius: "50%",
+                      cursor: "pointer",
+                      transition: "all 0.25s ease",
+                      backgroundColor:
+                        pagina === index + 1 ? "#fff" : "rgba(255,255,255,0.3)",
+                      "&:hover": {
+                        backgroundColor: "rgba(255,255,255,0.6)",
+                        transform: "scale(1.2)",
+                      },
+                    }}
+                  />
+                ))}
+              </Stack>
+            </Box>
+          )}
         </Box>
       </Container>
     </Box>

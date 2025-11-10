@@ -1,7 +1,7 @@
 import { ColorOption, Colors } from "@/types/cores.type";
 import { Produto } from "@/types/produto.type";
 import { ModelosOption, ProdutoAtual } from "@/types/produtoAtual.type";
-import { ProdutosPaginados } from "@/types/produtosPaginados";
+import { ProdutoPaginados } from "@/types/produtosPaginados";
 
 export async function getProduto(
   id: number
@@ -58,13 +58,31 @@ export async function getprodutosAleatorios() {
   return produtosAleatorios;
 }
 
-export async function getProdutosPromocoes() {
+export async function getProdutosPromocoes(
+  pagina: number = 1,
+  limite: number = 2
+): Promise<ProdutoPaginados> {
   const produtosData: Produto[] = (await import("./produtos.json")).default;
+
   const produtosComDesconto = produtosData.filter(
-    (p) => p.desconto > 0 || p.desconto != null
+    (p) => p.desconto != null && p.desconto > 0
   );
-  return produtosComDesconto;
+
+  const totalItens = produtosComDesconto.length;
+  const totalPaginas = Math.ceil(totalItens / limite);
+
+  const inicio = (pagina - 1) * limite;
+  const fim = inicio + limite;
+
+  const produtosPaginados = produtosComDesconto.slice(inicio, fim);
+
+  return {
+    produtos: produtosPaginados,
+    totalPaginas,
+    paginaAtual: pagina,
+  };
 }
+
 
 export async function buscaProdutosPorNome(nome: string): Promise<Produto[]> {
   const produtosData: Produto[] = (await import("./produtos.json")).default;
@@ -96,11 +114,13 @@ export async function buscaTipoProduto(
   tipoProduto: number,
   pagina: number = 1,
   limite: number = 8
-): Promise<ProdutosPaginados[]> {
-  const produtosData: ProdutosPaginados[] = (await import("./produtos.json")).default;
+): Promise<ProdutoPaginados> {
+  const produtosData: Produto[] = (await import("./produtos.json")).default;
 
-  if (!produtosData || produtosData.length === 0) return [];
-  
+  if (!produtosData || produtosData.length === 0) {
+    return { produtos: [], totalPaginas: 0, paginaAtual: pagina };
+  }
+
   const produtosFiltrados = produtosData.filter(
     (pr) => pr.tipoProduto === tipoProduto
   );
@@ -113,10 +133,9 @@ export async function buscaTipoProduto(
 
   const produtosPaginados = produtosFiltrados.slice(inicio, fim);
 
-  const produtosComTotal = produtosPaginados.map((p) => ({
-    ...p,
+  return {
+    produtos: produtosPaginados,
     totalPaginas,
-  }));
-
-  return produtosComTotal;
+    paginaAtual: pagina,
+  };
 }

@@ -18,7 +18,6 @@ import { Produto } from "@/types/produto.type";
 export default function AppBar() {
   const router = useRouter();
   const [busca, setBusca] = React.useState("");
-  const [openMenu, setOpenMenu] = React.useState(false);
   const [pagina, setPagina] = React.useState("");
   const [produtos, setProdutos] = React.useState<Produto[]>([]);
 
@@ -44,11 +43,7 @@ export default function AppBar() {
   }
 
   useEffect(() => {
-    const delayDebounce = setTimeout(() => {
       buscaProduto(busca);
-    }, 400);
-
-    return () => clearTimeout(delayDebounce);
   }, [busca]);
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -192,9 +187,6 @@ export default function AppBar() {
             sx={{
               display: { xs: "flex", md: "none" },
               ml: 1,
-            }}
-            onClick={() => {
-              setOpenMenu((prev) => !prev);
             }}
           >
             <Menu size={20} color="#fff" />
