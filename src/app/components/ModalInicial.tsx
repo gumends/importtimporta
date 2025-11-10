@@ -48,7 +48,7 @@ export default function ModalInicial() {
     >
       <Box
         component="img"
-        src="/logo-intro.png"
+        src="/identidades/logo-intro.png"
         alt="Logo Intro"
         sx={{
           width: { xs: 180, md: 320 },

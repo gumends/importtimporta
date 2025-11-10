@@ -49,7 +49,7 @@ export default function Footer() {
               </Typography>
               <Box
                 component="img"
-                src={"logo-import.png"}
+                src={"/identidades/logo-import.png"}
                 alt={"Logo"}
                 sx={{
                   width: "10%",
