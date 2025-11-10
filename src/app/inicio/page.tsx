@@ -406,7 +406,6 @@ export default function Inicio() {
         <Box
           sx={{
             color: "#fff",
-            minHeight: "100vh",
             py: 6,
             px: { xs: 2, md: 6 },
           }}
