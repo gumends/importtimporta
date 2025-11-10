@@ -170,6 +170,43 @@ export default function Produto() {
               },
             }}
           />
+          {produto.imagens && produto.imagens.length > 0 && (
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "nowrap",
+                overflowX: "auto",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 1,
+                mt: 2,
+                maxWidth: "100%",
+              }}
+            >
+              {produto.imagens.map((imagem, index) => (
+                <Box
+                  key={index}
+                  component="img"
+                  src={imagem.caminho}
+                  alt={`${produto.nomeProduto} - imagem ${index + 1}`}
+                  sx={{
+                    width: 100,
+                    height: 100,
+                    objectFit: "contain",
+                    cursor: "pointer",
+                    borderRadius: 10,
+                    border: imagem.caminho === produto.imagem ? "2px solid rgba(255, 255, 255, 0.25)" : "2px solid transparent",
+                    bgcolor: "rgba(255,255,255,0.05)",
+                    transition: "border-color 0.3s",
+                    "&:hover": {
+                      borderColor: "rgba(255,255,255,0.3)",
+                    },
+                  }}
+                  onClick={() => setProduto({ ...produto, imagem: imagem.caminho })}
+                />
+              ))}
+            </Box>
+          )}
         </Box>
         <Box
           sx={{
