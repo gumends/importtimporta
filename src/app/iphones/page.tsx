@@ -12,22 +12,22 @@ import {
   Stack,
 } from "@mui/joy";
 import { useRouter } from "next/navigation";
-import { ProdutosPaginados } from "@/types/produtosPaginados";
 import { buscaTipoProduto } from "@/services/produtos/produtos.service";
 import { formatarDinheiro } from "@/utils/mascara_dinheiro";
+import { Produto } from "@/types/produto.type";
 
 export default function ProdutosLista() {
   const router = useRouter();
-  const [produtos, setProdutos] = useState<ProdutosPaginados[]>([]);
+  const [produtos, setProdutos] = useState<Produto[]>([]);
   const [pagina, setPagina] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
 
   useEffect(() => {
     async function carregarProdutos() {
       const resultado = await buscaTipoProduto(1, pagina);
-      if (resultado.length > 0) {
-        setProdutos(resultado);
-        setTotalPaginas(resultado[0].totalPaginas ?? 1);
+      if (resultado.produtos.length > 0) {
+        setProdutos(resultado.produtos);
+        setTotalPaginas(resultado.totalPaginas);
       } else {
         setProdutos([]);
       }
