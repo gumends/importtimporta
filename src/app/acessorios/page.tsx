@@ -10,6 +10,7 @@ import {
   AspectRatio,
   Button,
   Stack,
+  Input,
 } from "@mui/joy";
 import { useRouter } from "next/navigation";
 import { buscaTipoProduto } from "@/services/produtos/produtos.service";
@@ -22,19 +23,45 @@ export default function ProdutosLista() {
   const [pagina, setPagina] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
 
-  useEffect(() => {
-    async function carregarProdutos() {
-      const resultado = await buscaTipoProduto(3, pagina);
-      if (resultado.produtos.length > 0) {
-        setProdutos(resultado.produtos);
-        setTotalPaginas(resultado.totalPaginas);
-      } else {
-        setProdutos([]);
-      }
-    }
+  // Filtros
+  const [nomeProduto, setNomeProduto] = useState("");
+  const [precoMinimo, setPrecoMinimo] = useState<number | undefined>();
+  const [precoMaximo, setPrecoMaximo] = useState<number | undefined>();
 
+  const tipoProduto = 3; // Acessórios
+
+  const carregarProdutos = async (
+    paginaAtual = pagina,
+    nome?: string,
+    min?: number,
+    max?: number
+  ) => {
+    const resultado = await buscaTipoProduto(
+      tipoProduto,
+      paginaAtual,
+      8,
+      nome,
+      min,
+      max
+    );
+
+    if (resultado.produtos.length > 0) {
+      setProdutos(resultado.produtos);
+      setTotalPaginas(resultado.totalPaginas);
+    } else {
+      setProdutos([]);
+      setTotalPaginas(1);
+    }
+  };
+
+  useEffect(() => {
     carregarProdutos();
   }, [pagina]);
+
+  const aplicarFiltros = async () => {
+    setPagina(1);
+    await carregarProdutos(1, nomeProduto, precoMinimo, precoMaximo);
+  };
 
   return (
     <Box
@@ -57,6 +84,58 @@ export default function ProdutosLista() {
         Acessórios disponíveis
       </Typography>
 
+      {/* 🔍 Formulário de Filtro */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          gap: 2,
+          mb: 5,
+          justifyContent: "center",
+        }}
+      >
+        <Input
+          placeholder="Buscar por nome"
+          variant="soft"
+          value={nomeProduto}
+          onChange={(e) => setNomeProduto(e.target.value)}
+          sx={{ minWidth: 200 }}
+        />
+        <Input
+          placeholder="Preço mínimo"
+          type="number"
+          variant="soft"
+          value={precoMinimo ?? ""}
+          onChange={(e) =>
+            setPrecoMinimo(e.target.value ? Number(e.target.value) : undefined)
+          }
+          sx={{ minWidth: 150 }}
+        />
+        <Input
+          placeholder="Preço máximo"
+          type="number"
+          variant="soft"
+          value={precoMaximo ?? ""}
+          onChange={(e) =>
+            setPrecoMaximo(e.target.value ? Number(e.target.value) : undefined)
+          }
+          sx={{ minWidth: 150 }}
+        />
+        <Button
+          onClick={aplicarFiltros}
+          variant="solid"
+          sx={{
+            bgcolor: "#fff",
+            color: "#000",
+            fontWeight: 700,
+            "&:hover": { bgcolor: "#f5f5f5" },
+          }}
+        >
+          Aplicar filtros
+        </Button>
+      </Box>
+
+      {/* 🧱 Lista de produtos */}
       <Box
         sx={{
           display: "grid",
@@ -69,7 +148,7 @@ export default function ProdutosLista() {
           gap: 4,
         }}
       >
-        {produtos ? (
+        {produtos && produtos.length > 0 ? (
           produtos.map((p) => (
             <Card
               key={p.id}
@@ -176,9 +255,16 @@ export default function ProdutosLista() {
             </Card>
           ))
         ) : (
-          <></>
+          <Typography
+            level="body-md"
+            sx={{ color: "rgba(255,255,255,0.7)", textAlign: "center", mt: 4 }}
+          >
+            Nenhum produto encontrado com os filtros aplicados.
+          </Typography>
         )}
       </Box>
+
+      {/* 📄 Paginação */}
       {totalPaginas > 0 && (
         <Stack
           direction="row"

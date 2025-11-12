@@ -9,32 +9,48 @@ import {
   CardOverflow,
   AspectRatio,
   Button,
+  Input,
   Stack,
 } from "@mui/joy";
 import { useRouter } from "next/navigation";
+import _ from "lodash";
 import { buscaTipoProduto } from "@/services/produtos/produtos.service";
-import { formatarDinheiro } from "@/utils/mascara_dinheiro";
 import { Produto } from "@/types/produto.type";
+import { formatarDinheiro } from "@/utils/mascara_dinheiro";
 
 export default function ProdutosLista() {
   const router = useRouter();
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [pagina, setPagina] = useState(1);
-  const [totalPaginas, setTotalPaginas] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(0);
+
+  const [nomeProduto, setNomeProduto] = useState("");
+  const [precoMinimo, setPrecoMinimo] = useState<number | undefined>();
+  const [precoMaximo, setPrecoMaximo] = useState<number | undefined>();
+
+  const tipoProduto = 1;
+
+  const carregarProdutos = async () => {
+    const { produtos, totalPaginas } = await buscaTipoProduto(
+      tipoProduto,
+      pagina,
+      8,
+      nomeProduto,
+      precoMinimo,
+      precoMaximo
+    );
+    setProdutos(produtos);
+    setTotalPaginas(totalPaginas);
+  };
 
   useEffect(() => {
-    async function carregarProdutos() {
-      const resultado = await buscaTipoProduto(1, pagina);
-      if (resultado.produtos.length > 0) {
-        setProdutos(resultado.produtos);
-        setTotalPaginas(resultado.totalPaginas);
-      } else {
-        setProdutos([]);
-      }
-    }
-
     carregarProdutos();
   }, [pagina]);
+
+  const aplicarFiltros = async () => {
+    setPagina(1);
+    await carregarProdutos();
+  };
 
   return (
     <Box
@@ -56,6 +72,55 @@ export default function ProdutosLista() {
       >
         iPhones disponíveis
       </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          gap: 2,
+          mb: 5,
+          justifyContent: "center",
+        }}
+      >
+        <Input
+          placeholder="Buscar por nome"
+          variant="soft"
+          value={nomeProduto}
+          onChange={(e) => setNomeProduto(e.target.value)}
+          sx={{ minWidth: 200 }}
+        />
+        <Input
+          placeholder="Preço mínimo"
+          type="number"
+          variant="soft"
+          value={precoMinimo ?? ""}
+          onChange={(e) =>
+            setPrecoMinimo(e.target.value ? Number(e.target.value) : undefined)
+          }
+          sx={{ minWidth: 150 }}
+        />
+        <Input
+          placeholder="Preço máximo"
+          type="number"
+          variant="soft"
+          value={precoMaximo ?? ""}
+          onChange={(e) =>
+            setPrecoMaximo(e.target.value ? Number(e.target.value) : undefined)
+          }
+          sx={{ minWidth: 150 }}
+        />
+        <Button
+          onClick={aplicarFiltros}
+          variant="solid"
+          sx={{
+            bgcolor: "#fff",
+            color: "#000",
+            fontWeight: 700,
+            "&:hover": { bgcolor: "#f5f5f5" },
+          }}
+        >
+          Aplicar filtros
+        </Button>
+      </Box>
       <Box
         sx={{
           display: "grid",
@@ -122,7 +187,9 @@ export default function ProdutosLista() {
                 {p.descricao}
               </Typography>
 
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
+              >
                 {p.valorOriginal > p.valor && (
                   <Typography
                     level="body-sm"
@@ -198,9 +265,7 @@ export default function ProdutosLista() {
           <Button
             variant="outlined"
             color="neutral"
-            onClick={() =>
-              setPagina((p) => Math.min(totalPaginas, p + 1))
-            }
+            onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
             disabled={pagina === totalPaginas}
           >
             Próxima
