@@ -2,6 +2,7 @@ import { ColorOption, Colors } from "@/types/cores.type";
 import { Produto } from "@/types/produto.type";
 import { ModelosOption, ProdutoAtual } from "@/types/produtoAtual.type";
 import { ProdutoPaginados } from "@/types/produtosPaginados";
+import _ from "lodash";
 
 export async function getProduto(
   id: number
@@ -113,7 +114,10 @@ export async function buscaProduto(
 export async function buscaTipoProduto(
   tipoProduto: number,
   pagina: number = 1,
-  limite: number = 8
+  limite: number = 8,
+  nomeProduto?: string,
+  precoMinimo?: number,
+  precoMaximo?: number
 ): Promise<ProdutoPaginados> {
   const produtosData: Produto[] = (await import("./produtos.json")).default;
 
@@ -131,7 +135,19 @@ export async function buscaTipoProduto(
   const inicio = (pagina - 1) * limite;
   const fim = inicio + limite;
 
-  const produtosPaginados = produtosFiltrados.slice(inicio, fim);
+  const produtosPaginados = _.orderBy(produtosFiltrados.slice(inicio, fim), ['valor'], ['desc']);
+
+  if (nomeProduto) {
+    _.remove(produtosPaginados, (p) => !p.nomeProduto.toLowerCase().includes(nomeProduto.toLowerCase()));
+  }
+
+  if (precoMinimo !== undefined) {
+    _.remove(produtosPaginados, (p) => p.valor < precoMinimo);
+  }
+  
+  if (precoMaximo !== undefined) {
+    _.remove(produtosPaginados, (p) => p.valor > precoMaximo);
+  }
 
   return {
     produtos: produtosPaginados,

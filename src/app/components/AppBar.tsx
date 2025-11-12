@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { buscaProdutosPorNome } from "@/services/produtos/produtos.service";
 import { Produto } from "@/types/produto.type";
+import { time } from "console";
 
 export default function AppBar() {
   const router = useRouter();
@@ -43,8 +44,9 @@ export default function AppBar() {
   }
 
   useEffect(() => {
-      buscaProduto(busca);
+    buscaProduto(busca);
   }, [busca]);
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -230,14 +232,17 @@ export default function AppBar() {
                 <Box
                   key={p.id}
                   onClick={() => {
-                    router.push(
-                      `/compra?produtoId=${p.id}&modeloId=${p.id}`
-                    );
+                    const url = `/compra?produtoId=${p.id}&modeloId=${p.id}`;
+                    if (window.location.pathname === "/compra") {
+                      router.replace(url);
+                      setTimeout(() => {
+                        window.location.reload();
+                      }, 300);
+                    } else {
+                      router.push(url);
+                    }
                     setBusca("");
                     setProdutos([]);
-                    setTimeout(() => {
-                      window.location.reload();
-                    }, 300);
                   }}
                   sx={{
                     display: "flex",
