@@ -143,7 +143,7 @@ export default function ProdutosLista() {
               borderRadius: "xl",
               transition: "all 0.3s ease",
               minWidth: "300px",
-              height: "530px", // 🔥 card com altura fixa
+              height: "530px",
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
@@ -153,7 +153,6 @@ export default function ProdutosLista() {
               },
             }}
           >
-            {/* IMAGEM */}
             <CardOverflow>
               <AspectRatio ratio="1" sx={{ bgcolor: "#000" }}>
                 <img
@@ -172,7 +171,6 @@ export default function ProdutosLista() {
             <CardContent
               sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
             >
-              {/* TÍTULO (fixo, 1 linha) */}
               <Typography
                 level="title-md"
                 sx={{
@@ -188,13 +186,12 @@ export default function ProdutosLista() {
                 {p.nomeProduto}
               </Typography>
 
-              {/* DESCRIÇÃO (fixa, 2 linhas) */}
               <Typography
                 level="body-sm"
                 sx={{
                   color: "rgba(255,255,255,0.6)",
                   mb: 1,
-                  height: "32px", // 🔥 trava 2 linhas
+                  height: "32px",
                   overflow: "hidden",
                   display: "-webkit-box",
                   WebkitLineClamp: 2,
@@ -203,11 +200,9 @@ export default function ProdutosLista() {
               >
                 {p.descricao}
               </Typography>
-
-              {/* BLOCO PREÇO (fixo) */}
               <Box
                 sx={{
-                  height: "40px", // 🔥 sempre reserva espaço igual
+                  height: "40px",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
@@ -238,12 +233,11 @@ export default function ProdutosLista() {
                 </Typography>
               </Box>
 
-              {/* BOTÃO FIXO NO FINAL */}
               <Button
                 fullWidth
                 variant="solid"
                 sx={{
-                  mt: "auto", // 🔥 mantém o botão no rodapé sem empurrar nada
+                  mt: "auto",
                   bgcolor: "#fff",
                   color: "#000",
                   fontWeight: 700,

@@ -75,7 +75,7 @@ export default function AppBar() {
       sx={{
         position: "relative",
         mt: 2,
-        pb: { xs: 2, md: 0 }, // espaço para o bloco da busca no mobile
+        pb: { xs: 2, md: 0 },
       }}
     >
       <Sheet
@@ -89,9 +89,6 @@ export default function AppBar() {
           boxShadow: "0 0 10px rgba(0,0,0,0.3)",
         }}
       >
-        {/* ============================
-          DESKTOP HEADER NORMAL
-      ============================= */}
         <Box
           sx={{
             display: { xs: "none", md: "flex" },
@@ -99,7 +96,6 @@ export default function AppBar() {
             justifyContent: "space-between",
           }}
         >
-          {/* MENU + LOGO */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Box
               onClick={() => router.push("/inicio")}
@@ -111,7 +107,6 @@ export default function AppBar() {
                 cursor: "pointer",
               }}
             />
-
             {menu.map((item, index) => (
               <Button
                 key={index}
@@ -134,8 +129,6 @@ export default function AppBar() {
               </Button>
             ))}
           </Box>
-
-          {/* BUSCA */}
           <Box
             ref={inputRef}
             sx={{
@@ -172,10 +165,6 @@ export default function AppBar() {
             </IconButton>
           </Box>
         </Box>
-
-        {/* ======================================
-          MOBILE HEADER ( NOVO MODELO )
-      ======================================= */}
         <Box
           sx={{
             display: { xs: "flex", md: "none" },
@@ -184,7 +173,6 @@ export default function AppBar() {
             gap: 2,
           }}
         >
-          {/* LINHA DE CIMA: MENU + LOGO */}
           <Box
             sx={{
               width: "100%",
@@ -236,8 +224,6 @@ export default function AppBar() {
               <Person sx={{ width: 24, height: 24, color: "#fff" }} />
             </IconButton>
           </Box>
-
-          {/* BARRA DE BUSCA NO MOBILE — EMBAIXO */}
           <Box
             ref={inputRef}
             sx={{
@@ -279,10 +265,6 @@ export default function AppBar() {
           </Box>
         </Box>
       </Sheet>
-
-      {/* ============================
-        RESULTADOS DA BUSCA
-    ============================= */}
       {busca && produtos.length > 0 && (
         <Sheet
           ref={resultsRef}
@@ -338,7 +320,6 @@ export default function AppBar() {
       )}
       {openMenu && (
         <>
-          {/* OVERLAY para fechar ao clicar fora */}
           <Box
             onClick={() => setOpenMenu(false)}
             sx={{
@@ -351,8 +332,6 @@ export default function AppBar() {
               zIndex: 39,
             }}
           />
-
-          {/* MENU LATERAL */}
           <Sheet
             sx={{
               position: "fixed",
@@ -401,8 +380,6 @@ export default function AppBar() {
                 IMPORTA
               </Typography>
             </Box>
-
-            {/* Páginas uma embaixo da outra */}
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
               <Button
                 variant="plain"

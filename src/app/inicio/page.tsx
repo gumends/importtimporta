@@ -84,10 +84,6 @@ export default function Inicio() {
   return (
     <Box sx={{ bgcolor: "#0a0a0a", color: "#fff", width: "100%" }}>
       <ModalInicial />
-
-      {/* ==========================
-          NOVA GERAÇÃO
-      ========================== */}
       <Container
         maxWidth="lg"
         sx={{ py: { xs: 4, md: 6 }, textAlign: "center" }}
@@ -102,8 +98,6 @@ export default function Inicio() {
         >
           Nova Geração
         </Typography>
-
-        {/* MENU DE MODELOS */}
         <Stack
           sx={{
             flexDirection: "row",
@@ -141,8 +135,6 @@ export default function Inicio() {
             </Box>
           ))}
         </Stack>
-
-        {/* IMAGEM DO PRODUTO */}
         <Box
           sx={{
             width: "100%",
@@ -174,8 +166,6 @@ export default function Inicio() {
             }}
           />
         </Box>
-
-        {/* CORES */}
         <Stack
           direction="row"
           spacing={1}
@@ -219,10 +209,6 @@ export default function Inicio() {
           </Button>
         )}
       </Container>
-
-      {/* ==========================
-          PRODUTOS ALEATÓRIOS
-      ========================== */}
       <Box sx={{ width: "100%", py: 8 }}>
         <Container maxWidth="lg">
           <Typography
@@ -246,7 +232,7 @@ export default function Inicio() {
             speed={900}
             style={{
               width: "100%",
-              height: "520px", // 🔥 Altura fixa para manter tudo alinhado
+              height: "520px",
               display: "flex",
               alignItems: "center",
             }}
@@ -260,11 +246,10 @@ export default function Inicio() {
                   spacing={{ xs: 2, md: 4 }}
                   sx={{
                     width: "100%",
-                    height: "100%", // 🔥 Garante alinhamento vertical
+                    height: "100%",
                     px: 2,
                   }}
                 >
-                  {/* IMAGEM */}
                   <Box
                     sx={{
                       flex: 1,
@@ -279,14 +264,13 @@ export default function Inicio() {
                       src={p.imagem}
                       alt={p.nomeProduto}
                       sx={{
-                        width: "500px", // 🔥 TAMANHO PADRÃO UNIFICADO
-                        height: "500px", // 🔥 TODAS IGUAIS
+                        width: "500px", 
+                        height: "500px", 
                         objectFit: "contain",
                       }}
                     />
                   </Box>
 
-                  {/* INFORMAÇÕES DO PRODUTO */}
                   <Box
                     sx={{
                       flex: 1,
@@ -331,10 +315,6 @@ export default function Inicio() {
           </Swiper>
         </Container>
       </Box>
-
-      {/* ==========================
-          PROMOÇÕES
-      ========================== */}
       <Container maxWidth="lg" sx={{ py: 8 }}>
         <Typography
           level="h2"
@@ -413,7 +393,6 @@ export default function Inicio() {
           ))}
         </Box>
 
-        {/* Paginação */}
         <Stack
           direction="row"
           justifyContent="center"
