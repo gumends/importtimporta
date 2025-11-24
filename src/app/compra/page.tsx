@@ -21,7 +21,10 @@ import {
   Option,
 } from "@mui/joy";
 import { Produto as p } from "@/types/produto.type";
-import { buscaProduto, getProdutosPorProdutoIdEModeloId } from "@/services/produtos/produtos.service";
+import {
+  buscaProduto,
+  getProdutosPorProdutoIdEModeloId,
+} from "@/services/produtos/produtos.service";
 import {
   formatarDinheiro,
   mascaraDinheiro,
@@ -156,9 +159,7 @@ export default function Produto() {
           </Typography>
           <Box
             component="img"
-            src={
-              produto.imagem ?? "/placeholder.png"
-            }
+            src={produto.imagem ?? "/placeholder.png"}
             alt={produto.nomeProduto}
             sx={{
               width: "100%",
@@ -195,14 +196,19 @@ export default function Produto() {
                     objectFit: "contain",
                     cursor: "pointer",
                     borderRadius: 10,
-                    border: imagem.caminho === produto.imagem ? "2px solid rgba(255, 255, 255, 0.25)" : "2px solid transparent",
+                    border:
+                      imagem.caminho === produto.imagem
+                        ? "2px solid rgba(255, 255, 255, 0.25)"
+                        : "2px solid transparent",
                     bgcolor: "rgba(255,255,255,0.05)",
                     transition: "border-color 0.3s",
                     "&:hover": {
                       borderColor: "rgba(255,255,255,0.3)",
                     },
                   }}
-                  onClick={() => setProduto({ ...produto, imagem: imagem.caminho })}
+                  onClick={() =>
+                    setProduto({ ...produto, imagem: imagem.caminho })
+                  }
                 />
               ))}
             </Box>
@@ -422,10 +428,7 @@ export default function Produto() {
           >
             <Box
               component="img"
-              src={
-                produto.imagem ??
-                "/placeholder.png"
-              }
+              src={produto.imagem ?? "/placeholder.png"}
               alt={produto.nomeProduto}
               sx={{
                 width: "100%",
@@ -467,7 +470,7 @@ export default function Produto() {
               </Typography>
 
               <FormControl sx={{ mb: 2 }}>
-                <FormLabel>Valor à vista (R$)</FormLabel>
+                <FormLabel>Valor de Entrada (R$)</FormLabel>
                 <Input
                   type="text"
                   value={valor}
@@ -484,7 +487,7 @@ export default function Produto() {
               </FormControl>
 
               <FormControl sx={{ mb: 2 }}>
-                <FormLabel>Parcelas no cartão</FormLabel>
+                <FormLabel>Parcelas no </FormLabel>
                 <Select<number>
                   value={parcelas}
                   onChange={(_, val) => {
@@ -506,15 +509,18 @@ export default function Produto() {
                       (porcentagemParcelas[selected - 1] - 1) *
                       100
                     ).toFixed(1);
-                    const jurosFormatado =
-                      juros.split(".")[1] != "0"
-                        ? juros
-                        : Math.round(parseFloat(juros));
                     return (
                       <Box
                         sx={{ display: "flex", alignItems: "center", gap: 1 }}
                       >
-                        <Typography component="span">{selected}x</Typography>
+                        <Typography component="span">
+                          {selected}x{" "}
+                          {formatarDinheiro(
+                            Math.round(
+                              (valorParcela?.valorAPagar ?? 0) / selected
+                            )
+                          )}
+                        </Typography>
                         {selected >= 6 ? (
                           <Chip
                             color="success"
