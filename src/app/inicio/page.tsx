@@ -229,7 +229,6 @@ export default function Inicio() {
             level="h2"
             sx={{
               textAlign: "center",
-              mb: 4,
               fontWeight: 700,
               fontSize: { xs: "1.7rem", md: "2.2rem" },
             }}
@@ -247,7 +246,7 @@ export default function Inicio() {
             speed={900}
             style={{
               width: "100%",
-              height: "420px", // 🔥 Altura fixa para manter tudo alinhado
+              height: "520px", // 🔥 Altura fixa para manter tudo alinhado
               display: "flex",
               alignItems: "center",
             }}
@@ -280,8 +279,8 @@ export default function Inicio() {
                       src={p.imagem}
                       alt={p.nomeProduto}
                       sx={{
-                        width: "300px", // 🔥 TAMANHO PADRÃO UNIFICADO
-                        height: "300px", // 🔥 TODAS IGUAIS
+                        width: "500px", // 🔥 TAMANHO PADRÃO UNIFICADO
+                        height: "500px", // 🔥 TODAS IGUAIS
                         objectFit: "contain",
                       }}
                     />
