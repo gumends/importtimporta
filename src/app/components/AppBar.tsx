@@ -197,6 +197,7 @@ export default function AppBar() {
                 alignItems: "center",
                 justifyContent: "center",
               }}
+              onClick={() => router.push("/inicio")}
             >
               <Typography level="h4" sx={{ fontWeight: 700 }}>
                 IMPORT
@@ -356,6 +357,7 @@ export default function AppBar() {
                 alignItems: "center",
                 justifyContent: "center",
               }}
+              onClick={() => router.push("/inicio")}
             >
               <Typography level="h4" sx={{ fontWeight: 700 }}>
                 IMPORT
