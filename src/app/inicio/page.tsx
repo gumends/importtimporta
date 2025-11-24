@@ -43,11 +43,9 @@ export default function Inicio() {
   const [produtosAleatorios, setProdutosAleatorios] = useState<
     Produto[] | null
   >(null);
-  const [produtosPromocoes, setProdutosPromocoes] = useState<
-    ProdutoPaginados
-  >();
+  const [produtosPromocoes, setProdutosPromocoes] =
+    useState<ProdutoPaginados>();
 
-  
   async function carregarPromocoes(pagina: number = 1) {
     const resultado: ProdutoPaginados = await getProdutosPromocoes(pagina, 3);
     if (resultado) {
@@ -161,27 +159,34 @@ export default function Inicio() {
             mb: 3,
           }}
         >
-          <Box
-            component="img"
-            key={produtoNovaGeracao?.modelos?.[0]?.image ?? "/atual.png"}
-            src={produtoNovaGeracao?.modelos?.[0]?.image ?? "/atual.png"}
-            alt={produtoNovaGeracao?.nomeProduto ?? "Produto destaque"}
-            sx={{
-              width: "100%",
-              height:
-                produtoNovaGeracao?.id === 7
-                  ? "100%"
-                  : produtoNovaGeracao?.id === 10
-                  ? "95%"
-                  : "90%",
-              objectFit: "contain",
-              animation: "fadeIn 1s ease-in-out",
-              "@keyframes fadeIn": {
-                from: { opacity: 0 },
-                to: { opacity: 1 },
-              },
-            }}
-          />
+          <Box sx={{
+            height: '600px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'end',
+          }}>
+            <Box
+              component="img"
+              key={produtoNovaGeracao?.modelos?.[0]?.image ?? "/atual.png"}
+              src={produtoNovaGeracao?.modelos?.[0]?.image ?? "/atual.png"}
+              alt={produtoNovaGeracao?.nomeProduto ?? "Produto destaque"}
+              sx={{
+                width: "100%",
+                height:
+                  produtoNovaGeracao?.id === 7
+                    ? "100%"
+                    : produtoNovaGeracao?.id === 10
+                    ? "95%"
+                    : "90%",
+                objectFit: "contain",
+                animation: "fadeIn 1s ease-in-out",
+                "@keyframes fadeIn": {
+                  from: { opacity: 0 },
+                  to: { opacity: 1 },
+                },
+              }}
+            />
+          </Box>
 
           <Box
             sx={{
@@ -392,6 +397,7 @@ export default function Inicio() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          height: "800px",
           gap: 2,
           py: 6,
         }}
@@ -410,7 +416,6 @@ export default function Inicio() {
             px: { xs: 2, md: 6 },
           }}
         >
-          {/* Grid de promoções */}
           <Box
             sx={{
               display: "grid",
