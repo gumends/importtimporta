@@ -219,7 +219,7 @@ export default function Inicio() {
               fontSize: { xs: "1.7rem", md: "2.2rem" },
             }}
           >
-            Produtos variados
+            Produtos Variados
           </Typography>
 
           <Swiper
@@ -232,9 +232,9 @@ export default function Inicio() {
             speed={900}
             style={{
               width: "100%",
-              height: "520px",
-              display: "flex",
-              alignItems: "center",
+              height: "auto",
+              minHeight: "600px",
+              paddingBottom: "40px",
             }}
           >
             {produtosAleatorios?.map((p, i) => (
@@ -256,7 +256,6 @@ export default function Inicio() {
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
-                      height: "100%",
                     }}
                   >
                     <Box
@@ -264,21 +263,20 @@ export default function Inicio() {
                       src={p.imagem}
                       alt={p.nomeProduto}
                       sx={{
-                        width: "500px", 
-                        height: "500px", 
+                        width: { xs: "70%", md: "500px" },
+                        height: { xs: "280px", md: "500px" },
                         objectFit: "contain",
                       }}
                     />
                   </Box>
-
                   <Box
                     sx={{
                       flex: 1,
                       color: "#fff",
                       textAlign: { xs: "center", md: "left" },
-                      alignItems: { xs: "center", md: "flex-start" },
                       display: "flex",
                       flexDirection: "column",
+                      alignItems: { xs: "center", md: "flex-start" },
                     }}
                   >
                     <Typography level="h4" sx={{ mb: 1 }}>

@@ -14,8 +14,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { buscaProdutosPorNome } from "@/services/produtos/produtos.service";
 import { Produto } from "@/types/produto.type";
-import { time } from "console";
-import { Person, Person2 } from "@mui/icons-material";
+import { Person } from "@mui/icons-material";
 
 export default function AppBar() {
   const router = useRouter();
@@ -215,14 +214,11 @@ export default function AppBar() {
                 IMPORTA
               </Typography>
             </Box>
-            <IconButton
-              size="sm"
-              variant="plain"
-              sx={{ p: 1 }}
-              onClick={() => setOpenMenu(true)}
+            <Box
+              sx={{ p: 1, cursor: "none",  }}
             >
-              <Person sx={{ width: 24, height: 24, color: "#fff" }} />
-            </IconButton>
+              <Person sx={{ width: 24, height: 24, color: "#fff", display: "none" }} />
+            </Box>
           </Box>
           <Box
             ref={inputRef}
