@@ -143,7 +143,10 @@ export default function ProdutosLista() {
               borderRadius: "xl",
               transition: "all 0.3s ease",
               minWidth: "300px",
-              minHeight: "500px",
+              height: "530px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
               "&:hover": {
                 transform: "translateY(-6px)",
                 boxShadow: "0 8px 25px rgba(255, 255, 255, 0.2)",
@@ -165,16 +168,19 @@ export default function ProdutosLista() {
               </AspectRatio>
             </CardOverflow>
 
-            <CardContent>
+            <CardContent
+              sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
+            >
               <Typography
                 level="title-md"
                 sx={{
                   color: "#fff",
                   fontWeight: 500,
                   mb: 1,
-                  textOverflow: "ellipsis",
                   overflow: "hidden",
                   whiteSpace: "nowrap",
+                  textOverflow: "ellipsis",
+                  height: "24px",
                 }}
               >
                 {p.nomeProduto}
@@ -182,13 +188,25 @@ export default function ProdutosLista() {
 
               <Typography
                 level="body-sm"
-                sx={{ color: "rgba(255,255,255,0.6)", mb: 1 }}
+                sx={{
+                  color: "rgba(255,255,255,0.6)",
+                  mb: 1,
+                  height: "32px",
+                  overflow: "hidden",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                }}
               >
                 {p.descricao}
               </Typography>
-
               <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
+                sx={{
+                  height: "40px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                }}
               >
                 {p.valorOriginal > p.valor && (
                   <Typography
@@ -196,35 +214,30 @@ export default function ProdutosLista() {
                     sx={{
                       color: "rgba(255,255,255,0.5)",
                       textDecoration: "line-through",
+                      fontSize: "0.85rem",
                     }}
                   >
                     {formatarDinheiro(p.valorOriginal)}
                   </Typography>
                 )}
 
-                {p.desconto > 0 && (
-                  <Typography level="body-xs">
-                    - {formatarDinheiro(p.desconto)}
-                  </Typography>
-                )}
+                <Typography
+                  level="title-lg"
+                  sx={{
+                    color: "#fff",
+                    fontWeight: 700,
+                    mt: p.valorOriginal > p.valor ? 0.3 : 1,
+                  }}
+                >
+                  {formatarDinheiro(p.valor)}
+                </Typography>
               </Box>
-
-              <Typography
-                level="title-lg"
-                sx={{
-                  color: "#fff",
-                  fontWeight: 700,
-                  mb: 1,
-                }}
-              >
-                {formatarDinheiro(p.valor)}
-              </Typography>
 
               <Button
                 fullWidth
                 variant="solid"
                 sx={{
-                  mt: 1,
+                  mt: "auto",
                   bgcolor: "#fff",
                   color: "#000",
                   fontWeight: 700,
