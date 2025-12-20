@@ -55,7 +55,7 @@ export default function ProdutosPage() {
       setLoading(false);
     }
   };
-  const apiUrl = "https://localhost:7126";
+  const apiUrl = "http://100.28.1.126:5000";
 
   const deletarProduto = async (id: number) => {
     await fetch(`${apiUrl}/produto/${id}`, { method: "DELETE" });
