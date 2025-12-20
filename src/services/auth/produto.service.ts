@@ -111,7 +111,8 @@ export class ProdutoService {
       throw new Error("Erro ao buscar produtos variados");
     }
 
-    const data: ProdutosResponse = await res.json();
-    return data.itens;
+    const data: Produto[] = await res.json();
+
+    return data;
   }
 }
