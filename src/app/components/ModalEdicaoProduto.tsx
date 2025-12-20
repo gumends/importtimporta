@@ -40,7 +40,7 @@ export default function ModalEditarProduto({
   idProduto,
   onSaved,
 }: Props) {
-  const apiUrl = "https://localhost:7126";
+  const apiUrl = "http://100.28.1.126:5000";
 
   const produtoService = new ProdutoService();
 
