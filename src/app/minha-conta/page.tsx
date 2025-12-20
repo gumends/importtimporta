@@ -136,7 +136,7 @@ export default function ProfilePage() {
                       color="success"
                       sx={{ mt: 1 }}
                     >
-                      Conta conectada com Google
+                      {user.acesso === "3" ? "Conta conectada normal" : "Conta conectada com Google"}
                     </Chip>
                   )}
                 </Box>

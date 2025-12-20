@@ -74,8 +74,7 @@ export default function ProdutosLista() {
       >
         iPhones disponíveis
       </Typography>
-
-      {/* 🔍 FILTROS */}
+      
       <Box
         sx={{
           display: "flex",
