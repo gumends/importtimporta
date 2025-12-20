@@ -269,6 +269,9 @@ export default function ModalEditarProduto({
 
     const res = await fetch(`${apiUrl}/produto/${idProduto}`, {
       method: "PUT",
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("auth_token")}`,
+      },
       body: formData,
     });
 
