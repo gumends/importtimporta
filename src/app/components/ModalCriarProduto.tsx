@@ -125,8 +125,7 @@ export default function ModalCriarProduto({
       setImagensUpload([]);
       setAba(0);
 
-      const tokenCookie = Cookies.get("auth_token");
-      console.log("Token", tokenCookie);
+      const tokenCookie = sessionStorage.getItem("auth_token");
 
       setToken(tokenCookie || "");
     }
