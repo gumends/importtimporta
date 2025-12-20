@@ -40,7 +40,7 @@ export default function ModalEditarProduto({
   idProduto,
   onSaved,
 }: Props) {
-  const apiUrl = "http://100.28.1.126:5000";
+  const apiUrl = "https://api.importtimporta.com.br";
 
   const produtoService = new ProdutoService();
 
