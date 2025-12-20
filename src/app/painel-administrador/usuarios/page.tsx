@@ -163,7 +163,7 @@ export default function UsuariosPage() {
                       <td>{u.nascimento}</td>
                       <td>
                         {
-                          TipoAcesso.find((t) => t.tipo.toString() == u.acesso)
+                          TipoAcesso.find((t) => t.tipo == u.acesso)
                             ?.nome
                         }
                       </td>
