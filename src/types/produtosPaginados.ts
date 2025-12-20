@@ -15,7 +15,7 @@ export interface Produtos {
   color: string;
   colorName: string;
   imagem: string;
-  imagens: IIMagens[] | null;
+  imagens: string[] | null;
   totalPaginas?: number;
 }
 

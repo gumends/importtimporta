@@ -2,9 +2,7 @@
 import {
   Phone,
   Mail,
-  Facebook,
   Instagram,
-  Twitter,
   WhatsApp,
 } from "@mui/icons-material";
 import {

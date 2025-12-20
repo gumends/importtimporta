@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Box,
   Typography,
@@ -9,58 +9,55 @@ import {
   CardOverflow,
   AspectRatio,
   Button,
-  Stack,
   Input,
+  Stack,
+  Skeleton,
 } from "@mui/joy";
 import { useRouter } from "next/navigation";
-import { buscaTipoProduto } from "@/services/produtos/produtos.service";
+import { ProdutoService } from "@/services/auth/produto.service";
 import { formatarDinheiro } from "@/utils/mascara_dinheiro";
-import { Produto } from "@/types/produto.type";
+import { Produto } from "@/types/ProdutoNovo.type";
+import Image from "next/image";
 
 export default function ProdutosLista() {
   const router = useRouter();
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [pagina, setPagina] = useState(1);
-  const [totalPaginas, setTotalPaginas] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(0);
 
-  // Filtros
   const [nomeProduto, setNomeProduto] = useState("");
   const [precoMinimo, setPrecoMinimo] = useState<number | undefined>();
   const [precoMaximo, setPrecoMaximo] = useState<number | undefined>();
 
-  const tipoProduto = 3; // Acessórios
+  const [loading, setLoading] = useState(true);
 
-  const carregarProdutos = async (
-    paginaAtual = pagina,
-    nome?: string,
-    min?: number,
-    max?: number
-  ) => {
-    const resultado = await buscaTipoProduto(
-      tipoProduto,
-      paginaAtual,
+  const produtoService = useMemo(() => new ProdutoService(), []);
+  const tipoProduto = 3;
+
+  const carregarProdutos = useCallback(async () => {
+    setLoading(true);
+
+    const resp = await produtoService.getProdutosPorTipo(
+      pagina,
       8,
-      nome,
-      min,
-      max
+      tipoProduto
     );
 
-    if (resultado.produtos.length > 0) {
-      setProdutos(resultado.produtos);
-      setTotalPaginas(resultado.totalPaginas);
-    } else {
-      setProdutos([]);
-      setTotalPaginas(1);
-    }
-  };
+    setProdutos(resp.itens);
+    setTotalPaginas(resp.totalPaginas);
+
+    setTimeout(() => {
+      setLoading(false);
+    }, 400);
+  }, [pagina, tipoProduto, produtoService]);
 
   useEffect(() => {
     carregarProdutos();
-  }, [pagina]);
+  }, [carregarProdutos]);
 
   const aplicarFiltros = async () => {
     setPagina(1);
-    await carregarProdutos(1, nomeProduto, precoMinimo, precoMaximo);
+    await carregarProdutos();
   };
 
   return (
@@ -81,10 +78,9 @@ export default function ProdutosLista() {
           color: "#fff",
         }}
       >
-        Acessórios disponíveis
+        iPhones disponíveis
       </Typography>
 
-      {/* 🔍 Formulário de Filtro */}
       <Box
         sx={{
           display: "flex",
@@ -101,6 +97,7 @@ export default function ProdutosLista() {
           onChange={(e) => setNomeProduto(e.target.value)}
           sx={{ minWidth: 200 }}
         />
+
         <Input
           placeholder="Preço mínimo"
           type="number"
@@ -111,6 +108,7 @@ export default function ProdutosLista() {
           }
           sx={{ minWidth: 150 }}
         />
+
         <Input
           placeholder="Preço máximo"
           type="number"
@@ -121,6 +119,7 @@ export default function ProdutosLista() {
           }
           sx={{ minWidth: 150 }}
         />
+
         <Button
           onClick={aplicarFiltros}
           variant="solid"
@@ -135,7 +134,6 @@ export default function ProdutosLista() {
         </Button>
       </Box>
 
-      {/* 🧱 Lista de produtos */}
       <Box
         sx={{
           display: "grid",
@@ -148,124 +146,181 @@ export default function ProdutosLista() {
           gap: 4,
         }}
       >
-        {produtos && produtos.length > 0 ? (
-          produtos.map((p) => (
-            <Card
-              key={p.id}
-              variant="outlined"
-              sx={{
-                bgcolor: "#121212",
-                borderColor: "#1f1f1f",
-                borderRadius: "xl",
-                transition: "all 0.3s ease",
-                "&:hover": {
-                  transform: "translateY(-6px)",
-                  boxShadow: "0 8px 25px rgba(255, 255, 255, 0.2)",
-                },
-              }}
-            >
-              <CardOverflow>
-                <AspectRatio ratio="1" sx={{ bgcolor: "#000" }}>
-                  <img
-                    src={p.imagem}
-                    alt={p.nomeProduto}
-                    loading="lazy"
-                    style={{
-                      objectFit: "contain",
-                      backgroundColor: "#000",
-                      padding: "10px",
-                    }}
+        {loading
+          ? Array.from({ length: 8 }).map((_, i) => (
+              <Card
+                key={i}
+                variant="outlined"
+                sx={{
+                  bgcolor: "#121212",
+                  borderColor: "#1f1f1f",
+                  borderRadius: "xl",
+                  minWidth: "300px",
+                  height: "530px",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <CardOverflow>
+                  <AspectRatio ratio="1" sx={{ bgcolor: "#000" }}>
+                    {/* skeleton grandão da imagem */}
+                    <Skeleton />
+                  </AspectRatio>
+                </CardOverflow>
+                <Box sx={{}}>
+                  <Skeleton
+                    sx={{ width: "80%", height: 24, borderRadius: 8 }}
                   />
-                </AspectRatio>
-              </CardOverflow>
+                </Box>
+                <Box>
+                  <Skeleton
+                    sx={{ width: "90%", height: 24, borderRadius: 8, mt: 2 }}
+                  />
+                </Box>
+                <Box>
+                  <Skeleton
+                    sx={{ width: "40%", height: 24, borderRadius: 8, mt: 6 }}
+                  />
+                </Box>
+                <Box>
+                  <Skeleton
+                    sx={{ width: "60%", height: 24, borderRadius: 8, mt: 8 }}
+                  />
+                </Box>
+                <Box>
+                  <Skeleton
+                    sx={{ width: "90%", height: 35, borderRadius: 8, mt: 15 }}
+                  />
+                </Box>
+              </Card>
+            ))
+          : produtos.map((p) => (
+              <Card
+                key={p.id}
+                variant="outlined"
+                sx={{
+                  bgcolor: "#121212",
+                  borderColor: "#1f1f1f",
+                  borderRadius: "xl",
+                  transition: "all 0.3s ease",
+                  minWidth: "300px",
+                  height: "530px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  "&:hover": {
+                    transform: "translateY(-6px)",
+                    boxShadow: "0 8px 25px rgba(255, 255, 255, 0.2)",
+                  },
+                }}
+              >
+                <CardOverflow>
+                  <AspectRatio ratio="1" sx={{ bgcolor: "#000" }}>
+                    <Image
+                      src={
+                        Array.isArray(p.imagens)
+                          ? p.imagens[0].caminho
+                          : p.imagens || ""
+                      }
+                      alt={p.nomeProduto}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 300px"
+                      style={{
+                        objectFit: "contain",
+                        backgroundColor: "#000",
+                        padding: "10px",
+                      }}
+                    />
+                  </AspectRatio>
+                </CardOverflow>
 
-              <CardContent>
-                <Typography
-                  level="title-md"
-                  sx={{
-                    color: "#fff",
-                    fontWeight: 500,
-                    mb: 1,
-                    textOverflow: "ellipsis",
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                  }}
+                <CardContent
+                  sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
                 >
-                  {p.nomeProduto}
-                </Typography>
+                  <Typography
+                    level="title-md"
+                    sx={{
+                      color: "#fff",
+                      fontWeight: 500,
+                      mb: 1,
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      textOverflow: "ellipsis",
+                      height: "24px",
+                    }}
+                  >
+                    {p.nomeProduto}
+                  </Typography>
 
-                <Typography
-                  level="body-sm"
-                  sx={{ color: "rgba(255,255,255,0.6)", mb: 1 }}
-                >
-                  {p.descricao}
-                </Typography>
+                  <Typography
+                    level="body-sm"
+                    sx={{
+                      color: "rgba(255,255,255,0.6)",
+                      mb: 1,
+                      height: "32px",
+                      overflow: "hidden",
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                    }}
+                  >
+                    {p.descricao}
+                  </Typography>
 
-                <Box
-                  sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
-                >
-                  {p.valorOriginal > p.valor && (
+                  <Box
+                    sx={{
+                      height: "40px",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {p.valorOriginal > (p.valor ?? 0) && (
+                      <Typography
+                        level="body-sm"
+                        sx={{
+                          color: "rgba(255,255,255,0.5)",
+                          textDecoration: "line-through",
+                          fontSize: "0.85rem",
+                        }}
+                      >
+                        {formatarDinheiro(p.valorOriginal)}
+                      </Typography>
+                    )}
+
                     <Typography
-                      level="body-sm"
+                      level="title-lg"
                       sx={{
-                        color: "rgba(255,255,255,0.5)",
-                        textDecoration: "line-through",
+                        color: "#fff",
+                        fontWeight: 700,
+                        mt: p.valorOriginal > (p.valor ?? 0) ? 0.3 : 1,
                       }}
                     >
-                      {formatarDinheiro(p.valorOriginal)}
+                      {formatarDinheiro(p.valor ?? 0)}
                     </Typography>
-                  )}
+                  </Box>
 
-                  {p.desconto > 0 && (
-                    <Typography level="body-xs">
-                      - {formatarDinheiro(p.desconto)}
-                    </Typography>
-                  )}
-                </Box>
-
-                <Typography
-                  level="title-lg"
-                  sx={{
-                    color: "#fff",
-                    fontWeight: 700,
-                    mb: 1,
-                  }}
-                >
-                  {formatarDinheiro(p.valor)}
-                </Typography>
-
-                <Button
-                  fullWidth
-                  variant="solid"
-                  sx={{
-                    mt: 1,
-                    bgcolor: "#fff",
-                    color: "#000",
-                    fontWeight: 700,
-                    "&:hover": { bgcolor: "#f5f5f5" },
-                    textTransform: "none",
-                  }}
-                  onClick={() => {
-                    router.push(`/compra?produtoId=${p.id}&modeloId=${p.id}`);
-                  }}
-                >
-                  Comprar agora
-                </Button>
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          <Typography
-            level="body-md"
-            sx={{ color: "rgba(255,255,255,0.7)", textAlign: "center", mt: 4 }}
-          >
-            Nenhum produto encontrado com os filtros aplicados.
-          </Typography>
-        )}
+                  <Button
+                    fullWidth
+                    variant="solid"
+                    sx={{
+                      mt: "auto",
+                      bgcolor: "#fff",
+                      color: "#000",
+                      fontWeight: 700,
+                      "&:hover": { bgcolor: "#f5f5f5" },
+                      textTransform: "none",
+                    }}
+                    onClick={() => router.push(`/compra?produtoId=${p.id}`)}
+                  >
+                    Comprar agora
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
       </Box>
 
-      {/* 📄 Paginação */}
-      {totalPaginas > 0 && (
+      {!loading && totalPaginas > 1 && (
         <Stack
           direction="row"
           justifyContent="center"

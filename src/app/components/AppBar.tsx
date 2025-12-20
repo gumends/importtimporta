@@ -12,9 +12,9 @@ import {
 import { Search, Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { buscaProdutosPorNome } from "@/services/produtos/produtos.service";
 import { Produto } from "@/types/produto.type";
 import { Person } from "@mui/icons-material";
+import LoginComponent from "./LoginComponent";
 
 export default function AppBar() {
   const router = useRouter();
@@ -32,21 +32,6 @@ export default function AppBar() {
     { label: "Acessórios", path: "/acessorios" },
     { label: "Outros", path: "/outros" },
   ];
-
-  function buscaProduto(nome: string) {
-    if (!nome.trim()) {
-      setProdutos([]);
-      return;
-    }
-
-    buscaProdutosPorNome(nome).then((res: Produto[]) => {
-      setProdutos(res || []);
-    });
-  }
-
-  useEffect(() => {
-    buscaProduto(busca);
-  }, [busca]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -158,10 +143,10 @@ export default function AppBar() {
                 bgcolor: "rgba(255,255,255,0.08)",
                 "&:hover": { bgcolor: "rgba(255,255,255,0.15)" },
               }}
-              onClick={() => buscaProduto(busca)}
             >
               <Search size={18} color="#fff" />
             </IconButton>
+            <LoginComponent/>
           </Box>
         </Box>
         <Box
@@ -215,10 +200,10 @@ export default function AppBar() {
                 IMPORTA
               </Typography>
             </Box>
-            <Box
-              sx={{ p: 1, cursor: "none",  }}
-            >
-              <Person sx={{ width: 24, height: 24, color: "#fff", display: "none" }} />
+            <Box sx={{ p: 1, cursor: "none" }}>
+              <Person
+                sx={{ width: 24, height: 24, color: "#fff", display: "none" }}
+              />
             </Box>
           </Box>
           <Box
@@ -251,7 +236,6 @@ export default function AppBar() {
             <IconButton
               size="md"
               variant="soft"
-              onClick={() => buscaProduto(busca)}
               sx={{
                 bgcolor: "rgba(255,255,255,0.08)",
                 "&:hover": { bgcolor: "rgba(255,255,255,0.2)" },
