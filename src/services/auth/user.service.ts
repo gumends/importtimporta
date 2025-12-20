@@ -1,7 +1,7 @@
 import { MenuResponse } from "@/types/menus.type";
 
 export class UserService {
-  public apiUrl = "https://localhost:7126";
+  public apiUrl = "http://100.28.1.126:5000";
 
   async validaUsuario(email: string) {
     const response = await fetch(`${this.apiUrl}/usuario/valid?email=${email}`);

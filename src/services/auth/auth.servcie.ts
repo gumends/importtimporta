@@ -3,9 +3,9 @@ import { Usuario } from "@/types/usuario.type";
 interface LoginResponse {
   token: string;
 }
-// googleAuthService.ts
+
 export class GoogleAuthService {
-  private apiUrl = "https://localhost:7126";
+  private apiUrl = "http://100.28.1.126:5000";
 
   async getGoogleLoginUrl(state: string): Promise<string> {
     const res = await fetch(

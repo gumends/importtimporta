@@ -1,7 +1,7 @@
 import { Produto, ProdutosResponse } from "@/types/ProdutoNovo.type";
 
 export class ProdutoService {
-  private readonly apiUrl = "https://localhost:7126";
+  private readonly apiUrl = "http://100.28.1.126:5000";
 
   async getProdutos(pagina: number): Promise<ProdutosResponse> {
     const res = await fetch(
