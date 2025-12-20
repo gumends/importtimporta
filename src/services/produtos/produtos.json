@@ -64,11 +64,11 @@
     "colorName": "Preto",
     "imagem": "acessorios/apple_watch_7_sport_02.png",
     "imagens": [
-      {"caminho": "acessorios/apple_watch_7_sport_02.png"},
-      {"caminho": "acessorios/apple_watch_7_sport_03.png"},
-      {"caminho": "acessorios/apple_watch_7_sport_05.png"},
-      {"caminho": "acessorios/apple_watch_7_sport_06.png"},
-      {"caminho": "acessorios/apple_watch_7_sport_08.png"}
+      "acessorios/apple_watch_7_sport_02.png",
+      "acessorios/apple_watch_7_sport_03.png",
+      "acessorios/apple_watch_7_sport_05.png",
+      "acessorios/apple_watch_7_sport_06.png",
+      "acessorios/apple_watch_7_sport_08.png"
     ]
   },
   {
@@ -103,11 +103,11 @@
     "colorName": "Branco",
     "imagem": "acessorios/airpods_3rd_generation_01.png",
     "imagens": [
-      { "caminho": "acessorios/airpods_3rd_generation_01.png" },
-      { "caminho": "acessorios/airpods_3rd_generation_03.png" },
-      { "caminho": "acessorios/airpods_3rd_generation_04.png" },
-      { "caminho": "acessorios/airpods_3rd_generation_05.png" },
-      { "caminho": "acessorios/airpods_3rd_generation_06.png" }
+      "acessorios/airpods_3rd_generation_01.png",
+      "acessorios/airpods_3rd_generation_03.png",
+      "acessorios/airpods_3rd_generation_04.png",
+      "acessorios/airpods_3rd_generation_05.png",
+      "acessorios/airpods_3rd_generation_06.png"
     ]
   },
   {
@@ -175,10 +175,10 @@
     "colorName": "Branco",
     "imagem": "outros/sonyplaystation5slim_001.png",
     "imagens": [
-      { "caminho": "outros/sonyplaystation5slim_001.png" },
-      { "caminho": "outros/sonyplaystation5slim_005.png" },
-      { "caminho": "outros/sonyplaystation5slim_008.png" },
-      { "caminho": "outros/sonyplaystation5slim_009.png" }
+      "outros/sonyplaystation5slim_001.png",
+      "outros/sonyplaystation5slim_005.png",
+      "outros/sonyplaystation5slim_008.png",
+      "outros/sonyplaystation5slim_009.png"
     ]
   },
   {
@@ -708,11 +708,11 @@
     "colorName": "Branco",
     "imagem": "acessorios/apple_airpods_pro2_01.png",
     "imagens": [
-      { "caminho": "acessorios/apple_airpods_pro2_01.png" },
-      { "caminho": "acessorios/apple_airpods_pro2_02.png" },
-      { "caminho": "acessorios/apple_airpods_pro2_04.png" },
-      { "caminho": "acessorios/apple_airpods_pro2_07.png" },
-      { "caminho": "acessorios/apple_airpods_pro2_09.png" }
+      "acessorios/apple_airpods_pro2_01.png",
+      "acessorios/apple_airpods_pro2_02.png",
+      "acessorios/apple_airpods_pro2_04.png",
+      "acessorios/apple_airpods_pro2_07.png",
+      "acessorios/apple_airpods_pro2_09.png" 
     ]
   },
     {
@@ -747,11 +747,11 @@
     "colorName": "Preto",
     "imagem": "acessorios/apple_watch_ultra_001.png",
     "imagens": [
-      {"caminho": "acessorios/apple_watch_ultra_001.png"},
-      {"caminho": "acessorios/apple_watch_ultra_002.png"},
-      {"caminho": "acessorios/apple_watch_ultra_003.png"},
-      {"caminho": "acessorios/apple_watch_ultra_004.png"},
-      {"caminho": "acessorios/apple_watch_ultra_005.png"}
+      "acessorios/apple_watch_ultra_001.png",
+      "acessorios/apple_watch_ultra_002.png",
+      "acessorios/apple_watch_ultra_003.png",
+      "acessorios/apple_watch_ultra_004.png",
+      "acessorios/apple_watch_ultra_005.png"
     ]
   }
   

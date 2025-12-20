@@ -18,16 +18,17 @@ import ModalInicial from "../components/ModalInicial";
 import {
   getCoresProduto,
   getProduto,
-  getprodutosAleatorios,
   getProdutosNovaGeracao,
   getProdutosPorProdutoIdEModeloId,
-  getProdutosPromocoes,
 } from "@/services/produtos/produtos.service";
 
-import { Produto } from "@/types/produto.type";
 import { ModelosOption, ProdutoAtual } from "@/types/produtoAtual.type";
 import { formatarDinheiro } from "@/utils/mascara_dinheiro";
-import { ProdutoPaginados } from "@/types/produtosPaginados";
+import { ProdutoService } from "@/services/auth/produto.service";
+import {
+  ProdutosResponse,
+  Produto as ProdutoNovo,
+} from "@/types/ProdutoNovo.type";
 
 export default function Inicio() {
   useEffect(() => {
@@ -41,16 +42,22 @@ export default function Inicio() {
   const [cores, setCores] = useState<ModelosOption[] | null>(null);
   const [novaGeracao, setNovaGeracao] = useState<ProdutoAtual[] | null>(null);
   const [produtosAleatorios, setProdutosAleatorios] = useState<
-    Produto[] | null
+    ProdutoNovo[] | null
   >(null);
   const [produtosPromocoes, setProdutosPromocoes] =
-    useState<ProdutoPaginados>();
+    useState<ProdutosResponse>();
   const [pagina, setPagina] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
 
+  const service = new ProdutoService();
+
   async function carregarPromocoes(pagina: number = 1) {
-    const resultado: ProdutoPaginados = await getProdutosPromocoes(pagina, 3);
+    const resultado: ProdutosResponse = await service.getProdutosPromocao(
+      pagina,
+      3
+    );
     if (resultado) {
+      console.log(resultado);
       setProdutosPromocoes(resultado);
       setTotalPaginas(resultado.totalPaginas);
       setPagina(pagina);
@@ -58,7 +65,9 @@ export default function Inicio() {
   }
 
   async function buscaProdutoAleatoros() {
-    setProdutosAleatorios(await getprodutosAleatorios());
+    await service.getProdutosVariados(3).then((res: ProdutoNovo[]) => {
+      setProdutosAleatorios(res);
+    });
   }
 
   async function buscaProduto(id: number) {
@@ -260,7 +269,7 @@ export default function Inicio() {
                   >
                     <Box
                       component="img"
-                      src={p.imagem}
+                      src={p.imagens?.[0]?.caminho ?? ""}
                       alt={p.nomeProduto}
                       sx={{
                         width: { xs: "70%", md: "500px" },
@@ -288,7 +297,7 @@ export default function Inicio() {
                     </Typography>
 
                     <Typography sx={{ mt: 2, fontWeight: 700 }}>
-                      {formatarDinheiro(p.valor)}
+                      {formatarDinheiro(p.valor ?? 0)}
                     </Typography>
 
                     <Button
@@ -337,7 +346,7 @@ export default function Inicio() {
             gap: 3,
           }}
         >
-          {produtosPromocoes?.produtos.map((p) => (
+          {produtosPromocoes?.itens.map((p) => (
             <Card
               key={p.id}
               sx={{
@@ -349,13 +358,15 @@ export default function Inicio() {
             >
               <Box
                 component="img"
-                src={p.imagem}
+                src={p.imagens?.[0]?.caminho ?? ""}
+                alt={p.imagens?.[0]?.descricao ?? ""}
                 sx={{
                   width: "100%",
                   height: 160,
                   objectFit: "contain",
                 }}
               />
+
               <Typography level="h4" sx={{ mt: 2 }}>
                 {p.nomeProduto}
               </Typography>
@@ -365,7 +376,7 @@ export default function Inicio() {
               </Typography>
 
               <Stack direction="row" spacing={1} justifyContent="center" mt={1}>
-                <Typography>{formatarDinheiro(p.valor)}</Typography>
+                <Typography>{formatarDinheiro(p.valor ?? 0)}</Typography>
                 <Typography
                   sx={{ textDecoration: "line-through", opacity: 0.6 }}
                 >

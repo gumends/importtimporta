@@ -1,24 +1,25 @@
 export interface Produto {
   id: number;
   nomeProduto: string;
-  valor: number;
+  valor?: number;
   valorOriginal: number;
   valorParcelado: number;
   desconto: number;
   descricao: string;
   tipoProduto: number;
-  novoLançamento: boolean;
+  novoLancamento: boolean;
   novaGeracao?: boolean;
   disponivel: boolean;
   mesesGarantia: number;
   informacoesAdicionais: Informacoes | null;
+  informacoesAdicionaisId?: number;
   color: string;
   colorName: string;
-  imagem: string;
-  imagens: string[] | null;
+  imagens: IImagem[] | null;
 }
 
 export interface Informacoes {
+  id?: number;
   marca: string;
   armazenamentoInterno: string | null;
   tipoTela: string | null;
@@ -34,6 +35,16 @@ export interface Informacoes {
   material: string | null;
 }
 
-export interface Produtos {
-  produtos: Produto[];
+export interface IImagem {
+  caminho: string;
+  descricao: string;
+  produtoId: number;
+}
+
+export interface ProdutosResponse {
+  itens: Produto[];
+  paginaAtual: number;
+  tamanhoPagina: number;
+  totalItens: number;
+  totalPaginas: number;
 }

@@ -11,12 +11,12 @@ import {
   Button,
   Input,
   Stack,
+  Skeleton,
 } from "@mui/joy";
 import { useRouter } from "next/navigation";
-import _ from "lodash";
-import { buscaTipoProduto } from "@/services/produtos/produtos.service";
-import { Produto } from "@/types/produto.type";
+import { ProdutoService } from "@/services/auth/produto.service";
 import { formatarDinheiro } from "@/utils/mascara_dinheiro";
+import { Produto } from "@/types/ProdutoNovo.type";
 
 export default function ProdutosLista() {
   const router = useRouter();
@@ -28,19 +28,21 @@ export default function ProdutosLista() {
   const [precoMinimo, setPrecoMinimo] = useState<number | undefined>();
   const [precoMaximo, setPrecoMaximo] = useState<number | undefined>();
 
+  const [loading, setLoading] = useState(true);
+
+  const produtoService = new ProdutoService();
   const tipoProduto = 1;
 
   const carregarProdutos = async () => {
-    const { produtos, totalPaginas } = await buscaTipoProduto(
-      tipoProduto,
-      pagina,
-      8,
-      nomeProduto,
-      precoMinimo,
-      precoMaximo
-    );
-    setProdutos(produtos);
-    setTotalPaginas(totalPaginas);
+    setLoading(true);
+
+    const resp = await produtoService.getProdutosPorTipo(pagina, 8, tipoProduto);
+    setProdutos(resp.itens);
+    setTotalPaginas(resp.totalPaginas);
+
+    setTimeout(() => {
+      setLoading(false);
+    }, 400);
   };
 
   useEffect(() => {
@@ -72,6 +74,8 @@ export default function ProdutosLista() {
       >
         iPhones disponíveis
       </Typography>
+
+      {/* 🔍 FILTROS */}
       <Box
         sx={{
           display: "flex",
@@ -88,6 +92,7 @@ export default function ProdutosLista() {
           onChange={(e) => setNomeProduto(e.target.value)}
           sx={{ minWidth: 200 }}
         />
+
         <Input
           placeholder="Preço mínimo"
           type="number"
@@ -98,6 +103,7 @@ export default function ProdutosLista() {
           }
           sx={{ minWidth: 150 }}
         />
+
         <Input
           placeholder="Preço máximo"
           type="number"
@@ -108,6 +114,7 @@ export default function ProdutosLista() {
           }
           sx={{ minWidth: 150 }}
         />
+
         <Button
           onClick={aplicarFiltros}
           variant="solid"
@@ -133,128 +140,182 @@ export default function ProdutosLista() {
           gap: 4,
         }}
       >
-        {produtos.map((p) => (
-          <Card
-            key={p.id}
-            variant="outlined"
-            sx={{
-              bgcolor: "#121212",
-              borderColor: "#1f1f1f",
-              borderRadius: "xl",
-              transition: "all 0.3s ease",
-              minWidth: "300px",
-              height: "530px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              "&:hover": {
-                transform: "translateY(-6px)",
-                boxShadow: "0 8px 25px rgba(255, 255, 255, 0.2)",
-              },
-            }}
-          >
-            <CardOverflow>
-              <AspectRatio ratio="1" sx={{ bgcolor: "#000" }}>
-                <img
-                  src={p.imagem}
-                  alt={p.nomeProduto}
-                  loading="lazy"
-                  style={{
-                    objectFit: "contain",
-                    backgroundColor: "#000",
-                    padding: "10px",
-                  }}
-                />
-              </AspectRatio>
-            </CardOverflow>
-
-            <CardContent
-              sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
-            >
-              <Typography
-                level="title-md"
+        {loading
+          ? Array.from({ length: 8 }).map((_, i) => (
+              <Card
+                key={i}
+                variant="outlined"
                 sx={{
-                  color: "#fff",
-                  fontWeight: 500,
-                  mb: 1,
-                  overflow: "hidden",
-                  whiteSpace: "nowrap",
-                  textOverflow: "ellipsis",
-                  height: "24px",
-                }}
-              >
-                {p.nomeProduto}
-              </Typography>
-
-              <Typography
-                level="body-sm"
-                sx={{
-                  color: "rgba(255,255,255,0.6)",
-                  mb: 1,
-                  height: "32px",
-                  overflow: "hidden",
-                  display: "-webkit-box",
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: "vertical",
-                }}
-              >
-                {p.descricao}
-              </Typography>
-              <Box
-                sx={{
-                  height: "40px",
+                  bgcolor: "#121212",
+                  borderColor: "#1f1f1f",
+                  borderRadius: "xl",
+                  minWidth: "300px",
+                  height: "530px",
                   display: "flex",
                   flexDirection: "column",
-                  justifyContent: "center",
                 }}
               >
-                {p.valorOriginal > p.valor && (
+                <CardOverflow>
+                  <AspectRatio ratio="1" sx={{ bgcolor: "#000" }}>
+                    <Skeleton />
+                  </AspectRatio>
+                </CardOverflow>
+                <Box sx={{}}>
+                  <Skeleton
+                    sx={{ width: "80%", height: 24, borderRadius: 8 }}
+                  />
+                </Box>
+                <Box>
+                  <Skeleton
+                    sx={{ width: "90%", height: 24, borderRadius: 8, mt: 2 }}
+                  />
+                </Box>
+                <Box>
+                  <Skeleton
+                    sx={{ width: "40%", height: 24, borderRadius: 8, mt: 6 }}
+                  />
+                </Box>
+                <Box>
+                  <Skeleton
+                    sx={{ width: "60%", height: 24, borderRadius: 8, mt: 8 }}
+                  />
+                </Box>
+                <Box>
+                  <Skeleton
+                    sx={{ width: "90%", height: 35, borderRadius: 8, mt: 15 }}
+                  />
+                </Box>
+              </Card>
+            ))
+          : produtos.map((p) => (
+              <Card
+                key={p.id}
+                variant="outlined"
+                sx={{
+                  bgcolor: "#121212",
+                  borderColor: "#1f1f1f",
+                  borderRadius: "xl",
+                  transition: "all 0.3s ease",
+                  minWidth: "300px",
+                  height: "530px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  "&:hover": {
+                    transform: "translateY(-6px)",
+                    boxShadow: "0 8px 25px rgba(255, 255, 255, 0.2)",
+                  },
+                }}
+              >
+                <CardOverflow>
+                  <AspectRatio ratio="1" sx={{ bgcolor: "#000" }}>
+                    <img
+                      src={
+                        Array.isArray(p.imagens)
+                          ? p.imagens[0].caminho
+                          : p.imagens || undefined
+                      }
+                      alt={p.nomeProduto}
+                      loading="lazy"
+                      style={{
+                        objectFit: "contain",
+                        backgroundColor: "#000",
+                        padding: "10px",
+                      }}
+                    />
+                  </AspectRatio>
+                </CardOverflow>
+
+                <CardContent
+                  sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
+                >
+                  <Typography
+                    level="title-md"
+                    sx={{
+                      color: "#fff",
+                      fontWeight: 500,
+                      mb: 1,
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      textOverflow: "ellipsis",
+                      height: "24px",
+                    }}
+                  >
+                    {p.nomeProduto}
+                  </Typography>
+
                   <Typography
                     level="body-sm"
                     sx={{
-                      color: "rgba(255,255,255,0.5)",
-                      textDecoration: "line-through",
-                      fontSize: "0.85rem",
+                      color: "rgba(255,255,255,0.6)",
+                      mb: 1,
+                      height: "32px",
+                      overflow: "hidden",
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
                     }}
                   >
-                    {formatarDinheiro(p.valorOriginal)}
+                    {p.descricao}
                   </Typography>
-                )}
 
-                <Typography
-                  level="title-lg"
-                  sx={{
-                    color: "#fff",
-                    fontWeight: 700,
-                    mt: p.valorOriginal > p.valor ? 0.3 : 1,
-                  }}
-                >
-                  {formatarDinheiro(p.valor)}
-                </Typography>
-              </Box>
+                  <Box
+                    sx={{
+                      height: "40px",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {p.valorOriginal > (p.valor ?? 0) && (
+                      <Typography
+                        level="body-sm"
+                        sx={{
+                          color: "rgba(255,255,255,0.5)",
+                          textDecoration: "line-through",
+                          fontSize: "0.85rem",
+                        }}
+                      >
+                        {formatarDinheiro(p.valorOriginal)}
+                      </Typography>
+                    )}
 
-              <Button
-                fullWidth
-                variant="solid"
-                sx={{
-                  mt: "auto",
-                  bgcolor: "#fff",
-                  color: "#000",
-                  fontWeight: 700,
-                  "&:hover": { bgcolor: "#f5f5f5" },
-                  textTransform: "none",
-                }}
-                onClick={() =>
-                  router.push(`/compra?produtoId=${p.id}&modeloId=${p.id}`)
-                }
-              >
-                Comprar agora
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
+                    <Typography
+                      level="title-lg"
+                      sx={{
+                        color: "#fff",
+                        fontWeight: 700,
+                        mt: p.valorOriginal > (p.valor ?? 0) ? 0.3 : 1,
+                      }}
+                    >
+                      {formatarDinheiro(p.valor ?? 0)}
+                    </Typography>
+                  </Box>
+
+                  <Button
+                    fullWidth
+                    variant="solid"
+                    sx={{
+                      mt: "auto",
+                      bgcolor: "#fff",
+                      color: "#000",
+                      fontWeight: 700,
+                      "&:hover": { bgcolor: "#f5f5f5" },
+                      textTransform: "none",
+                    }}
+                    onClick={() =>
+                      router.push(`/compra?produtoId=${p.id}`)
+                    }
+                  >
+                    Comprar agora
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
       </Box>
-      {totalPaginas > 1 && (
+
+      {/* PAGINAÇÃO (esconde enquanto carrega) */}
+      {!loading && totalPaginas > 1 && (
         <Stack
           direction="row"
           justifyContent="center"

@@ -20,16 +20,14 @@ import {
   Select,
   Option,
 } from "@mui/joy";
-import { Produto as p } from "@/types/produto.type";
-import {
-  buscaProduto,
-  getProdutosPorProdutoIdEModeloId,
-} from "@/services/produtos/produtos.service";
 import {
   formatarDinheiro,
   mascaraDinheiro,
   removerMascaraDinheiro,
 } from "@/utils/mascara_dinheiro";
+import { ProdutoService } from "@/services/auth/produto.service";
+import { Produto as p, ProdutosResponse } from "@/types/ProdutoNovo.type";
+import ModalEditarProduto from "../components/ModalEdicaoProduto";
 
 interface ResponseParcela {
   valorOriginal: number;
@@ -46,11 +44,30 @@ export default function Produto() {
   const [valor, setValor] = React.useState("");
   const [parcelas, setParcelas] = React.useState<number>(1);
   const [valorParcela, setValorParcela] = React.useState<ResponseParcela>();
+  const [imagemPrincipal, setImagemPrincipal] =
+    React.useState("/placeholder.png");
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [produtoEdit, setProdutoEdit] = React.useState<p | null>(null);
+  const service = new ProdutoService();
+  const [data, setData] = React.useState<ProdutosResponse | null>(null);
+  const [page, setPage] = React.useState(1);
 
   const porcentagemParcelas: number[] = [
     1.07, 1.07, 1.07, 1.07, 1.07, 1.075, 1.08, 1.09, 1.095, 1.1, 1.105, 1.115,
     1.125, 1.13, 1.14, 1.145, 1.15, 1.155,
   ];
+
+  const fetchProdutos = async (pagina: number) => {
+    try {
+      const res = await service.getProdutos(pagina);
+      console.log(res);
+      setData(res);
+    } catch (err) {
+      console.error("Erro ao carregar produtos", err);
+    } finally {
+      console.log("");
+    }
+  };
 
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -59,8 +76,10 @@ export default function Produto() {
     if (produtoParam) {
       const produtoId = parseInt(produtoParam, 10);
 
-      buscaProduto(produtoId).then((prod) => {
+      service.getProdutoPorId(produtoId).then((prod) => {
         if (prod) {
+          console.log("teste", prod);
+          setImagemPrincipal(prod.imagens?.[0].caminho ?? "/placeholder.png");
           setProduto(prod);
         }
       });
@@ -103,16 +122,6 @@ export default function Produto() {
       </Box>
     );
   }
-
-  const preco = produto.valor.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
-
-  const precoOriginal = produto.valorOriginal.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
 
   const handleComprar = () => {
     const mensagem = `Olá, gostaria de comprar o produto: ${produto.nomeProduto}`;
@@ -159,7 +168,7 @@ export default function Produto() {
           </Typography>
           <Box
             component="img"
-            src={produto.imagem ?? "/placeholder.png"}
+            src={imagemPrincipal}
             alt={produto.nomeProduto}
             sx={{
               width: "100%",
@@ -197,7 +206,7 @@ export default function Produto() {
                     cursor: "pointer",
                     borderRadius: 10,
                     border:
-                      imagem.caminho === produto.imagem
+                      imagem === produto.imagens?.[index]
                         ? "2px solid rgba(255, 255, 255, 0.25)"
                         : "2px solid transparent",
                     bgcolor: "rgba(255,255,255,0.05)",
@@ -206,9 +215,7 @@ export default function Produto() {
                       borderColor: "rgba(255,255,255,0.3)",
                     },
                   }}
-                  onClick={() =>
-                    setProduto({ ...produto, imagem: imagem.caminho })
-                  }
+                  onClick={() => setImagemPrincipal(imagem.caminho)}
                 />
               ))}
             </Box>
@@ -240,7 +247,7 @@ export default function Produto() {
                 fontSize: "1.5rem",
               }}
             >
-              {precoOriginal}
+              {formatarDinheiro(produto.valorOriginal)}
             </Typography>
           )}
           <Typography
@@ -251,7 +258,7 @@ export default function Produto() {
               textAlign: "left",
             }}
           >
-            {preco}
+            {formatarDinheiro(produto.valor ?? 0)}
           </Typography>
           <Typography
             sx={{
@@ -302,6 +309,22 @@ export default function Produto() {
               }}
             >
               SIMULAR PAGAMENTO
+            </Button>
+            <Button
+              variant="soft"
+              sx={{
+                borderColor: "#fff",
+                color: "#fff",
+                fontWeight: 600,
+                textTransform: "none",
+                "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
+              }}
+              onClick={() => {
+                setProdutoEdit(produto);
+                setModalOpen(true);
+              }}
+            >
+              ADMINISTRAR PRODUTO
             </Button>
           </Stack>
           <Chip color={produto.disponivel ? "success" : "danger"}>
@@ -428,7 +451,7 @@ export default function Produto() {
           >
             <Box
               component="img"
-              src={produto.imagem ?? "/placeholder.png"}
+              src={produto.imagens?.[0].caminho ?? "/placeholder.png"}
               alt={produto.nomeProduto}
               sx={{
                 width: "100%",
@@ -626,6 +649,12 @@ export default function Produto() {
           </Box>
         </ModalDialog>
       </Modal>
+      <ModalEditarProduto
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        idProduto={ produtoEdit?.id ?? 0}
+        onSaved={() => fetchProdutos(page)}
+      />
     </Box>
   );
 }
