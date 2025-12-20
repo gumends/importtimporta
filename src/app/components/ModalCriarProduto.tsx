@@ -36,7 +36,7 @@ export default function ModalCriarProduto({
   onClose,
   onSaved,
 }: PropsCriarProduto) {
-  const apiUrl = "http://100.28.1.126:5000";
+  const apiUrl = "https://api.importtimporta.com.br";
   const [aba, setAba] = useState(0);
 
   const EntradaOculta = styled("input")`

@@ -5,7 +5,7 @@ interface LoginResponse {
 }
 
 export class GoogleAuthService {
-  private apiUrl = "http://100.28.1.126:5000";
+  private apiUrl = "https://api.importtimporta.com.br";
 
   async getGoogleLoginUrl(state: string): Promise<string> {
     const res = await fetch(
