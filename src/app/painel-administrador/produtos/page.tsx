@@ -55,7 +55,7 @@ export default function ProdutosPage() {
       setLoading(false);
     }
   };
-  const apiUrl = "https://api.importtimporta.com.br";
+  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   const deletarProduto = async (id: number) => {
     await fetch(`${apiUrl}/produto/${id}`, { method: "DELETE" });

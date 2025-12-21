@@ -40,7 +40,7 @@ export default function ModalEditarProduto({
   idProduto,
   onSaved,
 }: Props) {
-  const apiUrl = "https://api.importtimporta.com.br";
+  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   const produtoService = new ProdutoService();
 
@@ -306,7 +306,6 @@ export default function ModalEditarProduto({
               <Tab>Informações Adicionais</Tab>
             </TabList>
 
-            {/* ABA 1 */}
             <TabPanel value={0}>
               <Grid container spacing={2} sx={{ mt: 1 }}>
                 <Grid xs={12}>
@@ -364,7 +363,6 @@ export default function ModalEditarProduto({
                   </FormControl>
                 </Grid>
 
-                {/* Imagens */}
                 <Grid xs={12}>
                   <FormControl>
                     <FormLabel>Imagens *</FormLabel>
@@ -557,7 +555,6 @@ export default function ModalEditarProduto({
               </Grid>
             </TabPanel>
 
-            {/* ABA 2 */}
             <TabPanel value={1}>
               <Grid container spacing={2}>
                 <Grid xs={6}>
