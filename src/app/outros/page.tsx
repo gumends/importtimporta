@@ -36,7 +36,14 @@ export default function ProdutosLista() {
   const carregarProdutos = async () => {
     setLoading(true);
 
-    const resp = await produtoService.getProdutosPorTipo(pagina, 8, tipoProduto);
+    const resp = await produtoService.getProdutosPorTipo(
+      tipoProduto,
+      pagina,
+      8
+    );
+
+    console.log(resp);
+
     setProdutos(resp.itens);
     setTotalPaginas(resp.totalPaginas);
 
@@ -72,10 +79,9 @@ export default function ProdutosLista() {
           color: "#fff",
         }}
       >
-        iPhones disponíveis
+        Outros produtos disponíveis
       </Typography>
 
-      {/* 🔍 FILTROS */}
       <Box
         sx={{
           display: "flex",
@@ -128,8 +134,6 @@ export default function ProdutosLista() {
           Aplicar filtros
         </Button>
       </Box>
-
-      {/* 🧱 GRID DE PRODUTOS / SKELETON */}
       <Box
         sx={{
           display: "grid",
@@ -159,7 +163,6 @@ export default function ProdutosLista() {
               >
                 <CardOverflow>
                   <AspectRatio ratio="1" sx={{ bgcolor: "#000" }}>
-                    {/* skeleton grandão da imagem */}
                     <Skeleton />
                   </AspectRatio>
                 </CardOverflow>
@@ -306,9 +309,7 @@ export default function ProdutosLista() {
                       "&:hover": { bgcolor: "#f5f5f5" },
                       textTransform: "none",
                     }}
-                    onClick={() =>
-                      router.push(`/compra?produtoId=${p.id}`)
-                    }
+                    onClick={() => router.push(`/compra?produtoId=${p.id}`)}
                   >
                     Comprar agora
                   </Button>

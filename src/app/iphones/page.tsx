@@ -36,7 +36,14 @@ export default function ProdutosLista() {
   const carregarProdutos = async () => {
     setLoading(true);
 
-    const resp = await produtoService.getProdutosPorTipo(pagina, 8, tipoProduto);
+    const resp = await produtoService.getProdutosPorTipo(
+      tipoProduto,
+      pagina,
+      8
+    );
+
+    console.log(resp);
+
     setProdutos(resp.itens);
     setTotalPaginas(resp.totalPaginas);
 
@@ -74,7 +81,7 @@ export default function ProdutosLista() {
       >
         iPhones disponíveis
       </Typography>
-      
+
       <Box
         sx={{
           display: "flex",
@@ -302,9 +309,7 @@ export default function ProdutosLista() {
                       "&:hover": { bgcolor: "#f5f5f5" },
                       textTransform: "none",
                     }}
-                    onClick={() =>
-                      router.push(`/compra?produtoId=${p.id}`)
-                    }
+                    onClick={() => router.push(`/compra?produtoId=${p.id}`)}
                   >
                     Comprar agora
                   </Button>

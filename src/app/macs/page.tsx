@@ -36,7 +36,14 @@ export default function ProdutosLista() {
   const carregarProdutos = async () => {
     setLoading(true);
 
-    const resp = await produtoService.getProdutosPorTipo(pagina, 8, tipoProduto);
+    const resp = await produtoService.getProdutosPorTipo(
+      tipoProduto,
+      pagina,
+      8
+    );
+
+    console.log(resp);
+
     setProdutos(resp.itens);
     setTotalPaginas(resp.totalPaginas);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -17,7 +17,6 @@ import { useRouter } from "next/navigation";
 import { ProdutoService } from "@/services/auth/produto.service";
 import { formatarDinheiro } from "@/utils/mascara_dinheiro";
 import { Produto } from "@/types/ProdutoNovo.type";
-import Image from "next/image";
 
 export default function ProdutosLista() {
   const router = useRouter();
@@ -31,17 +30,19 @@ export default function ProdutosLista() {
 
   const [loading, setLoading] = useState(true);
 
-  const produtoService = useMemo(() => new ProdutoService(), []);
+  const produtoService = new ProdutoService();
   const tipoProduto = 3;
 
-  const carregarProdutos = useCallback(async () => {
+  const carregarProdutos = async () => {
     setLoading(true);
 
     const resp = await produtoService.getProdutosPorTipo(
+      tipoProduto,
       pagina,
-      8,
-      tipoProduto
+      8
     );
+
+    console.log(resp);
 
     setProdutos(resp.itens);
     setTotalPaginas(resp.totalPaginas);
@@ -49,11 +50,11 @@ export default function ProdutosLista() {
     setTimeout(() => {
       setLoading(false);
     }, 400);
-  }, [pagina, tipoProduto, produtoService]);
+  };
 
   useEffect(() => {
     carregarProdutos();
-  }, [carregarProdutos]);
+  }, [pagina]);
 
   const aplicarFiltros = async () => {
     setPagina(1);
@@ -78,7 +79,7 @@ export default function ProdutosLista() {
           color: "#fff",
         }}
       >
-        iPhones disponíveis
+        Acessórios
       </Typography>
 
       <Box
@@ -133,7 +134,6 @@ export default function ProdutosLista() {
           Aplicar filtros
         </Button>
       </Box>
-
       <Box
         sx={{
           display: "grid",
@@ -163,7 +163,6 @@ export default function ProdutosLista() {
               >
                 <CardOverflow>
                   <AspectRatio ratio="1" sx={{ bgcolor: "#000" }}>
-                    {/* skeleton grandão da imagem */}
                     <Skeleton />
                   </AspectRatio>
                 </CardOverflow>
@@ -216,15 +215,14 @@ export default function ProdutosLista() {
               >
                 <CardOverflow>
                   <AspectRatio ratio="1" sx={{ bgcolor: "#000" }}>
-                    <Image
+                    <img
                       src={
                         Array.isArray(p.imagens)
                           ? p.imagens[0].caminho
-                          : p.imagens || ""
+                          : p.imagens || undefined
                       }
                       alt={p.nomeProduto}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 300px"
+                      loading="lazy"
                       style={{
                         objectFit: "contain",
                         backgroundColor: "#000",
@@ -320,6 +318,7 @@ export default function ProdutosLista() {
             ))}
       </Box>
 
+      {/* PAGINAÇÃO (esconde enquanto carrega) */}
       {!loading && totalPaginas > 1 && (
         <Stack
           direction="row"

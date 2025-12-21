@@ -97,8 +97,8 @@ export class ProdutoService {
     if (!res.ok) {
       throw new Error("Erro ao buscar produtos por tipo");
     }
-
-    return res.json();
+    
+    return await res.json();
   }
 
   async getProdutosVariados(quantidade: number): Promise<Produto[]> {
