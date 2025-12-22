@@ -55,7 +55,7 @@ export default function ProdutosPage() {
       setLoading(false);
     }
   };
-  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const deletarProduto = async (id: number) => {
     await fetch(`${apiUrl}/produto/${id}`, { method: "DELETE" });

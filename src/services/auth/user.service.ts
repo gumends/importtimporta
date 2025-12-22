@@ -1,7 +1,7 @@
 import { MenuResponse } from "@/types/menus.type";
 
 export class UserService {
-  public apiUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  public apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   async validaUsuario(email: string) {
     const response = await fetch(`${this.apiUrl}/usuario/valid?email=${email}`);

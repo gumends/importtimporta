@@ -40,7 +40,7 @@ export default function ModalEditarProduto({
   idProduto,
   onSaved,
 }: Props) {
-  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const produtoService = new ProdutoService();
 

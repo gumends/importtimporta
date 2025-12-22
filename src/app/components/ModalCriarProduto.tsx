@@ -37,7 +37,7 @@ export default function ModalCriarProduto({
   onClose,
   onSaved,
 }: PropsCriarProduto) {
-  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [aba, setAba] = useState(0);
 
   const EntradaOculta = styled("input")`

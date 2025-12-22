@@ -5,7 +5,7 @@ interface LoginResponse {
 }
 
 export class GoogleAuthService {
-  private apiUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  private apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   async getGoogleLoginUrl(state: string): Promise<string> {
     const res = await fetch(

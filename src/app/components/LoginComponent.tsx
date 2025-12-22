@@ -20,7 +20,6 @@ import { useRouter } from "next/navigation";
 import { UserService } from "@/services/auth/user.service";
 import { MenuResponse } from "@/types/menus.type";
 import Alerta from "./Alerta";
-import { ResponseError } from "@/types/ResponseError.type";
 
 export default function LoginComponent() {
   const [open, setOpen] = React.useState(false);
@@ -74,15 +73,28 @@ export default function LoginComponent() {
     return temTamanhoMinimo && temMaiuscula && temEspecial;
   }
 
-  async function handleGoogleLogin() {
-    try {
-      const currentUrl = window.location.href;
-      const url = await googleAuth.getGoogleLoginUrl(currentUrl);
-      window.location.href = url;
-    } catch (err) {
-      console.error("Erro ao iniciar login do Google:", err);
+async function handleGoogleLogin() {
+  const currentUrl = window.location.origin;
+  const url = await googleAuth.getGoogleLoginUrl(currentUrl);
+
+  const popup = window.open(url, "googleLogin", "width=500,height=600");
+
+  const listener = (event: MessageEvent) => {
+    if (event.origin !== process.env.NEXT_PUBLIC_API_URL) return;
+
+    const { token } = event.data;
+
+    if (token) {
+      sessionStorage.setItem("auth_token", token);
+      window.removeEventListener("message", listener);
+      popup?.close();
+      window.location.reload();
     }
-  }
+  };
+
+  window.addEventListener("message", listener);
+}
+
 
   async function getMenus(email: string) {
     const response: MenuResponse = await userService.GetMenus(email);

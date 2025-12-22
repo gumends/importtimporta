@@ -1,7 +1,7 @@
 import { Produto, ProdutosResponse } from "@/types/ProdutoNovo.type";
 
 export class ProdutoService {
-  private readonly apiUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  private readonly apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   async getProdutos(pagina: number): Promise<ProdutosResponse> {
     const res = await fetch(
