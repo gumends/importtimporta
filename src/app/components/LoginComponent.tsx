@@ -116,7 +116,7 @@ export default function LoginComponent() {
       await googleAuth.login(email, senha);
       setOpen(false);
       window.location.reload();
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (err instanceof Error) {
         mostrarAlerta(err.message, "danger", 9000);
       } else {
