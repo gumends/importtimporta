@@ -28,6 +28,8 @@ import {
 import { ProdutoService } from "@/services/auth/produto.service";
 import { Produto as p, ProdutosResponse } from "@/types/ProdutoNovo.type";
 import ModalEditarProduto from "../components/ModalEdicaoProduto";
+import { jwtDecode } from "jwt-decode";
+import { JwtPayload } from "@/types/JwtPayload.type";
 
 interface ResponseParcela {
   valorOriginal: number;
@@ -51,6 +53,7 @@ export default function Produto() {
   const service = new ProdutoService();
   const [data, setData] = React.useState<ProdutosResponse | null>(null);
   const [page, setPage] = React.useState(1);
+  const [admin, setAdmin] = React.useState(false);
 
   const porcentagemParcelas: number[] = [
     1.07, 1.07, 1.07, 1.07, 1.07, 1.075, 1.08, 1.09, 1.095, 1.1, 1.105, 1.115,
@@ -83,6 +86,14 @@ export default function Produto() {
           setProduto(prod);
         }
       });
+    }
+
+    var token = sessionStorage.getItem("auth_token");
+    if (token !== "" && token !== null) {
+      const decoded = jwtDecode<JwtPayload>(token ?? "");
+      if (decoded.role === "Admin") {
+        setAdmin(true);
+      }
     }
   }, []);
 
@@ -310,22 +321,24 @@ export default function Produto() {
             >
               SIMULAR PAGAMENTO
             </Button>
-            <Button
-              variant="soft"
-              sx={{
-                borderColor: "#fff",
-                color: "#fff",
-                fontWeight: 600,
-                textTransform: "none",
-                "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
-              }}
-              onClick={() => {
-                setProdutoEdit(produto);
-                setModalOpen(true);
-              }}
-            >
-              ADMINISTRAR PRODUTO
-            </Button>
+            {admin && (
+              <Button
+                variant="soft"
+                sx={{
+                  borderColor: "#fff",
+                  color: "#fff",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
+                }}
+                onClick={() => {
+                  setProdutoEdit(produto);
+                  setModalOpen(true);
+                }}
+              >
+                ADMINISTRAR PRODUTO
+              </Button>
+            )}
           </Stack>
           <Chip color={produto.disponivel ? "success" : "danger"}>
             {produto.disponivel ? "Produto Disponivel" : "Produto Indisponivel"}
@@ -652,7 +665,7 @@ export default function Produto() {
       <ModalEditarProduto
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        idProduto={ produtoEdit?.id ?? 0}
+        idProduto={produtoEdit?.id ?? 0}
         onSaved={() => fetchProdutos(page)}
       />
     </Box>

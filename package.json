@@ -16,6 +16,7 @@
     "@mui/joy": "^5.0.0-beta.52",
     "@mui/material": "^7.3.5",
     "js-cookie": "^3.0.5",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.545.0",
     "miragejs": "^0.1.48",
     "next": "15.5.9",
