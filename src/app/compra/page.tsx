@@ -88,7 +88,7 @@ export default function Produto() {
       });
     }
 
-    var token = sessionStorage.getItem("auth_token");
+    const token = sessionStorage.getItem("auth_token");
     if (token !== "" && token !== null) {
       const decoded = jwtDecode<JwtPayload>(token ?? "");
       if (decoded.role === "Admin") {
