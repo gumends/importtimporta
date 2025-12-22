@@ -79,10 +79,9 @@ export default function ProdutosLista() {
           color: "#fff",
         }}
       >
-        iPhones disponíveis
+        Macbooks disponíveis
       </Typography>
 
-      {/* 🔍 FILTROS */}
       <Box
         sx={{
           display: "flex",
@@ -136,7 +135,6 @@ export default function ProdutosLista() {
         </Button>
       </Box>
 
-      {/* 🧱 GRID DE PRODUTOS / SKELETON */}
       <Box
         sx={{
           display: "grid",
@@ -166,7 +164,6 @@ export default function ProdutosLista() {
               >
                 <CardOverflow>
                   <AspectRatio ratio="1" sx={{ bgcolor: "#000" }}>
-                    {/* skeleton grandão da imagem */}
                     <Skeleton />
                   </AspectRatio>
                 </CardOverflow>
@@ -324,7 +321,6 @@ export default function ProdutosLista() {
             ))}
       </Box>
 
-      {/* PAGINAÇÃO (esconde enquanto carrega) */}
       {!loading && totalPaginas > 1 && (
         <Stack
           direction="row"
