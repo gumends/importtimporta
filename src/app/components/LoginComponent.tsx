@@ -19,10 +19,27 @@ import { GoogleAuthService } from "@/services/auth/auth.servcie";
 import { useRouter } from "next/navigation";
 import { UserService } from "@/services/auth/user.service";
 import { MenuResponse } from "@/types/menus.type";
+import Alerta from "./Alerta";
+import { ResponseError } from "@/types/ResponseError.type";
 
 export default function LoginComponent() {
   const [open, setOpen] = React.useState(false);
   const [logado, setLogado] = React.useState(false);
+  const [alertaAberto, setAlertaAberto] = React.useState(false);
+  const [alertaMensagem, setAlertaMensagem] = React.useState("");
+  const [alertaTipo, setAlertaTipo] = React.useState<
+    "success" | "danger" | "warning" | "primary" | "neutral"
+  >("neutral");
+  const [TempoAlerta, setTempoAlerta] = React.useState<number | undefined>(
+    3000
+  );
+
+  const mostrarAlerta = (msg: string, tipo: TipoAlerta, tempo?: number) => {
+    setAlertaMensagem(msg);
+    setAlertaTipo(tipo);
+    setAlertaAberto(true);
+    setTempoAlerta(tempo);
+  };
 
   // Fluxo de login/cadastro
   const [userValid, setUserValid] = React.useState<boolean | null>(null);
@@ -95,10 +112,17 @@ export default function LoginComponent() {
   };
 
   const entrar = async () => {
-    await googleAuth.login(email, senha).then(() => {
+    try {
+      await googleAuth.login(email, senha);
       setOpen(false);
       window.location.reload();
-    });
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        mostrarAlerta(err.message, "danger", 9000);
+      } else {
+        mostrarAlerta("Erro ao fazer login", "danger", 9000);
+      }
+    }
   };
 
   const cadastrar = async () => {
@@ -126,220 +150,232 @@ export default function LoginComponent() {
   }, [open]);
 
   return (
-    <React.Fragment>
-      {!logado ? (
-        <IconButton onClick={() => setOpen(true)}>
-          <Person />
-        </IconButton>
-      ) : (
-        <Dropdown>
-          <MenuButton
-            slots={{ root: IconButton }}
-            slotProps={{ root: { variant: "outlined", color: "neutral" } }}
-          >
+    <>
+      <React.Fragment>
+        {!logado ? (
+          <IconButton onClick={() => setOpen(true)}>
             <Person />
-          </MenuButton>
-          <Menu>
-            {menus.map((menu) => (
-              <MenuItem key={menu.id} onClick={() => router.push(menu.link)}>
-                {menu.name}
+          </IconButton>
+        ) : (
+          <Dropdown>
+            <MenuButton
+              slots={{ root: IconButton }}
+              slotProps={{ root: { variant: "outlined", color: "neutral" } }}
+            >
+              <Person />
+            </MenuButton>
+            <Menu>
+              {menus.map((menu) => (
+                <MenuItem key={menu.id} onClick={() => router.push(menu.link)}>
+                  {menu.name}
+                </MenuItem>
+              ))}
+              <MenuItem color="danger" onClick={logout}>
+                Sair <ExitToApp />
               </MenuItem>
-            ))}
-            <MenuItem color="danger" onClick={logout}>
-              Sair <ExitToApp />
-            </MenuItem>
-          </Menu>
-        </Dropdown>
-      )}
+            </Menu>
+          </Dropdown>
+        )}
 
-      <Modal open={open} onClose={() => setOpen(false)}>
-        <ModalDialog sx={{ width: 700 }}>
-          <Typography>Acesse sua conta</Typography>
-          {userValid === null && (
-            <Box mt={2}>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  validaUsuario();
-                }}
-              >
-                <FormLabel sx={{ color: "#fff" }}>Email</FormLabel>
-                <Input
-                  placeholder="Digite seu e-mail"
-                  sx={{ mb: 2 }}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+        <Modal open={open} onClose={() => setOpen(false)}>
+          <ModalDialog sx={{ width: 700 }}>
+            <Typography>Acesse sua conta</Typography>
+            {userValid === null && (
+              <Box mt={2}>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    validaUsuario();
+                  }}
+                >
+                  <FormLabel sx={{ color: "#fff" }}>Email</FormLabel>
+                  <Input
+                    placeholder="Digite seu e-mail"
+                    sx={{ mb: 2 }}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
 
-                <Button type="submit" fullWidth>
-                  Continuar
-                </Button>
-              </form>
-            </Box>
-          )}
+                  <Button type="submit" fullWidth>
+                    Continuar
+                  </Button>
+                </form>
+              </Box>
+            )}
 
-          {/* ================================
+            {/* ================================
                 2) SE USUÁRIO EXISTE → LOGIN
               ================================= */}
-          {userValid === true && (
-            <Box mt={2}>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  entrar();
-                }}
-              >
-                <FormLabel sx={{ color: "#fff" }}>Email</FormLabel>
-                <Input value={email} disabled sx={{ mb: 2 }} />
-
-                <FormLabel sx={{ color: "#fff" }}>Senha</FormLabel>
-                <Input
-                  type="password"
-                  placeholder="Digite sua senha"
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                />
-
-                <Button sx={{ mt: 3 }} type="submit" fullWidth>
-                  Entrar
-                </Button>
-              </form>
-            </Box>
-          )}
-
-          {/* ================================
-                3) SE USUÁRIO NÃO EXISTE → CADASTRO
-              ================================= */}
-          {userValid === false && (
-            <Box mt={2}>
-              <Typography sx={{ mb: 2 }}>Criar nova conta</Typography>
-
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  cadastrar();
-                }}
-              >
-                <FormLabel sx={{ color: "#fff", mb: 1 }}>
-                  Nome completo
-                </FormLabel>
-                <Input
-                  placeholder="Seu nome"
-                  sx={{ mb: 2 }}
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                />
-
-                <FormLabel sx={{ color: "#fff", mb: 1 }}>
-                  Data de nascimento
-                </FormLabel>
-                <Input
-                  type="date"
-                  sx={{ mb: 2 }}
-                  value={nascimento}
-                  onChange={(e) => setNascimento(e.target.value)}
-                />
-
-                <FormLabel sx={{ color: "#fff", mb: 1 }}>Email</FormLabel>
-                <Input
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
+            {userValid === true && (
+              <Box mt={2}>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    entrar();
                   }}
-                  placeholder="Digite seu Email"
-                  sx={{ mb: 2 }}
-                />
-
-                <FormLabel sx={{ color: "#fff", mb: 1 }}>Senha</FormLabel>
-                <Stack
-                  spacing={0.5}
-                  sx={{ "--hue": Math.min(senha.length * 10, 120), mb: 2 }}
                 >
+                  <FormLabel sx={{ color: "#fff" }}>Email</FormLabel>
+                  <Input value={email} sx={{ mb: 2 }} />
+
+                  <FormLabel sx={{ color: "#fff" }}>Senha</FormLabel>
                   <Input
                     type="password"
                     placeholder="Digite sua senha"
                     value={senha}
-                    onChange={(e) => {
-                      const valor = e.target.value;
-                      setSenha(valor);
-                      setSenhaValida(validarSenha(valor));
-                    }}
+                    onChange={(e) => setSenha(e.target.value)}
                   />
 
-                  <Typography
-                    level="body-sm"
-                    sx={{ color: senhaValida ? "green" : "red", mt: 1 }}
-                  >
-                    {senha.length === 0
-                      ? ""
-                      : senhaValida
-                      ? "Senha válida"
-                      : "A senha deve ter pelo menos 6 caracteres, 1 maiúscula e 1 caractere especial"}
-                  </Typography>
-                </Stack>
+                  <Button sx={{ mt: 3 }} type="submit" fullWidth>
+                    Entrar
+                  </Button>
+                </form>
+              </Box>
+            )}
 
-                <FormLabel sx={{ color: "#fff", mb: 1 }}>
-                  Confirmar Senha
-                </FormLabel>
-                <Stack
-                  spacing={0.5}
-                  sx={{
-                    "--hue": Math.min(senhaConfirm.length * 10, 120),
-                    mb: 5,
+            {/* ================================
+                3) SE USUÁRIO NÃO EXISTE → CADASTRO
+              ================================= */}
+            {userValid === false && (
+              <Box mt={2}>
+                <Typography sx={{ mb: 2 }}>Criar nova conta</Typography>
+
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    cadastrar();
                   }}
                 >
+                  <FormLabel sx={{ color: "#fff", mb: 1 }}>
+                    Nome completo
+                  </FormLabel>
                   <Input
-                    type="password"
-                    placeholder="Confirmar senha"
-                    value={senhaConfirm}
-                    onChange={(e) => {
-                      const valor = e.target.value;
-                      setSenhaConfirm(valor);
-                      setSenhaConfirmValida(
-                        validarSenha(valor) && valor === senha
-                      );
-                    }}
+                    placeholder="Seu nome"
+                    sx={{ mb: 2 }}
+                    value={nome}
+                    onChange={(e) => setNome(e.target.value)}
                   />
 
-                  <Typography
-                    level="body-sm"
-                    sx={{ color: senhaConfirmValida ? "green" : "red", mt: 1 }}
+                  <FormLabel sx={{ color: "#fff", mb: 1 }}>
+                    Data de nascimento
+                  </FormLabel>
+                  <Input
+                    type="date"
+                    sx={{ mb: 2 }}
+                    value={nascimento}
+                    onChange={(e) => setNascimento(e.target.value)}
+                  />
+
+                  <FormLabel sx={{ color: "#fff", mb: 1 }}>Email</FormLabel>
+                  <Input
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                    }}
+                    placeholder="Digite seu Email"
+                    sx={{ mb: 2 }}
+                  />
+
+                  <FormLabel sx={{ color: "#fff", mb: 1 }}>Senha</FormLabel>
+                  <Stack
+                    spacing={0.5}
+                    sx={{ "--hue": Math.min(senha.length * 10, 120), mb: 2 }}
                   >
-                    {senhaConfirm.length === 0
-                      ? ""
-                      : senhaConfirmValida
-                      ? "Senhas coincidem e são válidas"
-                      : "As senhas não coincidem ou não atendem os requisitos"}
-                  </Typography>
-                </Stack>
+                    <Input
+                      type="password"
+                      placeholder="Digite sua senha"
+                      value={senha}
+                      onChange={(e) => {
+                        const valor = e.target.value;
+                        setSenha(valor);
+                        setSenhaValida(validarSenha(valor));
+                      }}
+                    />
 
-                <Button
-                  fullWidth
-                  type="submit"
-                  disabled={!(senhaValida && senhaConfirmValida)}
-                >
-                  Criar conta
-                </Button>
-              </form>
+                    <Typography
+                      level="body-sm"
+                      sx={{ color: senhaValida ? "green" : "red", mt: 1 }}
+                    >
+                      {senha.length === 0
+                        ? ""
+                        : senhaValida
+                        ? "Senha válida"
+                        : "A senha deve ter pelo menos 6 caracteres, 1 maiúscula e 1 caractere especial"}
+                    </Typography>
+                  </Stack>
+
+                  <FormLabel sx={{ color: "#fff", mb: 1 }}>
+                    Confirmar Senha
+                  </FormLabel>
+                  <Stack
+                    spacing={0.5}
+                    sx={{
+                      "--hue": Math.min(senhaConfirm.length * 10, 120),
+                      mb: 5,
+                    }}
+                  >
+                    <Input
+                      type="password"
+                      placeholder="Confirmar senha"
+                      value={senhaConfirm}
+                      onChange={(e) => {
+                        const valor = e.target.value;
+                        setSenhaConfirm(valor);
+                        setSenhaConfirmValida(
+                          validarSenha(valor) && valor === senha
+                        );
+                      }}
+                    />
+
+                    <Typography
+                      level="body-sm"
+                      sx={{
+                        color: senhaConfirmValida ? "green" : "red",
+                        mt: 1,
+                      }}
+                    >
+                      {senhaConfirm.length === 0
+                        ? ""
+                        : senhaConfirmValida
+                        ? "Senhas coincidem e são válidas"
+                        : "As senhas não coincidem ou não atendem os requisitos"}
+                    </Typography>
+                  </Stack>
+
+                  <Button
+                    fullWidth
+                    type="submit"
+                    disabled={!(senhaValida && senhaConfirmValida)}
+                  >
+                    Criar conta
+                  </Button>
+                </form>
+              </Box>
+            )}
+
+            {/* BOTÕES DE LOGIN SOCIAL */}
+            <Box sx={{ mt: 4, display: "flex", gap: 2 }}>
+              <Button variant="outlined" onClick={handleGoogleLogin} fullWidth>
+                <Google sx={{ mr: 1 }} /> Entrar com Google
+              </Button>
+
+              <Button
+                fullWidth
+                variant="solid"
+                sx={{ bgcolor: "#fff", color: "#000" }}
+              >
+                <Apple sx={{ mr: 1 }} /> Entrar com Apple
+              </Button>
             </Box>
-          )}
-
-          {/* BOTÕES DE LOGIN SOCIAL */}
-          <Box sx={{ mt: 4, display: "flex", gap: 2 }}>
-            <Button variant="outlined" onClick={handleGoogleLogin} fullWidth>
-              <Google sx={{ mr: 1 }} /> Entrar com Google
-            </Button>
-
-            <Button
-              fullWidth
-              variant="solid"
-              sx={{ bgcolor: "#fff", color: "#000" }}
-            >
-              <Apple sx={{ mr: 1 }} /> Entrar com Apple
-            </Button>
-          </Box>
-        </ModalDialog>
-      </Modal>
-    </React.Fragment>
+          </ModalDialog>
+        </Modal>
+      </React.Fragment>
+      <Alerta
+        mensagem={alertaMensagem}
+        tipo={alertaTipo}
+        aberto={alertaAberto}
+        aoFechar={() => setAlertaAberto(false)}
+        tempo={TempoAlerta}
+      />
+    </>
   );
 }

@@ -1,25 +1,29 @@
-"use client";
-
-import React from "react";
-import Snackbar from "@mui/joy/Snackbar";
+import { Snackbar, Alert } from "@mui/joy";
+import ReactDOM from "react-dom";
 
 interface Props {
-  mensagem: string;
-  tipo?: "success" | "danger" | "warning" | "primary" | "neutral";
   aberto: boolean;
+  mensagem: string;
+  tipo: "success" | "danger" | "warning" | "primary" | "neutral";
   aoFechar: () => void;
+  tempo?: number;
 }
 
-export default function Alerta({ mensagem, tipo = "neutral", aberto, aoFechar }: Props) {
-  return (
+export default function Alerta({ mensagem, tipo = "neutral", aberto, aoFechar, tempo }: Props) {
+  if (typeof window === "undefined") return null;
+  return ReactDOM.createPortal(
     <Snackbar
-      autoHideDuration={3000}
+      autoHideDuration={tempo || 3000}
       open={aberto}
       color={tipo}
       variant="soft"
       onClose={() => aoFechar()}
+      sx={{
+        zIndex: 99999
+      }}
     >
       {mensagem}
-    </Snackbar>
+    </Snackbar>,
+    document.body
   );
 }

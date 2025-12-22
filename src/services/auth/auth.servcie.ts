@@ -49,12 +49,13 @@ export class GoogleAuthService {
       },
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      throw new Error("Falha ao fazer login");
+      throw new Error(data.message || "Erro ao fazer login");
     }
 
-    const data: LoginResponse = await response.json();
-
     sessionStorage.setItem("auth_token", data.token);
+    return data;
   }
 }
