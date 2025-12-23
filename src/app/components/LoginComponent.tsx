@@ -40,13 +40,11 @@ export default function LoginComponent() {
     setTempoAlerta(tempo);
   };
 
-  // Fluxo de login/cadastro
-  const [userValid, setUserValid] = React.useState<boolean | null>(null);
+  const [cadastroUsuario, setCadastroUsuario] = React.useState<boolean>(false);
   const [email, setEmail] = React.useState("");
   const [senha, setSenha] = React.useState("");
   const [senhaConfirm, setSenhaConfirm] = React.useState("");
 
-  // Dados do cadastro
   const [nome, setNome] = React.useState("");
   const [nascimento, setNascimento] = React.useState("");
   const [menus, setMenus] = React.useState<MenuResponse>([]);
@@ -73,28 +71,27 @@ export default function LoginComponent() {
     return temTamanhoMinimo && temMaiuscula && temEspecial;
   }
 
-async function handleGoogleLogin() {
-  const currentUrl = window.location.origin;
-  const url = await googleAuth.getGoogleLoginUrl(currentUrl);
+  async function handleGoogleLogin() {
+    const currentUrl = window.location.origin;
+    const url = await googleAuth.getGoogleLoginUrl(currentUrl);
 
-  const popup = window.open(url, "googleLogin", "width=500,height=600");
+    const popup = window.open(url, "googleLogin", "width=500,height=600");
 
-  const listener = (event: MessageEvent) => {
-    if (event.origin !== process.env.NEXT_PUBLIC_API_URL) return;
+    const listener = (event: MessageEvent) => {
+      if (event.origin !== process.env.NEXT_PUBLIC_API_URL) return;
 
-    const { token } = event.data;
+      const { token } = event.data;
 
-    if (token) {
-      sessionStorage.setItem("auth_token", token);
-      window.removeEventListener("message", listener);
-      popup?.close();
-      window.location.reload();
-    }
-  };
+      if (token) {
+        sessionStorage.setItem("auth_token", token);
+        window.removeEventListener("message", listener);
+        popup?.close();
+        window.location.reload();
+      }
+    };
 
-  window.addEventListener("message", listener);
-}
-
+    window.addEventListener("message", listener);
+  }
 
   async function getMenus(email: string) {
     const response: MenuResponse = await userService.GetMenus(email);
@@ -114,15 +111,6 @@ async function handleGoogleLogin() {
     await googleAuth.logout().then(() => router.push("/"));
   };
 
-  const validaUsuario = async () => {
-    try {
-      const isValid = await userService.validaUsuario(email);
-      setUserValid(isValid);
-    } catch (err) {
-      console.error("Erro ao validar usuário:", err);
-    }
-  };
-
   const entrar = async () => {
     try {
       await googleAuth.login(email, senha);
@@ -138,23 +126,20 @@ async function handleGoogleLogin() {
   };
 
   const cadastrar = async () => {
-    const currentUrl = window.location.href;
-    if (senhaValida || senhaConfirmValida) {
-      const result = await userService.createUser(
-        nome,
-        email,
-        senha,
-        nascimento,
-        currentUrl
-      );
-
-      window.location.href = result.redirect;
+    try {
+      await userService.createUser(nome, email, senha, nascimento);
+      window.location.href
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        mostrarAlerta(err.message, "danger", 9000);
+      } else {
+        mostrarAlerta("Erro ao fazer login", "danger", 9000);
+      }
     }
   };
 
   React.useEffect(() => {
     if (open) {
-      setUserValid(null);
       setSenha("");
       setNome("");
       setNascimento("");
@@ -191,35 +176,9 @@ async function handleGoogleLogin() {
 
         <Modal open={open} onClose={() => setOpen(false)}>
           <ModalDialog sx={{ width: 700 }}>
-            <Typography>Acesse sua conta</Typography>
-            {userValid === null && (
+            {cadastroUsuario === false && (
               <Box mt={2}>
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    validaUsuario();
-                  }}
-                >
-                  <FormLabel sx={{ color: "#fff" }}>Email</FormLabel>
-                  <Input
-                    placeholder="Digite seu e-mail"
-                    sx={{ mb: 2 }}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-
-                  <Button type="submit" fullWidth>
-                    Continuar
-                  </Button>
-                </form>
-              </Box>
-            )}
-
-            {/* ================================
-                2) SE USUÁRIO EXISTE → LOGIN
-              ================================= */}
-            {userValid === true && (
-              <Box mt={2}>
+                <Typography>Acesse sua conta</Typography>
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -227,7 +186,14 @@ async function handleGoogleLogin() {
                   }}
                 >
                   <FormLabel sx={{ color: "#fff" }}>Email</FormLabel>
-                  <Input value={email} sx={{ mb: 2 }} />
+                  <Input
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                    }}
+                    placeholder="Digite seu Email"
+                    sx={{ mb: 2 }}
+                  />
 
                   <FormLabel sx={{ color: "#fff" }}>Senha</FormLabel>
                   <Input
@@ -244,10 +210,7 @@ async function handleGoogleLogin() {
               </Box>
             )}
 
-            {/* ================================
-                3) SE USUÁRIO NÃO EXISTE → CADASTRO
-              ================================= */}
-            {userValid === false && (
+            {cadastroUsuario === true && (
               <Box mt={2}>
                 <Typography sx={{ mb: 2 }}>Criar nova conta</Typography>
 
@@ -353,31 +316,55 @@ async function handleGoogleLogin() {
                     </Typography>
                   </Stack>
 
-                  <Button
-                    fullWidth
-                    type="submit"
-                    disabled={!(senhaValida && senhaConfirmValida)}
+                  <Box
+                    sx={{
+                      display: "flex",
+                    }}
                   >
-                    Criar conta
-                  </Button>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      sx={{ mr: 2 }}
+                      onClick={() => setCadastroUsuario(false)}
+                    >
+                      Voltar ao login
+                    </Button>
+                    <Button
+                      fullWidth
+                      type="submit"
+                      disabled={!(senhaValida && senhaConfirmValida)}
+                    >
+                      Criar conta
+                    </Button>
+                  </Box>
                 </form>
               </Box>
             )}
-
-            {/* BOTÕES DE LOGIN SOCIAL */}
-            <Box sx={{ mt: 4, display: "flex", gap: 2 }}>
-              <Button variant="outlined" onClick={handleGoogleLogin} fullWidth>
-                <Google sx={{ mr: 1 }} /> Entrar com Google
-              </Button>
-
-              <Button
-                fullWidth
-                variant="solid"
-                sx={{ bgcolor: "#fff", color: "#000" }}
-              >
-                <Apple sx={{ mr: 1 }} /> Entrar com Apple
-              </Button>
-            </Box>
+            {!cadastroUsuario && (
+              <Box>
+                <Box>
+                  <Typography
+                    sx={{
+                      textAlign: "end",
+                      cursor: "pointer",
+                      "&:hover": { textDecoration: "underline" },
+                    }}
+                    onClick={() => setCadastroUsuario(true)}
+                  >
+                    Não tem uma conta? Cadastre-se agora.
+                  </Typography>
+                </Box>
+                <Box sx={{ mt: 1, display: "flex", gap: 2 }}>
+                  <Button
+                    variant="outlined"
+                    onClick={handleGoogleLogin}
+                    fullWidth
+                  >
+                    <Google sx={{ mr: 1 }} /> Entrar com Google
+                  </Button>
+                </Box>
+              </Box>
+            )}
           </ModalDialog>
         </Modal>
       </React.Fragment>

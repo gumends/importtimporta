@@ -10,7 +10,7 @@ export class UserService {
   }
 
   async BuscaUsuario(email: string) {
-    const response = await fetch(`${this.apiUrl}/usuario?email=${email}`,{
+    const response = await fetch(`${this.apiUrl}/usuario?email=${email}`, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -27,22 +27,27 @@ export class UserService {
     email: string,
     senha: string,
     nascimento: string,
-    state: string
   ) {
     const response = await fetch(
-      `${this.apiUrl}/usuario?state=${encodeURIComponent(state)}`,
+      `${this.apiUrl}/usuario`,
       {
         method: "POST",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + sessionStorage.getItem("auth_token"),
         },
         body: JSON.stringify({ name, email, senha, nascimento }),
       }
     );
-    if (!response.ok) throw new Error("Falha ao fazer cadastro");
-    return await response.json();
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Erro ao fazer login");
+    }
+
+    sessionStorage.setItem("auth_token", data.token);
+    return data;
   }
 
   async updateUser(
