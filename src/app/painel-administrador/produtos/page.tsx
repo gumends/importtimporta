@@ -14,7 +14,6 @@ import {
 } from "@mui/joy";
 import { ProdutosResponse, Produto } from "@/types/ProdutoNovo.type";
 import { PaginationJoy } from "@/app/components/PaginationJoy";
-import ProdutoModal from "@/app/components/ModalCriarProduto";
 import { ProdutoService } from "@/services/auth/produto.service";
 import { Plus } from "lucide-react";
 import { Delete, Edit } from "@mui/icons-material";
@@ -55,18 +54,19 @@ export default function ProdutosPage() {
       setLoading(false);
     }
   };
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
+ 
   const deletarProduto = async (id: number) => {
-    await fetch(`${apiUrl}/produto/${id}`, { method: "DELETE" });
-    setOpenConfirm(false);
-    fetchProdutos(page);
+    await produtoService.deletarProduto(id).then(() => {
+      setOpenConfirmDesativar(false);
+      fetchProdutos(page);
+    });
   };
 
   const desativarProduto = async (id: number) => {
-    await fetch(`${apiUrl}/produto/ativa_desativa/${id}`, { method: "PUT" });
-    setOpenConfirmDesativar(false);
-    fetchProdutos(page);
+    await produtoService.desativarProduto(id).then(() => {
+      setOpenConfirmDesativar(false);
+      fetchProdutos(page);
+    });
   };
 
   useEffect(() => {

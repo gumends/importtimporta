@@ -54,10 +54,10 @@ export class ProdutoService {
   async atualizarProduto(produto: Produto, token: string): Promise<Produto> {
     const res = await fetch(`${this.apiUrl}/produto`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       body: JSON.stringify(produto),
     });
 
@@ -115,4 +115,38 @@ export class ProdutoService {
 
     return data;
   }
+
+  async deletarProduto(id: number) {
+    const res = await fetch(`${this.apiUrl}/produto/${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("auth_token")}`
+        }
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Erro ao deletar produto");
+    }
+
+    return res;
+  };
+
+  async desativarProduto(id: number) {
+    const res = await fetch(`${this.apiUrl}/produto/ativa_desativa/${id}`,
+      { 
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("auth_token")}`
+        }
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Erro ao deletar produto");
+    }
+
+    return res;
+  };
 }
