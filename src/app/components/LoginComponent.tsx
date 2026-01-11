@@ -128,7 +128,7 @@ export default function LoginComponent() {
   const cadastrar = async () => {
     try {
       await userService.createUser(nome, email, senha, nascimento);
-      window.location.href
+      window.location.reload();
     } catch (err: unknown) {
       if (err instanceof Error) {
         mostrarAlerta(err.message, "danger", 9000);
