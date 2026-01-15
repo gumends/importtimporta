@@ -1,9 +1,9 @@
 import { Produto } from "./ProdutoNovo.type";
 
 export interface CarrinhoResponse {
-    subtotal: Number;
-    total: Number;
-    taxaEntrega: Number;
+    subtotal: number;
+    total: number;
+    taxaEntrega: number;
     carrinhos: NewCarrinhoDto[];
 }
 
