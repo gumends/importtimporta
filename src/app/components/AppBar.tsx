@@ -10,6 +10,7 @@ import {
   Typography,
 } from "@mui/joy";
 import { Search, Menu } from "lucide-react";
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { Produto } from "@/types/produto.type";
@@ -147,6 +148,9 @@ export default function AppBar() {
               <Search size={18} color="#fff" />
             </IconButton>
             <LoginComponent/>
+            <IconButton variant="outlined" onClick={() => {router.push('/carrinho')}}>
+              <ShoppingCartIcon />
+            </IconButton>
           </Box>
         </Box>
         <Box
@@ -246,59 +250,6 @@ export default function AppBar() {
           </Box>
         </Box>
       </Sheet>
-      {busca && produtos.length > 0 && (
-        <Sheet
-          ref={resultsRef}
-          variant="soft"
-          sx={{
-            position: "absolute",
-            top: { xs: "138px", md: "70px" },
-            left: 0,
-            right: 0,
-            mx: "auto",
-            width: { xs: "100%", sm: "90%", md: "50%" },
-            bgcolor: "rgba(18,18,18,0.98)",
-            borderRadius: "md",
-            boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
-            zIndex: 30,
-            p: 1,
-            maxHeight: 250,
-            overflowY: "auto",
-          }}
-        >
-          {produtos.map((p) => (
-            <Box
-              key={p.id}
-              onClick={() => {
-                router.push(`/compra?produtoId=${p.id}`);
-                setBusca("");
-                setProdutos([]);
-              }}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                p: 1,
-                borderRadius: "sm",
-                cursor: "pointer",
-                "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
-              }}
-            >
-              <Box
-                component="img"
-                src={p.imagem}
-                sx={{
-                  width: 40,
-                  height: 40,
-                  objectFit: "contain",
-                  borderRadius: "sm",
-                }}
-              />
-              <Typography>{p.nomeProduto}</Typography>
-            </Box>
-          ))}
-        </Sheet>
-      )}
       {openMenu && (
         <>
           <Box

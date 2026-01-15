@@ -29,6 +29,9 @@ import {
   ProdutosResponse,
   Produto as ProdutoNovo,
 } from "@/types/ProdutoNovo.type";
+import { AddShoppingCart } from "@mui/icons-material";
+import CheckIcon from "@mui/icons-material/Check";
+import { CarrinhoService } from "@/services/carrinho/carrinho.service";
 
 export default function Inicio() {
   useEffect(() => {
@@ -36,6 +39,24 @@ export default function Inicio() {
     buscaProdutoAleatoros();
     carregarPromocoes();
   }, []);
+
+  const serviceCarrinho = new CarrinhoService();
+  const [added, setAdded] = useState(false);
+
+  const handleClick = (idProduto: number, quantidade: number) => {
+    const token = sessionStorage.getItem("auth_token") || "";
+    const produto_carrinho = {
+      IdProduto: idProduto,
+      Quantidade: quantidade,
+    };
+    serviceCarrinho.postCarrinho(produto_carrinho, token).then(() => {
+      setAdded(true);
+    });
+
+    setTimeout(() => {
+      setAdded(false);
+    }, 1200);
+  };
 
   const [produtoNovaGeracao, setProdutoNovaGeracao] =
     useState<ProdutoAtual | null>(null);
@@ -397,6 +418,44 @@ export default function Inicio() {
                 }}
               >
                 Comprar
+              </Button>
+              <Button
+                color="primary"
+                onClick={() => handleClick(p.id, 1)}
+                sx={{
+                  overflow: "hidden",
+                  position: "relative",
+                  transition: "all 0.3s ease",
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    transform: added ? "translateY(-40px)" : "translateY(0)",
+                    opacity: added ? 0 : 1,
+                    transition: "all 0.3s ease",
+                    position: "absolute",
+                  }}
+                >
+                  <AddShoppingCart />
+                  Adicionar ao carrinho
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    transform: added ? "translateY(0)" : "translateY(40px)",
+                    opacity: added ? 1 : 0,
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  <CheckIcon />
+                  Adicionado!
+                </Box>
               </Button>
             </Card>
           ))}

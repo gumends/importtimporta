@@ -91,6 +91,7 @@ export default function ModalCriarProduto({
     novaGeracao: false,
     disponivel: true,
     mesesGarantia: "",
+    quantidade: "",
     informacoesAdicionais: {
       id: 0,
       marca: "",
@@ -220,6 +221,7 @@ export default function ModalCriarProduto({
     dados.append("NovaGeracao", String(formulario.novaGeracao));
     dados.append("Disponivel", String(formulario.disponivel));
     dados.append("MesesGarantia", formulario.mesesGarantia);
+    dados.append("Quantidade", formulario.quantidade);
     dados.append(
       "InformacoesAdicionaisId",
       formulario.informacoesAdicionaisId.toString()
@@ -431,13 +433,24 @@ export default function ModalCriarProduto({
                   </FormControl>
                 </Grid>
 
-                <Grid xs={6}>
+                <Grid xs={3}>
                   <FormControl>
                     <FormLabel>Meses de Garantia *</FormLabel>
                     <Input
                       type="number"
                       value={formulario.mesesGarantia}
                       onChange={(e) => alterar("mesesGarantia", e.target.value)}
+                    />
+                  </FormControl>
+                </Grid>
+
+                <Grid xs={3}>
+                  <FormControl>
+                    <FormLabel>Quantidade</FormLabel>
+                    <Input
+                      type="number"
+                      value={formulario.quantidade}
+                      onChange={(e) => alterar("quantidade", e.target.value)}
                     />
                   </FormControl>
                 </Grid>

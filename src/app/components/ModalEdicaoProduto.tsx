@@ -97,6 +97,7 @@ export default function ModalEditarProduto({
     novaGeracao: false,
     disponivel: true,
     mesesGarantia: "",
+    quantidade: "",
     informacoesAdicionais: {
       id: 0,
       marca: "",
@@ -151,6 +152,7 @@ export default function ModalEditarProduto({
       informacoesAdicionaisId: produto.informacoesAdicionaisId ?? 0,
       color: produto.color,
       colorName: produto.colorName,
+      quantidade: produto.quantidade.toString(),
       informacoesAdicionais: {
         id: produto.informacoesAdicionais?.id ?? 0,
         marca: produto.informacoesAdicionais?.marca ?? "",
@@ -248,6 +250,7 @@ export default function ModalEditarProduto({
     formData.append("NovaGeracao", String(formulario.novaGeracao));
     formData.append("Disponivel", String(formulario.disponivel));
     formData.append("MesesGarantia", formulario.mesesGarantia);
+    formData.append("Quantidade", formulario.quantidade);
     formData.append(
       "InformacoesAdicionaisId",
       formulario.informacoesAdicionaisId.toString()
@@ -476,13 +479,24 @@ export default function ModalEditarProduto({
                   </FormControl>
                 </Grid>
 
-                <Grid xs={6}>
+                <Grid xs={3}>
                   <FormControl>
                     <FormLabel>Meses de Garantia *</FormLabel>
                     <Input
                       type="number"
                       value={formulario.mesesGarantia}
                       onChange={(e) => alterar("mesesGarantia", e.target.value)}
+                    />
+                  </FormControl>
+                </Grid>
+
+                <Grid xs={3}>
+                  <FormControl>
+                    <FormLabel>Quantidade *</FormLabel>
+                    <Input
+                      type="number"
+                      value={formulario.quantidade}
+                      onChange={(e) => alterar("quantidade", e.target.value)}
                     />
                   </FormControl>
                 </Grid>

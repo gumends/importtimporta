@@ -22,10 +22,11 @@ interface FormularioProduto {
   valorParcelado: string;
   desconto: string;
   descricao: string;
-  tipoProduto: string; // 👈 string
+  tipoProduto: string;
   novoLancamento: boolean;
   novaGeracao: boolean;
   disponivel: boolean;
+  quantidade: string;
   mesesGarantia: string;
   informacoesAdicionais: InformacoesAdicionais;
   informacoesAdicionaisId: number;

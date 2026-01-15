@@ -13,6 +13,7 @@ export interface Produto {
   mesesGarantia: number;
   informacoesAdicionais: Informacoes | null;
   informacoesAdicionaisId?: number;
+  quantidade: number;
   color: string;
   colorName: string;
   imagens: IImagem[] | null;
