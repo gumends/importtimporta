@@ -41,7 +41,7 @@ export default function Inicio() {
   }, []);
 
   const serviceCarrinho = new CarrinhoService();
-  const [added, setAdded] = useState(false);
+  const [addedId, setAddedId] = useState<number | null>(null);
 
   const handleClick = (idProduto: number, quantidade: number) => {
     const token = sessionStorage.getItem("auth_token") || "";
@@ -49,12 +49,13 @@ export default function Inicio() {
       IdProduto: idProduto,
       Quantidade: quantidade,
     };
-    serviceCarrinho.postCarrinho(produto_carrinho, token).then(() => {
-      setAdded(true);
-    });
+
+    serviceCarrinho.postCarrinho(produto_carrinho, token);
+
+    setAddedId(idProduto);
 
     setTimeout(() => {
-      setAdded(false);
+      setAddedId(null);
     }, 1200);
   };
 
@@ -267,7 +268,9 @@ export default function Inicio() {
               paddingBottom: "40px",
             }}
           >
-            {produtosAleatorios?.map((p, i) => (
+            {produtosAleatorios?.map((p, i) => {
+              const isAdded = addedId === p.id;
+              return (
               <SwiperSlide key={i}>
                 <Stack
                   direction={{ xs: "column", md: "row" }}
@@ -320,7 +323,7 @@ export default function Inicio() {
                     <Typography sx={{ mt: 2, fontWeight: 700 }}>
                       {formatarDinheiro(p.valor ?? 0)}
                     </Typography>
-
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                     <Button
                       sx={{
                         mt: 2,
@@ -336,10 +339,43 @@ export default function Inicio() {
                     >
                       Comprar
                     </Button>
+                    <Button
+                      onClick={() => handleClick(p.id, 1)}
+                      sx={{
+                        mt: 2,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        position: "relative",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          transition: "all 0.3s ease",
+                          transform: isAdded ? "scale(0)" : "scale(1)",
+                          opacity: isAdded ? 0 : 1,
+                        }}
+                      >
+                        <AddShoppingCart />
+                      </Box>
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          transition: "all 0.3s ease",
+                          transform: isAdded ? "scale(1)" : "scale(0)",
+                          opacity: isAdded ? 1 : 0,
+                        }}
+                      >
+                        <CheckIcon />
+                      </Box>
+                    </Button>
+                    </Box>
                   </Box>
                 </Stack>
               </SwiperSlide>
-            ))}
+            )})}
           </Swiper>
         </Container>
       </Box>
@@ -367,7 +403,10 @@ export default function Inicio() {
             gap: 3,
           }}
         >
-          {produtosPromocoes?.itens.map((p) => (
+          {produtosPromocoes?.itens.map((p) => {
+            const isAdded = addedId === p.id;
+
+            return (
             <Card
               key={p.id}
               sx={{
@@ -425,7 +464,6 @@ export default function Inicio() {
                 sx={{
                   overflow: "hidden",
                   position: "relative",
-                  transition: "all 0.3s ease",
                 }}
               >
                 <Box
@@ -433,8 +471,8 @@ export default function Inicio() {
                     display: "flex",
                     alignItems: "center",
                     gap: 1,
-                    transform: added ? "translateY(-40px)" : "translateY(0)",
-                    opacity: added ? 0 : 1,
+                    transform: isAdded ? "translateY(-40px)" : "translateY(0)",
+                    opacity: isAdded ? 0 : 1,
                     transition: "all 0.3s ease",
                     position: "absolute",
                   }}
@@ -448,8 +486,8 @@ export default function Inicio() {
                     display: "flex",
                     alignItems: "center",
                     gap: 1,
-                    transform: added ? "translateY(0)" : "translateY(40px)",
-                    opacity: added ? 1 : 0,
+                    transform: isAdded ? "translateY(0)" : "translateY(40px)",
+                    opacity: isAdded ? 1 : 0,
                     transition: "all 0.3s ease",
                   }}
                 >
@@ -458,7 +496,7 @@ export default function Inicio() {
                 </Box>
               </Button>
             </Card>
-          ))}
+          )})}
         </Box>
 
         <Stack

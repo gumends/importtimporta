@@ -7,6 +7,7 @@ import React from "react";
 import { CarrinhoService } from "@/services/carrinho/carrinho.service";
 import { CarrinhoResponse } from "@/types/carrinhoRespone";
 import { formatarDinheiro } from "@/utils/mascara_dinheiro";
+import { log } from "console";
 export default function Carrinho() {
 
     const [quantidade, setQuantidade] = React.useState(1);
@@ -20,6 +21,8 @@ export default function Carrinho() {
     const buscarCarrinho = () => {
         service.getCarrinho().then((data) => {
             setCarrinhoData(data);
+            console.log(data);
+            (data);
         }).catch((error) => {
             console.error("Erro ao buscar carrinho:", error);
         });
@@ -57,7 +60,7 @@ export default function Carrinho() {
                                     display: "flex", alignItems: "center"
                                 }}>
                                     <IconButton onClick={() => setQuantidade(quantidade > 1 ? quantidade - 1 : 1)}><RemoveIcon /></IconButton>
-                                    <Typography component="span" sx={{ mx: 1, width: 20, textAlign: "center" }}>{item.Quantidade}</Typography>
+                                    <Typography component="span" sx={{ mx: 1, width: 20, textAlign: "center" }}>{item.quantidade}</Typography>
                                     <IconButton onClick={() => setQuantidade(quantidade + 1)}><Plus /></IconButton>
                                     <Typography level="body-xs" sx={{ ml: 2 }}>{item.produto.quantidade} disponiveis</Typography>
                                 </Box>

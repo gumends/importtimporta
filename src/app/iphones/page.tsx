@@ -17,6 +17,9 @@ import { useRouter } from "next/navigation";
 import { ProdutoService } from "@/services/auth/produto.service";
 import { formatarDinheiro } from "@/utils/mascara_dinheiro";
 import { Produto } from "@/types/ProdutoNovo.type";
+import { AddShoppingCart } from "@mui/icons-material";
+import { CheckIcon } from "lucide-react";
+import { CarrinhoService } from "@/services/carrinho/carrinho.service";
 
 export default function ProdutosLista() {
   const router = useRouter();
@@ -32,6 +35,26 @@ export default function ProdutosLista() {
 
   const produtoService = new ProdutoService();
   const tipoProduto = 1;
+
+  const [addedId, setAddedId] = useState<number | null>(null);
+
+  const serviceCarrinho = new CarrinhoService();
+  
+  const handleClick = (idProduto: number, quantidade: number) => {
+    const token = sessionStorage.getItem("auth_token") || "";
+    const produto_carrinho = {
+      IdProduto: idProduto,
+      Quantidade: quantidade,
+    };
+
+    serviceCarrinho.postCarrinho(produto_carrinho, token);
+
+    setAddedId(idProduto);
+
+    setTimeout(() => {
+      setAddedId(null);
+    }, 1200);
+  };
 
   const carregarProdutos = async () => {
     setLoading(true);
@@ -193,7 +216,10 @@ export default function ProdutosLista() {
                 </Box>
               </Card>
             ))
-          : produtos.map((p) => (
+          : produtos.map((p) => {
+              const isAdded = addedId === p.id;
+
+              return (
               <Card
                 key={p.id}
                 variant="outlined"
@@ -203,7 +229,7 @@ export default function ProdutosLista() {
                   borderRadius: "xl",
                   transition: "all 0.3s ease",
                   minWidth: "300px",
-                  height: "530px",
+                  height: "540px",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
@@ -302,20 +328,59 @@ export default function ProdutosLista() {
                     fullWidth
                     variant="solid"
                     sx={{
-                      mt: "auto",
+                      mt: 1,
                       bgcolor: "#fff",
                       color: "#000",
                       fontWeight: 700,
                       "&:hover": { bgcolor: "#f5f5f5" },
                       textTransform: "none",
+                      mb: 1
                     }}
                     onClick={() => router.push(`/compra?produtoId=${p.id}`)}
                   >
                     Comprar agora
                   </Button>
+                  <Button
+                    color="primary"
+                    onClick={() => handleClick(p.id, 1)}
+                    sx={{
+                      overflow: "hidden",
+                      position: "relative",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        transform: isAdded ? "translateY(-40px)" : "translateY(0)",
+                        opacity: isAdded ? 0 : 1,
+                        transition: "all 0.3s ease",
+                        position: "absolute",
+                      }}
+                    >
+                      <AddShoppingCart />
+                      Adicionar ao carrinho
+                    </Box>
+    
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        transform: isAdded ? "translateY(0)" : "translateY(40px)",
+                        opacity: isAdded ? 1 : 0,
+                        transition: "all 0.3s ease",
+                      }}
+                    >
+                      <CheckIcon />
+                      Adicionado!
+                    </Box>
+                  </Button>
                 </CardContent>
               </Card>
-            ))}
+              );
+            })}
       </Box>
 
       {/* PAGINAÇÃO (esconde enquanto carrega) */}

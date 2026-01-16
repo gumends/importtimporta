@@ -10,8 +10,8 @@ export interface CarrinhoResponse {
 export interface NewCarrinhoDto {
     id: number;
     IdProduto: number;
-    Quantidade: number;
     IdUsuario: number;
     CriadoEm: Date;
+    quantidade: number;
     produto: Produto;
 }
