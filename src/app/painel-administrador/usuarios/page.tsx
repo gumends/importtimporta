@@ -10,18 +10,15 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/joy";
-import { Produto } from "@/types/ProdutoNovo.type";
 
 interface UsuariosResponse {
   itens: Usuario[];
   totalPaginas: number;
 }
 import { PaginationJoy } from "@/app/components/PaginationJoy";
-import { Plus } from "lucide-react";
 import ConfirmModal from "@/app/components/ConfirmModal";
 import { UserService } from "@/services/auth/user.service";
 import { Usuario } from "@/types/usuario.type";
-import { Delete, Edit } from "@mui/icons-material";
 import PanToolIcon from "@mui/icons-material/PanTool";
 import DoNotTouchIcon from "@mui/icons-material/DoNotTouch";
 import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
@@ -31,8 +28,6 @@ export default function UsuariosPage() {
   const [data, setData] = useState<UsuariosResponse | null>(null);
   const [pagina, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [modalOpenCriar, setModalOpenCriar] = useState(false);
-  const [produtoEdit, setProdutoEdit] = useState<Produto | null>(null);
   const userService = new UserService();
   const [openConfirmStatus, setOpenConfirmStatus] = useState(false);
   const [openConfirmAcesso, setOpenConfirmAcesso] = useState(false);
@@ -115,15 +110,6 @@ export default function UsuariosPage() {
           >
             Lista de Usuarios
           </Typography>
-          <IconButton
-            variant="plain"
-            onClick={() => {
-              setProdutoEdit(null);
-              setModalOpenCriar(true);
-            }}
-          >
-            <Plus style={{ width: 40, height: 40 }} />
-          </IconButton>
         </Box>
 
         {loading && (
@@ -180,42 +166,44 @@ export default function UsuariosPage() {
                           justifyContent: "space-evenly",
                         }}
                       >
-                        <IconButton
-                          size="sm"
-                          onClick={() => {
-                            setIdUsuario(u.id);
-                            setOpenConfirmAcesso(true);
-                          }}
-                        >
-                          {u.role == "2" ? (
-                            <ArrowCircleDownIcon
-                              color="warning"
-                              style={{ width: 25, height: 25 }}
-                            />
-                          ) : (
-                            <ArrowCircleUpIcon
-                              color="primary"
-                              style={{ width: 25, height: 25 }}
-                            />
-                          )}
-                        </IconButton>
-                        <IconButton
-                          size="sm"
-                          onClick={() => {
-                            setIdUsuario(u.id);
-                            setOpenConfirmStatus(true);
-                          }}
-                        >
-                          {u.status ? (
-                            <PanToolIcon color="warning"
-                              style={{ width: 25, height: 25 }}
-                            />
-                          ) : (
-                            <DoNotTouchIcon
-                              style={{ color: "red", width: 25, height: 25 }}
-                            />
-                          )}
-                        </IconButton>
+                          <IconButton
+                            size="sm"
+                            onClick={() => {
+                              setIdUsuario(u.id);
+                              setOpenConfirmAcesso(true);
+                            }}
+                          >
+                            <Tooltip title={u.role == "1" ? "Regredir Permissão" : "Promover"} variant="solid">
+                              {u.role == "2" ? (
+                                <ArrowCircleUpIcon
+                                  color="primary"
+                                  style={{ width: 25, height: 25 }}
+                                />
+                              ) : (
+                                <ArrowCircleDownIcon
+                                  color="warning"
+                                  style={{ width: 25, height: 25 }}
+                                />
+                              )}
+                            </Tooltip>
+                          </IconButton>
+                          <IconButton
+                            size="sm"
+                            onClick={() => {
+                              setIdUsuario(u.id);
+                              setOpenConfirmStatus(true);
+                            }}
+                          >
+                            {u.status ? (
+                              <PanToolIcon color="warning"
+                                style={{ width: 25, height: 25 }}
+                              />
+                            ) : (
+                              <DoNotTouchIcon
+                                style={{ color: "red", width: 25, height: 25 }}
+                              />
+                            )}
+                          </IconButton>
                       </td>
                     </tr>
                   ))}
