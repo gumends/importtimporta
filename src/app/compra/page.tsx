@@ -30,6 +30,10 @@ import { Produto as p, ProdutosResponse } from "@/types/ProdutoNovo.type";
 import ModalEditarProduto from "../components/ModalEdicaoProduto";
 import { jwtDecode } from "jwt-decode";
 import { JwtPayload } from "@/types/JwtPayload.type";
+import { AddShoppingCart } from "@mui/icons-material";
+import { CheckIcon } from "lucide-react";
+import { CarrinhoService } from "@/services/carrinho/carrinho.service";
+import { CarrinhoRequest } from "@/types/carrinhoRequest";
 
 interface ResponseParcela {
   valorOriginal: number;
@@ -54,6 +58,9 @@ export default function Produto() {
   const [data, setData] = React.useState<ProdutosResponse | null>(null);
   const [page, setPage] = React.useState(1);
   const [admin, setAdmin] = React.useState(false);
+  const [isAdded, setIsAdded] = React.useState<boolean>(false);
+
+  const serviceCarrinho = new CarrinhoService();
 
   const porcentagemParcelas: number[] = [
     1.07, 1.07, 1.07, 1.07, 1.07, 1.075, 1.08, 1.09, 1.095, 1.1, 1.105, 1.115,
@@ -70,6 +77,22 @@ export default function Produto() {
     } finally {
       console.log("");
     }
+  };
+
+  const handleClick = () => {
+    const token = sessionStorage.getItem("auth_token") || "";
+    const produto_carrinho: CarrinhoRequest = {
+      IdProduto: Number(produto?.id),
+      Quantidade: 1,
+    };
+
+    serviceCarrinho.postCarrinho(produto_carrinho, token);
+
+    setIsAdded(true);
+
+    setTimeout(() => {
+      setIsAdded(false);
+    }, 1200);
   };
 
   React.useEffect(() => {
@@ -304,6 +327,38 @@ export default function Produto() {
               }}
             >
               COMPRAR AGORA
+            </Button>
+            <Button
+              onClick={() => handleClick()}
+              sx={{
+                mt: 2,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  transition: "all 0.3s ease",
+                  transform: isAdded ? "scale(0)" : "scale(1)",
+                  opacity: isAdded ? 0 : 1,
+                }}
+              >
+                <AddShoppingCart /> Adicionar ao carrinho
+              </Box>
+              <Box
+                sx={{
+                  position: "absolute",
+                  transition: "all 0.3s ease",
+                  transform: isAdded ? "scale(1)" : "scale(0)",
+                  opacity: isAdded ? 1 : 0,
+                }}
+              >
+                <CheckIcon />
+              </Box>
             </Button>
             <Button
               variant="outlined"

@@ -4,26 +4,25 @@ import ModalDialog from "@mui/joy/ModalDialog";
 import {
   Box,
   Button,
-  Dropdown,
   FormLabel,
-  IconButton,
   Input,
-  Menu,
-  MenuButton,
-  MenuItem,
   Stack,
   Typography,
 } from "@mui/joy";
-import { Google, Person, Apple, ExitToApp } from "@mui/icons-material";
+import { Google } from "@mui/icons-material";
 import { GoogleAuthService } from "@/services/auth/auth.servcie";
-import { useRouter } from "next/navigation";
 import { UserService } from "@/services/auth/user.service";
-import { MenuResponse } from "@/types/menus.type";
 import Alerta from "./Alerta";
 
-export default function LoginComponent() {
+export default function LoginComponent({
+    openModal,
+    onClose,
+  }: {
+    openModal: boolean;
+    onClose: () => void;
+  }) {
+
   const [open, setOpen] = React.useState(false);
-  const [logado, setLogado] = React.useState(false);
   const [alertaAberto, setAlertaAberto] = React.useState(false);
   const [alertaMensagem, setAlertaMensagem] = React.useState("");
   const [alertaTipo, setAlertaTipo] = React.useState<
@@ -40,6 +39,10 @@ export default function LoginComponent() {
     setTempoAlerta(tempo);
   };
 
+  React.useEffect(() => {
+    setOpen(openModal);
+  }, [openModal]);
+
   const [cadastroUsuario, setCadastroUsuario] = React.useState<boolean>(false);
   const [email, setEmail] = React.useState("");
   const [senha, setSenha] = React.useState("");
@@ -47,9 +50,7 @@ export default function LoginComponent() {
 
   const [nome, setNome] = React.useState("");
   const [nascimento, setNascimento] = React.useState("");
-  const [menus, setMenus] = React.useState<MenuResponse>([]);
   const googleAuth = new GoogleAuthService();
-  const router = useRouter();
   const userService = new UserService();
 
   const [senhaValida, setSenhaValida] = React.useState(false);
@@ -93,24 +94,6 @@ export default function LoginComponent() {
     window.addEventListener("message", listener);
   }
 
-  async function getMenus(email: string) {
-    const response: MenuResponse = await userService.GetMenus(email);
-    setMenus(response);
-  }
-
-  React.useEffect(() => {
-    googleAuth.me().then((res) => {
-      if (res && res.email) {
-        getMenus(res.email);
-        setLogado(true);
-      }
-    });
-  }, [logado]);
-
-  const logout = async () => {
-    await googleAuth.logout().then(() => router.push("/"));
-  };
-
   const entrar = async () => {
     try {
       await googleAuth.login(email, senha);
@@ -149,32 +132,7 @@ export default function LoginComponent() {
   return (
     <>
       <React.Fragment>
-        {!logado ? (
-          <IconButton onClick={() => setOpen(true)}>
-            <Person />
-          </IconButton>
-        ) : (
-          <Dropdown>
-            <MenuButton
-              slots={{ root: IconButton }}
-              slotProps={{ root: { variant: "outlined", color: "neutral" } }}
-            >
-              <Person />
-            </MenuButton>
-            <Menu>
-              {menus.map((menu) => (
-                <MenuItem key={menu.id} onClick={() => router.push(menu.link)}>
-                  {menu.name}
-                </MenuItem>
-              ))}
-              <MenuItem color="danger" onClick={logout}>
-                Sair <ExitToApp />
-              </MenuItem>
-            </Menu>
-          </Dropdown>
-        )}
-
-        <Modal open={open} onClose={() => setOpen(false)}>
+        <Modal open={openModal} onClose={onClose}>
           <ModalDialog sx={{ width: 700 }}>
             {cadastroUsuario === false && (
               <Box mt={2}>

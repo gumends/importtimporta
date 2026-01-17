@@ -5,27 +5,41 @@ import {
   Sheet,
   Button,
   Input,
-  IconButton,
   Container,
   Typography,
+  Badge,
 } from "@mui/joy";
-import { Search, Menu } from "lucide-react";
+import { Search, Menu as M } from "lucide-react";
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { Produto } from "@/types/produto.type";
-import { Person } from "@mui/icons-material";
+import { ExitToApp, Person } from "@mui/icons-material";
 import LoginComponent from "./LoginComponent";
+import { GoogleAuthService } from "@/services/auth/auth.servcie";
+import { MenuResponse } from "@/types/menus.type";
+import { UserService } from "@/services/auth/user.service";
+import Dropdown from "@mui/joy/Dropdown";
+import Menu from "@mui/joy/Menu";
+import MenuItem from "@mui/joy/MenuItem";
+import MenuButton from "@mui/joy/MenuButton";
+import IconButton from "@mui/joy/IconButton";
+import { CarrinhoService } from "@/services/carrinho/carrinho.service";
 
 export default function AppBar() {
   const router = useRouter();
   const [busca, setBusca] = React.useState("");
   const [pagina, setPagina] = React.useState("");
-  const [produtos, setProdutos] = React.useState<Produto[]>([]);
   const [openMenu, setOpenMenu] = React.useState(false);
+  const [logado, setLogado] = React.useState(false);
+  const [menus, setMenus] = React.useState<MenuResponse>([]);
+  const [openModal, setOpenModal] = React.useState<boolean>(false);
+  const [quantidadeCarrinho, setQuantidadeCarrinho] = React.useState<number>(0);
+  
+  const googleAuth = new GoogleAuthService();
+  const userService = new UserService();
 
   const inputRef = useRef<HTMLDivElement | null>(null);
-  const resultsRef = useRef<HTMLDivElement | null>(null);
+  const serviceCarrihno = new CarrinhoService();
 
   const menu = [
     { label: "Iphones", path: "/iphones" },
@@ -34,21 +48,29 @@ export default function AppBar() {
     { label: "Outros", path: "/outros" },
   ];
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        inputRef.current &&
-        !inputRef.current.contains(event.target as Node) &&
-        resultsRef.current &&
-        !resultsRef.current.contains(event.target as Node)
-      ) {
-        setProdutos([]);
-      }
-    }
+  const logout = async () => {
+    await googleAuth.logout().then(() => router.push("/"));
+  };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  async function getMenus(email: string) {
+    const response: MenuResponse = await userService.GetMenus(email);
+    setMenus(response);
+  }
+
+  useEffect(() => {
+    googleAuth.me().then((res) => {
+      if (res && res.email) {
+        getMenus(res.email);
+        setLogado(true);
+      }
+    });
+
+    if (logado) {
+      serviceCarrihno.getCarrinho().then((res) => {
+        setQuantidadeCarrinho(res.carrinhos.length);
+      });
+    }
+  }, [logado]);
 
   useEffect(() => {
     setPagina(window.location.pathname);
@@ -147,10 +169,39 @@ export default function AppBar() {
             >
               <Search size={18} color="#fff" />
             </IconButton>
-            <LoginComponent/>
-            <IconButton variant="outlined" onClick={() => {router.push('/carrinho')}}>
-              <ShoppingCartIcon />
-            </IconButton>
+            <LoginComponent
+              openModal={openModal}
+              onClose={() => setOpenModal(false)}
+            />
+            {!logado ? (
+              <IconButton onClick={() => setOpenModal(true)}>
+                <Person />
+              </IconButton>
+            ) : (
+              <Dropdown>
+                <MenuButton
+                  slots={{ root: IconButton }}
+                  slotProps={{ root: { variant: "outlined", color: "neutral" } }}
+                >
+                  <Person />
+                </MenuButton>
+              <Menu>
+                {menus.map((menu) => (
+                  <MenuItem key={menu.id} onClick={() => router.push(menu.link)}>
+                    {menu.name}
+                  </MenuItem>
+                ))}
+                <MenuItem color="danger" onClick={logout}>
+                  Sair <ExitToApp />
+                </MenuItem>
+              </Menu>
+              </Dropdown>
+            )}
+            <Badge badgeContent={quantidadeCarrinho} color="primary">
+              <IconButton variant="outlined" onClick={() => {router.push('/carrinho')}}>
+                <ShoppingCartIcon />
+              </IconButton>
+            </Badge>
           </Box>
         </Box>
         <Box
@@ -176,7 +227,7 @@ export default function AppBar() {
               sx={{ p: 1 }}
               onClick={() => setOpenMenu(true)}
             >
-              <Menu size={24} color="#fff" />
+              <M size={24} color="#fff" />
             </IconButton>
 
             <Box
