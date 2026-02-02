@@ -1,3 +1,4 @@
+import { Endereco } from "@/types/Endereco.type";
 import { MenuResponse } from "@/types/menus.type";
 
 export class UserService {
@@ -127,6 +128,35 @@ export class UserService {
       }
     );
     if (!response.ok) throw new Error("Falha ao buscar menus do usuário");
+    return response.json();
+  }
+
+  async BuscaEnderecosUsuario(): Promise<Endereco[]> {
+    const response = await fetch(
+      `${this.apiUrl}/usuario/enderecos`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: "Bearer " + sessionStorage.getItem("auth_token"),
+        },
+      }
+    );
+    if (!response.ok) throw new Error("Falha ao buscar endereços do usuário");
+    return response.json();
+  }
+
+  async ExcluirEndereco(id: number): Promise<Endereco[]> {
+    const response = await fetch(
+      `${this.apiUrl}/usuario/endereco?id=${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+        },
+      }
+    );
+    if (!response.ok) throw new Error("Falha ao excluir endereço do usuário");
     return response.json();
   }
 }

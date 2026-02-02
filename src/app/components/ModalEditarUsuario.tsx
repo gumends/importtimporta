@@ -50,7 +50,9 @@ export default function ModalEditarUsuario({
   const carregarUsuario = async () => {
     try {
       const data = await userService.BuscaUsuario(emailUser);
-
+      console.log(emailUser);
+      console.log(data);
+      
       setId(data.id);
       setName(data.name);
       setEmail(data.email);

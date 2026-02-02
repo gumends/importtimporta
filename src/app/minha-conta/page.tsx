@@ -11,26 +11,55 @@ import {
   Stack,
   Divider,
   Chip,
+  IconButton,
 } from "@mui/joy";
 import { useRouter } from "next/navigation";
 import { GoogleAuthService } from "@/services/auth/auth.service";
 import { Usuario } from "@/types/usuario.type";
 import ModalEditarUsuario from "../components/ModalEditarUsuario";
 import { UserService } from "@/services/user/user.service";
+import { Add, Delete, DeleteForever, Edit } from "@mui/icons-material";
+import { Endereco } from "@/types/Endereco.type";
+import ConfirmModal from "../components/ConfirmModal";
+import { set } from "lodash";
 
 export default function ProfilePage() {
   const router = useRouter();
   const googleAuth = new GoogleAuthService();
+  const userService = new UserService();
 
   const [user, setUser] = useState<Usuario | null>(null);
   const [loading, setLoading] = useState(true);
   const [editarOpen, setEditarOpen] = useState(false);
+  const [enderecos, setEnderecos] = useState<Endereco[]>([]);
+  const [openConfirmExcluirEndereco, setOpenConfirmExcluirEndereco] = useState(false);
+  const [idEndereco, setIdEndereco] = useState<number>(0);
 
   function getInitials(name: string) {
     if (!name) return "";
     const parts = name.trim().split(" ");
     if (parts.length === 1) return parts[0][0]?.toUpperCase();
     return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+  }
+
+  const buscaEnderecos = async () => {
+    try {
+      const enderecos = await userService.BuscaEnderecosUsuario();
+      setEnderecos(enderecos);
+      console.log(enderecos);
+    } catch (error) {
+      console.error("Erro ao buscar endereços:", error);
+    }
+  }
+
+  const excluirEndereco = async (id: number) => {
+    try {
+      await userService.ExcluirEndereco(id);
+      setOpenConfirmExcluirEndereco(false);
+      buscaEnderecos();
+    } catch (error) {
+      console.error("Erro ao excluir endereço:", error);
+    }
   }
 
   const carregarUsuario = async () => {
@@ -46,6 +75,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     carregarUsuario();
+    buscaEnderecos();
   }, []);
 
   const logout = async () => {
@@ -168,11 +198,11 @@ export default function ProfilePage() {
 
               <Divider sx={{ my: 3 }} />
               <Box>
-                <Typography level="body-sm" sx={{ opacity: 0.7 }}>
+                <Typography level="body-md" sx={{ fontWeight: 500 }}>
                   Informações da Conta
                 </Typography>
 
-                <Stack
+                                <Stack
                   direction={{ xs: "column", md: "row" }}
                   spacing={3}
                   mt={2}
@@ -191,6 +221,60 @@ export default function ProfilePage() {
                     <Typography>{user?.email ?? "-"}</Typography>
                   </Box>
                 </Stack>
+
+
+                <Divider sx={{ my: 3 }} />
+
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, justifyContent: "space-between" }}>
+                  <Typography level="body-md" sx={{ fontWeight: 500 }}>
+                    Endereços
+                  </Typography>
+                  <IconButton onClick={() => {}} size="md" variant="outlined" sx={{ pr: 2 }}>
+                    <Add sx={{ mr: 2 }}/> Novo Endereço
+                  </IconButton>
+                </Box>
+                {
+                  enderecos && enderecos.length > 0 ? enderecos.map((endereco) => (
+                  <Box
+                    key={endereco.id}
+                    sx={{ border: "1px solid #333", borderRadius: "md", p: 2, mt: 2 }}
+                  >
+                    <Box sx={{ display: "flex", justifyContent: "end", alignItems: "center", gap: 1, mb: 1 }}>
+                      <IconButton color="warning" onClick={() => {}} size="sm"><Edit/></IconButton>
+                      <IconButton color="danger" onClick={() => {setIdEndereco(endereco.id); setOpenConfirmExcluirEndereco(true);}} size="sm"><DeleteForever/></IconButton>
+                    </Box>
+                    <Stack
+                      direction={{ xs: "column", md: "row" }}
+                      spacing={3}
+                    >
+                      <Box sx={{ flex: 1 }}>
+                        <Typography level="body-xs" sx={{ opacity: 0.5 }}>
+                          CEP
+                        </Typography>
+                        <Typography level="body-md" >{endereco?.cep ?? "-"}</Typography>
+                      </Box>
+
+                      <Box sx={{ flex: 1 }}>
+                        <Typography level="body-xs" sx={{ opacity: 0.5 }}>
+                          Numero
+                        </Typography>
+                        <Typography level="body-md" >{endereco?.numero ?? "-"}</Typography>
+                      </Box>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography level="body-xs" sx={{ opacity: 0.5 }}>
+                          Complemento
+                        </Typography>
+                        <Typography level="body-md" >{endereco?.complemento ?? "-"}</Typography>
+                      </Box>
+                    </Stack>
+                  </Box>
+                  )) : (
+                    <Box sx={{ textAlign: "center", mt: 3, mb: 2 }}>
+                      <Typography level="body-lg">Nenhum endereço cadastrado</Typography>
+                      <Typography level="body-sm" sx={{ mt: 1 }}>Para realizar uma compra, adicione um endereço de entrega.</Typography>
+                    </Box>
+                  )
+                }
               </Box>
             </CardContent>
           </Card>
@@ -220,6 +304,13 @@ export default function ProfilePage() {
         onClose={() => setEditarOpen(false)}
         emailUser={user?.email || ""}
         onSaved={() => {}}
+      />
+      <ConfirmModal
+        open={openConfirmExcluirEndereco}
+        title="Excluir Endereço"
+        message="Tem certeza que deseja excluir este endereço?"
+        onCancel={() => setOpenConfirmExcluirEndereco(false)}
+        onConfirm={() => excluirEndereco(idEndereco)}
       />
     </>
   );
