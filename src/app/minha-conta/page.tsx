@@ -13,10 +13,10 @@ import {
   Chip,
 } from "@mui/joy";
 import { useRouter } from "next/navigation";
-import { GoogleAuthService } from "@/services/auth/auth.servcie";
+import { GoogleAuthService } from "@/services/auth/auth.service";
 import { Usuario } from "@/types/usuario.type";
 import ModalEditarUsuario from "../components/ModalEditarUsuario";
-import { UserService } from "@/services/auth/user.service";
+import { UserService } from "@/services/user/user.service";
 
 export default function ProfilePage() {
   const router = useRouter();

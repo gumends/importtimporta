@@ -14,7 +14,7 @@ import {
 } from "@mui/joy";
 import { ProdutosResponse, Produto } from "@/types/ProdutoNovo.type";
 import { PaginationJoy } from "@/app/components/PaginationJoy";
-import { ProdutoService } from "@/services/auth/produto.service";
+import { ProdutoService } from "@/services/produto/produto.service";
 import { Plus } from "lucide-react";
 import { Delete, Edit } from "@mui/icons-material";
 import ConfirmModal from "@/app/components/ConfirmModal";

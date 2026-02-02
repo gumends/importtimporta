@@ -25,7 +25,7 @@ import {
   mascaraDinheiro,
   removerMascaraDinheiro,
 } from "@/utils/mascara_dinheiro";
-import { ProdutoService } from "@/services/auth/produto.service";
+import { ProdutoService } from "@/services/produto/produto.service";
 import { Produto as p, ProdutosResponse } from "@/types/ProdutoNovo.type";
 import ModalEditarProduto from "../components/ModalEdicaoProduto";
 import { jwtDecode } from "jwt-decode";

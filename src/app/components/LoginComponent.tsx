@@ -10,8 +10,8 @@ import {
   Typography,
 } from "@mui/joy";
 import { Google } from "@mui/icons-material";
-import { GoogleAuthService } from "@/services/auth/auth.servcie";
-import { UserService } from "@/services/auth/user.service";
+import { GoogleAuthService } from "@/services/auth/auth.service";
+import { UserService } from "@/services/user/user.service";
 import Alerta from "./Alerta";
 
 export default function LoginComponent({

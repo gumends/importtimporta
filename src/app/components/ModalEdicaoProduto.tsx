@@ -23,7 +23,7 @@ import SvgIcon from "@mui/joy/SvgIcon";
 import { styled } from "@mui/joy";
 import Alerta from "./Alerta";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { ProdutoService } from "@/services/auth/produto.service";
+import { ProdutoService } from "@/services/produto/produto.service";
 import { IImagem, Produto } from "@/types/ProdutoNovo.type";
 
 interface Props {

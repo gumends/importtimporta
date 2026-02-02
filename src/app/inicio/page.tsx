@@ -24,7 +24,7 @@ import {
 
 import { ModelosOption, ProdutoAtual } from "@/types/produtoAtual.type";
 import { formatarDinheiro } from "@/utils/mascara_dinheiro";
-import { ProdutoService } from "@/services/auth/produto.service";
+import { ProdutoService } from "@/services/produto/produto.service";
 import {
   ProdutosResponse,
   Produto as ProdutoNovo,

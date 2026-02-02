@@ -14,7 +14,7 @@ import {
   Skeleton,
 } from "@mui/joy";
 import { useRouter } from "next/navigation";
-import { ProdutoService } from "@/services/auth/produto.service";
+import { ProdutoService } from "@/services/produto/produto.service";
 import { formatarDinheiro } from "@/utils/mascara_dinheiro";
 import { Produto } from "@/types/ProdutoNovo.type";
 import { AddShoppingCart } from "@mui/icons-material";

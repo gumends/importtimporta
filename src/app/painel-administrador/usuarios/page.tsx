@@ -17,7 +17,7 @@ interface UsuariosResponse {
 }
 import { PaginationJoy } from "@/app/components/PaginationJoy";
 import ConfirmModal from "@/app/components/ConfirmModal";
-import { UserService } from "@/services/auth/user.service";
+import { UserService } from "@/services/user/user.service";
 import { Usuario } from "@/types/usuario.type";
 import PanToolIcon from "@mui/icons-material/PanTool";
 import DoNotTouchIcon from "@mui/icons-material/DoNotTouch";

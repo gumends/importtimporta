@@ -13,7 +13,7 @@ import {
   Box,
 } from "@mui/joy";
 import Alerta from "./Alerta";
-import { UserService } from "@/services/auth/user.service";
+import { UserService } from "@/services/user/user.service";
 
 interface Props {
   open: boolean;
