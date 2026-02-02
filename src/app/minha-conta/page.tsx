@@ -18,10 +18,11 @@ import { GoogleAuthService } from "@/services/auth/auth.service";
 import { Usuario } from "@/types/usuario.type";
 import ModalEditarUsuario from "../components/ModalEditarUsuario";
 import { UserService } from "@/services/user/user.service";
-import { Add, Delete, DeleteForever, Edit } from "@mui/icons-material";
+import { Add, DeleteForever, Edit } from "@mui/icons-material";
 import { Endereco } from "@/types/Endereco.type";
 import ConfirmModal from "../components/ConfirmModal";
-import { set } from "lodash";
+import ModalCriarEndereco from "../components/Endereco/ModalCriarEndereco";
+import ModalEndereco from "../components/Endereco/ModalEndereco";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -34,7 +35,15 @@ export default function ProfilePage() {
   const [enderecos, setEnderecos] = useState<Endereco[]>([]);
   const [openConfirmExcluirEndereco, setOpenConfirmExcluirEndereco] = useState(false);
   const [idEndereco, setIdEndereco] = useState<number>(0);
-
+  const [openCriarEndereco, setOpenCriarEndereco] = useState(false);
+  const [openEndereco, setOpenEndereco] = useState(false);
+  const [enderecoEditId, setEnderecoEditId] = useState<number | undefined>();
+  const maskCep = (value: string) => {
+    const onlyNumbers = value.replace(/\D/g, "");
+    return onlyNumbers
+        .slice(0, 8)
+        .replace(/^(\d{5})(\d)/, "$1-$2");
+  };
   function getInitials(name: string) {
     if (!name) return "";
     const parts = name.trim().split(" ");
@@ -46,7 +55,6 @@ export default function ProfilePage() {
     try {
       const enderecos = await userService.BuscaEnderecosUsuario();
       setEnderecos(enderecos);
-      console.log(enderecos);
     } catch (error) {
       console.error("Erro ao buscar endereços:", error);
     }
@@ -229,8 +237,13 @@ export default function ProfilePage() {
                   <Typography level="body-md" sx={{ fontWeight: 500 }}>
                     Endereços
                   </Typography>
-                  <IconButton onClick={() => {}} size="md" variant="outlined" sx={{ pr: 2 }}>
-                    <Add sx={{ mr: 2 }}/> Novo Endereço
+                  <IconButton
+                    onClick={() => setOpenCriarEndereco(true)}
+                    size="md"
+                    variant="outlined"
+                    sx={{ pr: 2 }}
+                  >
+                    <Add sx={{ mr: 2 }} /> Novo Endereço
                   </IconButton>
                 </Box>
                 {
@@ -239,9 +252,19 @@ export default function ProfilePage() {
                     key={endereco.id}
                     sx={{ border: "1px solid #333", borderRadius: "md", p: 2, mt: 2 }}
                   >
-                    <Box sx={{ display: "flex", justifyContent: "end", alignItems: "center", gap: 1, mb: 1 }}>
-                      <IconButton color="warning" onClick={() => {}} size="sm"><Edit/></IconButton>
-                      <IconButton color="danger" onClick={() => {setIdEndereco(endereco.id); setOpenConfirmExcluirEndereco(true);}} size="sm"><DeleteForever/></IconButton>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 1, mb: 1 }}>
+                      <Box>
+                        <Box sx={{ flex: 1 }}>
+                          <Typography level="body-xs" sx={{ opacity: 0.5 }}>
+                            Rua
+                          </Typography>
+                          <Typography level="body-md" >{endereco?.logradouro ?? "-"}</Typography>
+                        </Box>
+                      </Box>
+                      <Box>
+                        <IconButton color="warning" onClick={() => {setEnderecoEditId(endereco.id); setOpenEndereco(true);}} size="sm"><Edit/></IconButton>
+                        <IconButton color="danger" onClick={() => {setIdEndereco(endereco.id); setOpenConfirmExcluirEndereco(true);}} size="sm"><DeleteForever/></IconButton>
+                      </Box>
                     </Box>
                     <Stack
                       direction={{ xs: "column", md: "row" }}
@@ -251,9 +274,8 @@ export default function ProfilePage() {
                         <Typography level="body-xs" sx={{ opacity: 0.5 }}>
                           CEP
                         </Typography>
-                        <Typography level="body-md" >{endereco?.cep ?? "-"}</Typography>
+                        <Typography level="body-md" >{maskCep(String(endereco.cep))}</Typography>
                       </Box>
-
                       <Box sx={{ flex: 1 }}>
                         <Typography level="body-xs" sx={{ opacity: 0.5 }}>
                           Numero
@@ -311,6 +333,17 @@ export default function ProfilePage() {
         message="Tem certeza que deseja excluir este endereço?"
         onCancel={() => setOpenConfirmExcluirEndereco(false)}
         onConfirm={() => excluirEndereco(idEndereco)}
+      />
+      <ModalCriarEndereco
+        open={openCriarEndereco}
+        onClose={() => setOpenCriarEndereco(false)}
+        onSaved={buscaEnderecos}
+      />
+      <ModalEndereco
+        open={openEndereco}
+        onClose={() => setOpenEndereco(false)}
+        enderecoId={enderecoEditId}
+        onSaved={buscaEnderecos}
       />
     </>
   );

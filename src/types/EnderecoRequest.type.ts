@@ -1,8 +1,6 @@
-export interface Endereco {
-  id: number
+export interface EnderecoRequest {
   cep: number
   logradouro: string
   numero: number
   complemento: string
-  idUsuario: number
 }

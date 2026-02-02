@@ -1,4 +1,5 @@
 import { Endereco } from "@/types/Endereco.type";
+import { EnderecoRequest } from "@/types/EnderecoRequest.type";
 import { MenuResponse } from "@/types/menus.type";
 
 export class UserService {
@@ -157,6 +158,53 @@ export class UserService {
       }
     );
     if (!response.ok) throw new Error("Falha ao excluir endereço do usuário");
+    return response.json();
+  }
+
+  async CriarEndereco(endereco: EnderecoRequest): Promise<Endereco> {
+    const response = await fetch(
+      `${this.apiUrl}/usuario/endereco`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + sessionStorage.getItem("auth_token"),
+        },
+        body: JSON.stringify(endereco),
+      }
+    );
+    if (!response.ok) throw new Error("Falha ao criar endereço do usuário");
+    return response.json();
+  }
+
+  async BuscarEnderecoPorId(id: number): Promise<Endereco> {
+    const response = await fetch(
+      `${this.apiUrl}/usuario/endereco?id=${id}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: "Bearer " + sessionStorage.getItem("auth_token"),
+        },
+      }
+    );
+    if (!response.ok) throw new Error("Falha ao buscar endereço do usuário");
+    return response.json();
+  }
+
+  async EditarEndereco(id: number, endereco: EnderecoRequest): Promise<Endereco> {
+    const response = await fetch(
+      `${this.apiUrl}/usuario/endereco?id=${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + sessionStorage.getItem("auth_token"),
+        },
+        body: JSON.stringify(endereco),
+      }
+    );
+    if (!response.ok) throw new Error("Falha ao editar endereço do usuário");
     return response.json();
   }
 }
