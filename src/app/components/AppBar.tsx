@@ -42,8 +42,8 @@ export default function AppBar() {
   const serviceCarrihno = new CarrinhoService();
 
   const menu = [
-    { label: "Iphones", path: "/iphones" },
-    { label: "Macs", path: "/macs" },
+    { label: "IPhone", path: "/iphones" },
+    { label: "Mac", path: "/macs" },
     { label: "Acessórios", path: "/acessorios" },
     { label: "Outros", path: "/outros" },
   ];

@@ -240,293 +240,304 @@ export default function Inicio() {
           </Button>
         )}
       </Container>
-      <Box sx={{ width: "100%", py: 8 }}>
-        <Container maxWidth="lg">
+      {
+        produtosAleatorios && produtosAleatorios.length > 0 && (
+        
+          <Box sx={{ width: "100%", py: 8 }}>
+            <Container maxWidth="lg">
+              <Typography
+                level="h2"
+                sx={{
+                  textAlign: "center",
+                  fontWeight: 700,
+                  fontSize: { xs: "1.7rem", md: "2.2rem" },
+                }}
+              >
+                Produtos Variados
+              </Typography>
+
+              <Swiper
+                modules={[Navigation, Autoplay]}
+                navigation
+                slidesPerView={1}
+                centeredSlides
+                loop
+                autoplay={{ delay: 4000, disableOnInteraction: false }}
+                speed={900}
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  minHeight: "600px",
+                  paddingBottom: "40px",
+                }}
+              >
+                {produtosAleatorios?.map((p, i) => {
+                  const isAdded = addedId === p.id;
+                  return (
+                  <SwiperSlide key={i}>
+                    <Stack
+                      direction={{ xs: "column", md: "row" }}
+                      alignItems="center"
+                      justifyContent="center"
+                      spacing={{ xs: 2, md: 4 }}
+                      sx={{
+                        width: "100%",
+                        height: "100%",
+                        px: 2,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          flex: 1,
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Box
+                          component="img"
+                          src={p.imagens?.[0]?.caminho ?? ""}
+                          alt={p.nomeProduto}
+                          sx={{
+                            width: { xs: "70%", md: "500px" },
+                            height: { xs: "280px", md: "500px" },
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                      <Box
+                        sx={{
+                          flex: 1,
+                          color: "#fff",
+                          textAlign: { xs: "center", md: "left" },
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: { xs: "center", md: "flex-start" },
+                        }}
+                      >
+                        <Typography level="h4" sx={{ mb: 1 }}>
+                          {p.nomeProduto}
+                        </Typography>
+
+                        <Typography level="body-sm" sx={{ opacity: 0.75 }}>
+                          {p.descricao}
+                        </Typography>
+
+                        <Typography sx={{ mt: 2, fontWeight: 700 }}>
+                          {formatarDinheiro(p.valor ?? 0)}
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                        <Button
+                          sx={{
+                            mt: 2,
+                            bgcolor: "#fff",
+                            color: "#000",
+                            fontWeight: 700,
+                            textTransform: "none",
+                            "&:hover": { bgcolor: "#f5f5f5" },
+                          }}
+                          onClick={() =>
+                            (window.location.href = `/compra?produtoId=${p.id}`)
+                          }
+                        >
+                          Comprar
+                        </Button>
+                        <Button
+                          onClick={() => handleClick(p.id, 1)}
+                          sx={{
+                            mt: 2,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            position: "relative",
+                            overflow: "hidden",
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              position: "absolute",
+                              transition: "all 0.3s ease",
+                              transform: isAdded ? "scale(0)" : "scale(1)",
+                              opacity: isAdded ? 0 : 1,
+                            }}
+                          >
+                            <AddShoppingCart />
+                          </Box>
+                          <Box
+                            sx={{
+                              position: "absolute",
+                              transition: "all 0.3s ease",
+                              transform: isAdded ? "scale(1)" : "scale(0)",
+                              opacity: isAdded ? 1 : 0,
+                            }}
+                          >
+                            <CheckIcon />
+                          </Box>
+                        </Button>
+                        </Box>
+                      </Box>
+                    </Stack>
+                  </SwiperSlide>
+                )})}
+              </Swiper>
+            </Container>
+          </Box>
+        )
+      }
+
+      {
+        produtosPromocoes && produtosPromocoes.itens.length > 0 && (
+
+        <Container maxWidth="lg" sx={{ py: 8 }}>
           <Typography
             level="h2"
             sx={{
+              mb: 4,
               textAlign: "center",
               fontWeight: 700,
-              fontSize: { xs: "1.7rem", md: "2.2rem" },
+              fontSize: { xs: "1.7rem", md: "2rem" },
             }}
           >
-            Produtos Variados
+            Promoções
           </Typography>
 
-          <Swiper
-            modules={[Navigation, Autoplay]}
-            navigation
-            slidesPerView={1}
-            centeredSlides
-            loop
-            autoplay={{ delay: 4000, disableOnInteraction: false }}
-            speed={900}
-            style={{
-              width: "100%",
-              height: "auto",
-              minHeight: "600px",
-              paddingBottom: "40px",
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "repeat(1, 1fr)",
+                sm: "repeat(2, 1fr)",
+                md: "repeat(3, 1fr)",
+              },
+              gap: 3,
             }}
           >
-            {produtosAleatorios?.map((p, i) => {
+            {produtosPromocoes?.itens.map((p) => {
               const isAdded = addedId === p.id;
+
               return (
-              <SwiperSlide key={i}>
-                <Stack
-                  direction={{ xs: "column", md: "row" }}
-                  alignItems="center"
-                  justifyContent="center"
-                  spacing={{ xs: 2, md: 4 }}
+              <Card
+                key={p.id}
+                sx={{
+                  p: 2,
+                  bgcolor: "#121212",
+                  borderRadius: "18px",
+                  textAlign: "center",
+                }}
+              >
+                <Box
+                  component="img"
+                  src={p.imagens?.[0]?.caminho ?? ""}
+                  alt={p.imagens?.[0]?.descricao ?? ""}
                   sx={{
                     width: "100%",
-                    height: "100%",
-                    px: 2,
+                    height: 160,
+                    objectFit: "contain",
+                  }}
+                />
+
+                <Typography level="h4" sx={{ mt: 2 }}>
+                  {p.nomeProduto}
+                </Typography>
+
+                <Typography level="body-sm" sx={{ opacity: 0.72 }}>
+                  {p.descricao}
+                </Typography>
+
+                <Stack direction="row" spacing={1} justifyContent="center" mt={1}>
+                  <Typography>{formatarDinheiro(p.valor ?? 0)}</Typography>
+                  <Typography
+                    sx={{ textDecoration: "line-through", opacity: 0.6 }}
+                  >
+                    {formatarDinheiro(p.valorOriginal)}
+                  </Typography>
+                </Stack>
+
+                <Button
+                  onClick={() =>
+                    (window.location.href = `/compra?produtoId=${p.id}`)
+                  }
+                  sx={{
+                    mt: 2,
+                    bgcolor: "#fff",
+                    color: "#000",
+                    fontWeight: 700,
+                    "&:hover": { bgcolor: "#f5f5f5" },
+                  }}
+                >
+                  Comprar
+                </Button>
+                <Button
+                  color="primary"
+                  onClick={() => handleClick(p.id, 1)}
+                  sx={{
+                    overflow: "hidden",
+                    position: "relative",
                   }}
                 >
                   <Box
                     sx={{
-                      flex: 1,
                       display: "flex",
-                      justifyContent: "center",
                       alignItems: "center",
+                      gap: 1,
+                      transform: isAdded ? "translateY(-40px)" : "translateY(0)",
+                      opacity: isAdded ? 0 : 1,
+                      transition: "all 0.3s ease",
+                      position: "absolute",
                     }}
                   >
-                    <Box
-                      component="img"
-                      src={p.imagens?.[0]?.caminho ?? ""}
-                      alt={p.nomeProduto}
-                      sx={{
-                        width: { xs: "70%", md: "500px" },
-                        height: { xs: "280px", md: "500px" },
-                        objectFit: "contain",
-                      }}
-                    />
+                    <AddShoppingCart />
+                    Adicionar ao carrinho
                   </Box>
+
                   <Box
                     sx={{
-                      flex: 1,
-                      color: "#fff",
-                      textAlign: { xs: "center", md: "left" },
                       display: "flex",
-                      flexDirection: "column",
-                      alignItems: { xs: "center", md: "flex-start" },
+                      alignItems: "center",
+                      gap: 1,
+                      transform: isAdded ? "translateY(0)" : "translateY(40px)",
+                      opacity: isAdded ? 1 : 0,
+                      transition: "all 0.3s ease",
                     }}
                   >
-                    <Typography level="h4" sx={{ mb: 1 }}>
-                      {p.nomeProduto}
-                    </Typography>
-
-                    <Typography level="body-sm" sx={{ opacity: 0.75 }}>
-                      {p.descricao}
-                    </Typography>
-
-                    <Typography sx={{ mt: 2, fontWeight: 700 }}>
-                      {formatarDinheiro(p.valor ?? 0)}
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                    <Button
-                      sx={{
-                        mt: 2,
-                        bgcolor: "#fff",
-                        color: "#000",
-                        fontWeight: 700,
-                        textTransform: "none",
-                        "&:hover": { bgcolor: "#f5f5f5" },
-                      }}
-                      onClick={() =>
-                        (window.location.href = `/compra?produtoId=${p.id}`)
-                      }
-                    >
-                      Comprar
-                    </Button>
-                    <Button
-                      onClick={() => handleClick(p.id, 1)}
-                      sx={{
-                        mt: 2,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        position: "relative",
-                        overflow: "hidden",
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          transition: "all 0.3s ease",
-                          transform: isAdded ? "scale(0)" : "scale(1)",
-                          opacity: isAdded ? 0 : 1,
-                        }}
-                      >
-                        <AddShoppingCart />
-                      </Box>
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          transition: "all 0.3s ease",
-                          transform: isAdded ? "scale(1)" : "scale(0)",
-                          opacity: isAdded ? 1 : 0,
-                        }}
-                      >
-                        <CheckIcon />
-                      </Box>
-                    </Button>
-                    </Box>
+                    <CheckIcon />
+                    Adicionado!
                   </Box>
-                </Stack>
-              </SwiperSlide>
+                </Button>
+              </Card>
             )})}
-          </Swiper>
-        </Container>
-      </Box>
-      <Container maxWidth="lg" sx={{ py: 8 }}>
-        <Typography
-          level="h2"
-          sx={{
-            mb: 4,
-            textAlign: "center",
-            fontWeight: 700,
-            fontSize: { xs: "1.7rem", md: "2rem" },
-          }}
-        >
-          Promoções
-        </Typography>
+          </Box>
 
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: {
-              xs: "repeat(1, 1fr)",
-              sm: "repeat(2, 1fr)",
-              md: "repeat(3, 1fr)",
-            },
-            gap: 3,
-          }}
-        >
-          {produtosPromocoes?.itens.map((p) => {
-            const isAdded = addedId === p.id;
-
-            return (
-            <Card
-              key={p.id}
-              sx={{
-                p: 2,
-                bgcolor: "#121212",
-                borderRadius: "18px",
-                textAlign: "center",
-              }}
-            >
+          <Stack
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+            spacing={1}
+            mt={4}
+          >
+            {Array.from({ length: totalPaginas }).map((_, index) => (
               <Box
-                component="img"
-                src={p.imagens?.[0]?.caminho ?? ""}
-                alt={p.imagens?.[0]?.descricao ?? ""}
+                key={index}
+                onClick={() => carregarPromocoes(index + 1)}
                 sx={{
-                  width: "100%",
-                  height: 160,
-                  objectFit: "contain",
+                  width: pagina === index + 1 ? 16 : 12,
+                  height: pagina === index + 1 ? 16 : 12,
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  transition: "all 0.25s ease",
+                  backgroundColor:
+                    pagina === index + 1 ? "#fff" : "rgba(255,255,255,0.3)",
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.6)",
+                    transform: "scale(1.2)",
+                  },
                 }}
               />
-
-              <Typography level="h4" sx={{ mt: 2 }}>
-                {p.nomeProduto}
-              </Typography>
-
-              <Typography level="body-sm" sx={{ opacity: 0.72 }}>
-                {p.descricao}
-              </Typography>
-
-              <Stack direction="row" spacing={1} justifyContent="center" mt={1}>
-                <Typography>{formatarDinheiro(p.valor ?? 0)}</Typography>
-                <Typography
-                  sx={{ textDecoration: "line-through", opacity: 0.6 }}
-                >
-                  {formatarDinheiro(p.valorOriginal)}
-                </Typography>
-              </Stack>
-
-              <Button
-                onClick={() =>
-                  (window.location.href = `/compra?produtoId=${p.id}`)
-                }
-                sx={{
-                  mt: 2,
-                  bgcolor: "#fff",
-                  color: "#000",
-                  fontWeight: 700,
-                  "&:hover": { bgcolor: "#f5f5f5" },
-                }}
-              >
-                Comprar
-              </Button>
-              <Button
-                color="primary"
-                onClick={() => handleClick(p.id, 1)}
-                sx={{
-                  overflow: "hidden",
-                  position: "relative",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    transform: isAdded ? "translateY(-40px)" : "translateY(0)",
-                    opacity: isAdded ? 0 : 1,
-                    transition: "all 0.3s ease",
-                    position: "absolute",
-                  }}
-                >
-                  <AddShoppingCart />
-                  Adicionar ao carrinho
-                </Box>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    transform: isAdded ? "translateY(0)" : "translateY(40px)",
-                    opacity: isAdded ? 1 : 0,
-                    transition: "all 0.3s ease",
-                  }}
-                >
-                  <CheckIcon />
-                  Adicionado!
-                </Box>
-              </Button>
-            </Card>
-          )})}
-        </Box>
-
-        <Stack
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-          spacing={1}
-          mt={4}
-        >
-          {Array.from({ length: totalPaginas }).map((_, index) => (
-            <Box
-              key={index}
-              onClick={() => carregarPromocoes(index + 1)}
-              sx={{
-                width: pagina === index + 1 ? 16 : 12,
-                height: pagina === index + 1 ? 16 : 12,
-                borderRadius: "50%",
-                cursor: "pointer",
-                transition: "all 0.25s ease",
-                backgroundColor:
-                  pagina === index + 1 ? "#fff" : "rgba(255,255,255,0.3)",
-                "&:hover": {
-                  backgroundColor: "rgba(255,255,255,0.6)",
-                  transform: "scale(1.2)",
-                },
-              }}
-            />
-          ))}
-        </Stack>
-      </Container>
+            ))}
+          </Stack>
+        </Container>
+       )
+      }
     </Box>
   );
 }
