@@ -62,11 +62,6 @@ export default function Produto() {
 
   const serviceCarrinho = new CarrinhoService();
 
-  const porcentagemParcelas: number[] = [
-    1.07, 1.07, 1.07, 1.07, 1.07, 1.075, 1.08, 1.09, 1.095, 1.1, 1.105, 1.115,
-    1.125, 1.13, 1.14, 1.145, 1.15, 1.155,
-  ];
-
   const fetchProdutos = async (pagina: number) => {
     try {
       const res = await service.getProdutos(pagina);
@@ -119,26 +114,6 @@ export default function Produto() {
       }
     }
   }, []);
-
-  React.useEffect(() => {
-    valorTotalSimulacao();
-  }, [valor, parcelas]);
-
-  function valorTotalSimulacao(valorNumerico?: number) {
-    const valorOriginal = produto?.valorParcelado ?? 0;
-    const valorPago = valorNumerico ?? removerMascaraDinheiro(valor.toString());
-
-    const valorSubtraido = Math.max(valorOriginal - valorPago, 0);
-    const juros = ((porcentagemParcelas[parcelas - 1] - 1) * 100).toFixed(1);
-    const valorAPagar = valorSubtraido * porcentagemParcelas[parcelas - 1];
-
-    setValorParcela({
-      valorOriginal,
-      valorSubtraido,
-      valorAPagar,
-      juros: Number(juros),
-    });
-  }
 
   if (!produto) {
     return (
@@ -304,14 +279,14 @@ export default function Produto() {
           >
             À vista no PIX com{" "}
             <b>
-              {((porcentagemParcelas[4] - 1) * 100).toFixed(0)}% de desconto
+              {((1.07 - 1) * 100).toFixed(0)}% de desconto
             </b>
           </Typography>
           <Typography sx={{ mb: 4, color: "#ccc", textAlign: "left" }}>
-            {formatarDinheiro(produto.valorParcelado * porcentagemParcelas[4])}{" "}
+            {formatarDinheiro(produto.valorParcelado * 1.07)}{" "}
             em até <b>5x</b> de{" "}
             {formatarDinheiro(
-              (produto.valorParcelado * porcentagemParcelas[4]) / 5
+              (produto.valorParcelado * 1.07) / 5
             )}{" "}
             sem juros
           </Typography>
@@ -359,22 +334,6 @@ export default function Produto() {
               >
                 <CheckIcon />
               </Box>
-            </Button>
-            <Button
-              variant="outlined"
-              sx={{
-                borderColor: "#fff",
-                color: "#fff",
-                fontWeight: 600,
-                textTransform: "none",
-                "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
-              }}
-              onClick={() => {
-                setVariant("soft");
-                valorTotalSimulacao();
-              }}
-            >
-              SIMULAR PAGAMENTO
             </Button>
             {admin && (
               <Button
@@ -548,172 +507,6 @@ export default function Produto() {
                 {formatarDinheiro(valorParcela?.valorAPagar ?? 0)}
               </Typography>
             </Box>
-          </Box>
-          <Box>
-            <ModalClose />
-            <Typography level="h4" sx={{ mb: 2, textAlign: "center", mt: 2 }}>
-              Simulação de Pagamento
-            </Typography>
-
-            <DialogContent>
-              <Typography level="body-md" sx={{ mb: 2, textAlign: "center" }}>
-                Digite o valor a vista e selecione o número de parcelas.
-              </Typography>
-
-              <FormControl sx={{ mb: 2 }}>
-                <FormLabel>Valor de Entrada (R$)</FormLabel>
-                <Input
-                  type="text"
-                  value={valor}
-                  onChange={(e) => {
-                    const valorFormatado = mascaraDinheiro(e.target.value);
-                    setValor(valorFormatado);
-
-                    const valorNumerico =
-                      removerMascaraDinheiro(valorFormatado);
-                    valorTotalSimulacao(valorNumerico);
-                  }}
-                  placeholder="Ex: R$ 1.500,00"
-                />
-              </FormControl>
-
-              <FormControl sx={{ mb: 2 }}>
-                <FormLabel>Parcelas no </FormLabel>
-                <Select<number>
-                  value={parcelas}
-                  onChange={(_, val) => {
-                    setParcelas(val || 1);
-                    valorTotalSimulacao();
-                  }}
-                  defaultValue={1}
-                  sx={{
-                    width: "100%",
-                    ".MuiSelect-button": {
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    },
-                  }}
-                  renderValue={(option) => {
-                    const selected = option?.value ?? 1;
-                    const juros = (
-                      (porcentagemParcelas[selected - 1] - 1) *
-                      100
-                    ).toFixed(1);
-                    return (
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                      >
-                        <Typography component="span">
-                          {selected}x{" "}
-                          {formatarDinheiro(
-                            Math.round(
-                              (valorParcela?.valorAPagar ?? 0) / selected
-                            )
-                          )}
-                        </Typography>
-                        {selected >= 6 ? (
-                          <Chip
-                            color="success"
-                            size="sm"
-                            variant="soft"
-                            sx={{
-                              fontSize: "11px",
-                              height: 20,
-                              px: 0.5,
-                            }}
-                          >
-                            Juros: {juros}%
-                          </Chip>
-                        ) : (
-                          <Chip
-                            color="success"
-                            size="sm"
-                            variant="soft"
-                            sx={{
-                              fontSize: "11px",
-                              height: 20,
-                              px: 0.5,
-                            }}
-                          >
-                            Sem Juros
-                          </Chip>
-                        )}
-                      </Box>
-                    );
-                  }}
-                >
-                  {[...Array(18)].map((_, i) => (
-                    <Option
-                      key={i + 1}
-                      value={i + 1}
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        fontSize: "14px",
-                        py: 0.5,
-                      }}
-                    >
-                      <Typography component="span">{i + 1}x</Typography>
-                      {i >= 5 ? (
-                        <Chip
-                          color="success"
-                          size="sm"
-                          variant="soft"
-                          sx={{
-                            fontSize: "10px",
-                            height: 18,
-                            px: 0.5,
-                          }}
-                        >
-                          Juros:{" "}
-                          {((porcentagemParcelas[i] - 1) * 100)
-                            .toFixed(1)
-                            .split(".")[1] != "0"
-                            ? ((porcentagemParcelas[i] - 1) * 100).toFixed(1)
-                            : Math.round(
-                                parseFloat(
-                                  ((porcentagemParcelas[i] - 1) * 100).toFixed(
-                                    1
-                                  )
-                                )
-                              )}
-                          %
-                        </Chip>
-                      ) : (
-                        <Chip
-                          color="success"
-                          size="sm"
-                          variant="soft"
-                          sx={{
-                            fontSize: "10px",
-                            height: 18,
-                            px: 0.5,
-                          }}
-                        >
-                          Sem juros
-                        </Chip>
-                      )}
-                    </Option>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <Button
-                sx={{
-                  mt: 1,
-                  bgcolor: "#fff",
-                  color: "#000",
-                  fontWeight: 700,
-                  "&:hover": { bgcolor: "#f5f5f5" },
-                  textTransform: "none",
-                }}
-                fullWidth
-              >
-                COMPRAR AGORA
-              </Button>
-            </DialogContent>
           </Box>
         </ModalDialog>
       </Modal>
