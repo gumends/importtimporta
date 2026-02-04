@@ -10,7 +10,7 @@ import {
   Badge,
 } from "@mui/joy";
 import { Search, Menu as M } from "lucide-react";
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { ExitToApp, Person } from "@mui/icons-material";
@@ -34,7 +34,7 @@ export default function AppBar() {
   const [menus, setMenus] = React.useState<MenuResponse>([]);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [quantidadeCarrinho, setQuantidadeCarrinho] = React.useState<number>(0);
-  
+
   const googleAuth = new GoogleAuthService();
   const userService = new UserService();
 
@@ -57,20 +57,48 @@ export default function AppBar() {
     setMenus(response);
   }
 
-  useEffect(() => {
-    googleAuth.me().then((res) => {
-      if (res && res.email) {
-        getMenus(res.email);
-        setLogado(true);
-      }
-    });
+  const sincronizarCarrinhoLocal = async (token: string) => {
+    const carrinhoStorage = sessionStorage.getItem("carrinho");
 
-    if (logado) {
-      serviceCarrihno.getCarrinho().then((res) => {
-        setQuantidadeCarrinho(res.carrinhos.length);
-      });
+    if (!carrinhoStorage) return;
+
+    const carrinhoLocal = JSON.parse(carrinhoStorage);
+
+    if (!carrinhoLocal?.carrinhos?.length) return;
+
+    for (const item of carrinhoLocal.carrinhos) {
+      await serviceCarrihno.postCarrinho(
+        {
+          IdProduto: item.IdProduto,
+          Quantidade: item.quantidade,
+        },
+        token,
+      );
     }
-  }, [logado]);
+
+    sessionStorage.removeItem("carrinho");
+  };
+
+  useEffect(() => {
+    const init = async () => {
+      const res = await googleAuth.me();
+
+      if (!res || !res.email) return;
+
+      getMenus(res.email);
+      setLogado(true);
+
+      const token = sessionStorage.getItem("auth_token");
+      if (!token) return;
+
+      await sincronizarCarrinhoLocal(token);
+
+      const carrinhoApi = await serviceCarrihno.getCarrinho();
+      setQuantidadeCarrinho(carrinhoApi.carrinhos.length);
+    };
+
+    init();
+  }, []);
 
   useEffect(() => {
     setPagina(window.location.pathname);
@@ -181,24 +209,34 @@ export default function AppBar() {
               <Dropdown>
                 <MenuButton
                   slots={{ root: IconButton }}
-                  slotProps={{ root: { variant: "outlined", color: "neutral" } }}
+                  slotProps={{
+                    root: { variant: "outlined", color: "neutral" },
+                  }}
                 >
                   <Person />
                 </MenuButton>
-              <Menu>
-                {menus.map((menu) => (
-                  <MenuItem key={menu.id} onClick={() => router.push(menu.link)}>
-                    {menu.name}
+                <Menu>
+                  {menus.map((menu) => (
+                    <MenuItem
+                      key={menu.id}
+                      onClick={() => router.push(menu.link)}
+                    >
+                      {menu.name}
+                    </MenuItem>
+                  ))}
+                  <MenuItem color="danger" onClick={logout}>
+                    Sair <ExitToApp />
                   </MenuItem>
-                ))}
-                <MenuItem color="danger" onClick={logout}>
-                  Sair <ExitToApp />
-                </MenuItem>
-              </Menu>
+                </Menu>
               </Dropdown>
             )}
             <Badge badgeContent={quantidadeCarrinho} color="primary">
-              <IconButton variant="outlined" onClick={() => {router.push('/carrinho')}}>
+              <IconButton
+                variant="outlined"
+                onClick={() => {
+                  router.push("/carrinho");
+                }}
+              >
                 <ShoppingCartIcon />
               </IconButton>
             </Badge>

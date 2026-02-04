@@ -67,7 +67,6 @@ export default function ModalEndereco({
     carregarEndereco();
   }, [open, isEdit, enderecoId]);
 
-  // 🔹 Buscar CEP automaticamente
   useEffect(() => {
     const buscarCep = async () => {
       const cepNumerico = cep.replace(/\D/g, "");
@@ -140,7 +139,6 @@ export default function ModalEndereco({
         </Typography>
 
         <Stack spacing={2}>
-          {/* CEP */}
           <Stack spacing={0.5}>
             <Typography level="body-sm">CEP</Typography>
             <Input
@@ -157,7 +155,6 @@ export default function ModalEndereco({
             )}
           </Stack>
 
-          {/* Rua */}
           <Stack spacing={0.5}>
             <Typography level="body-sm">Rua</Typography>
             <Input
@@ -166,7 +163,6 @@ export default function ModalEndereco({
             />
           </Stack>
 
-          {/* Número */}
           <Stack spacing={0.5}>
             <Typography level="body-sm">Número</Typography>
             <Input
@@ -179,7 +175,6 @@ export default function ModalEndereco({
             />
           </Stack>
 
-          {/* Complemento */}
           <Stack spacing={0.5}>
             <Typography level="body-sm">Complemento</Typography>
             <Input
@@ -188,7 +183,6 @@ export default function ModalEndereco({
             />
           </Stack>
 
-          {/* Ações */}
           <Stack direction="row" spacing={1} justifyContent="flex-end">
             <Button variant="outlined" onClick={onClose}>
               Cancelar

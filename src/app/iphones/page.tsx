@@ -20,6 +20,7 @@ import { Produto } from "@/types/ProdutoNovo.type";
 import { AddShoppingCart } from "@mui/icons-material";
 import { CheckIcon } from "lucide-react";
 import { CarrinhoService } from "@/services/carrinho/carrinho.service";
+import { CarrinhoResponse, NewCarrinhoDto } from "@/types/carrinhoRespone";
 
 export default function ProdutosLista() {
   const router = useRouter();
@@ -39,15 +40,64 @@ export default function ProdutosLista() {
   const [addedId, setAddedId] = useState<number | null>(null);
 
   const serviceCarrinho = new CarrinhoService();
-  
-  const handleClick = (idProduto: number, quantidade: number) => {
-    const token = sessionStorage.getItem("auth_token") || "";
-    const produto_carrinho = {
-      IdProduto: idProduto,
-      Quantidade: quantidade,
-    };
+  const service = new ProdutoService();
 
-    serviceCarrinho.postCarrinho(produto_carrinho, token);
+  const AdicionarAoCarrinho = async (idProduto: number, quantidade: number) => {
+    const token = sessionStorage.getItem("auth_token") || "";
+
+    if (token) {
+      await serviceCarrinho.postCarrinho(
+        { IdProduto: idProduto, Quantidade: quantidade },
+        token,
+      );
+      setAddedId(idProduto);
+
+      setTimeout(() => {
+        setAddedId(null);
+      }, 1200);
+      return;
+    }
+
+    const produto = await service.getProdutoPorId(idProduto);
+
+    const carrinhoStorage = sessionStorage.getItem("carrinho");
+
+    const carrinho: CarrinhoResponse = carrinhoStorage
+      ? JSON.parse(carrinhoStorage)
+      : {
+          subtotal: 0,
+          total: 0,
+          taxaEntrega: 20,
+          carrinhos: [],
+        };
+
+    const itemExistente = carrinho.carrinhos.find(
+      (item) => item.IdProduto === idProduto,
+    );
+
+    if (itemExistente) {
+      itemExistente.quantidade += quantidade;
+    } else {
+      const novoItem: NewCarrinhoDto = {
+        id: Date.now(),
+        IdProduto: idProduto,
+        IdUsuario: 0,
+        CriadoEm: new Date(),
+        quantidade: quantidade,
+        produto: produto,
+      };
+
+      carrinho.carrinhos.push(novoItem);
+    }
+
+    carrinho.subtotal = carrinho.carrinhos.reduce(
+      (acc, item) => acc + (item.produto.valor ?? 0) * item.quantidade,
+      0,
+    );
+
+    carrinho.total = carrinho.subtotal + carrinho.taxaEntrega;
+
+    sessionStorage.setItem("carrinho", JSON.stringify(carrinho));
 
     setAddedId(idProduto);
 
@@ -62,7 +112,7 @@ export default function ProdutosLista() {
     const resp = await produtoService.getProdutosPorTipo(
       tipoProduto,
       pagina,
-      8
+      8,
     );
 
     console.log(resp);
@@ -220,165 +270,173 @@ export default function ProdutosLista() {
               const isAdded = addedId === p.id;
 
               return (
-              <Card
-                key={p.id}
-                variant="outlined"
-                sx={{
-                  bgcolor: "#121212",
-                  borderColor: "#1f1f1f",
-                  borderRadius: "xl",
-                  transition: "all 0.3s ease",
-                  minWidth: "300px",
-                  height: "540px",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  "&:hover": {
-                    transform: "translateY(-6px)",
-                    boxShadow: "0 8px 25px rgba(255, 255, 255, 0.2)",
-                  },
-                }}
-              >
-                <CardOverflow>
-                  <AspectRatio ratio="1" sx={{ bgcolor: "#000" }}>
-                    <img
-                      src={
-                        Array.isArray(p.imagens)
-                          ? p.imagens[0].caminho
-                          : p.imagens || undefined
-                      }
-                      alt={p.nomeProduto}
-                      loading="lazy"
-                      style={{
-                        objectFit: "contain",
-                        backgroundColor: "#000",
-                        padding: "10px",
-                      }}
-                    />
-                  </AspectRatio>
-                </CardOverflow>
-
-                <CardContent
-                  sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
+                <Card
+                  key={p.id}
+                  variant="outlined"
+                  sx={{
+                    bgcolor: "#121212",
+                    borderColor: "#1f1f1f",
+                    borderRadius: "xl",
+                    transition: "all 0.3s ease",
+                    minWidth: "300px",
+                    height: "540px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    "&:hover": {
+                      transform: "translateY(-6px)",
+                      boxShadow: "0 8px 25px rgba(255, 255, 255, 0.2)",
+                    },
+                  }}
                 >
-                  <Typography
-                    level="title-md"
-                    sx={{
-                      color: "#fff",
-                      fontWeight: 500,
-                      mb: 1,
-                      overflow: "hidden",
-                      whiteSpace: "nowrap",
-                      textOverflow: "ellipsis",
-                      height: "24px",
-                    }}
-                  >
-                    {p.nomeProduto}
-                  </Typography>
+                  <CardOverflow>
+                    <AspectRatio ratio="1" sx={{ bgcolor: "#000" }}>
+                      <img
+                        src={
+                          Array.isArray(p.imagens)
+                            ? p.imagens[0].caminho
+                            : p.imagens || undefined
+                        }
+                        alt={p.nomeProduto}
+                        loading="lazy"
+                        style={{
+                          objectFit: "contain",
+                          backgroundColor: "#000",
+                          padding: "10px",
+                        }}
+                      />
+                    </AspectRatio>
+                  </CardOverflow>
 
-                  <Typography
-                    level="body-sm"
+                  <CardContent
                     sx={{
-                      color: "rgba(255,255,255,0.6)",
-                      mb: 1,
-                      height: "32px",
-                      overflow: "hidden",
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                    }}
-                  >
-                    {p.descricao}
-                  </Typography>
-
-                  <Box
-                    sx={{
-                      height: "40px",
+                      flexGrow: 1,
                       display: "flex",
                       flexDirection: "column",
-                      justifyContent: "center",
                     }}
                   >
-                    {p.valorOriginal > (p.valor ?? 0) && (
-                      <Typography
-                        level="body-sm"
-                        sx={{
-                          color: "rgba(255,255,255,0.5)",
-                          textDecoration: "line-through",
-                          fontSize: "0.85rem",
-                        }}
-                      >
-                        {formatarDinheiro(p.valorOriginal)}
-                      </Typography>
-                    )}
-
                     <Typography
-                      level="title-lg"
+                      level="title-md"
                       sx={{
                         color: "#fff",
-                        fontWeight: 700,
-                        mt: p.valorOriginal > (p.valor ?? 0) ? 0.3 : 1,
+                        fontWeight: 500,
+                        mb: 1,
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                        textOverflow: "ellipsis",
+                        height: "24px",
                       }}
                     >
-                      {formatarDinheiro(p.valor ?? 0)}
+                      {p.nomeProduto}
                     </Typography>
-                  </Box>
 
-                  <Button
-                    fullWidth
-                    variant="solid"
-                    sx={{
-                      mt: 1,
-                      bgcolor: "#fff",
-                      color: "#000",
-                      fontWeight: 700,
-                      "&:hover": { bgcolor: "#f5f5f5" },
-                      textTransform: "none",
-                      mb: 1
-                    }}
-                    onClick={() => router.push(`/compra?produtoId=${p.id}`)}
-                  >
-                    Comprar agora
-                  </Button>
-                  <Button
-                    color="primary"
-                    onClick={() => handleClick(p.id, 1)}
-                    sx={{
-                      overflow: "hidden",
-                      position: "relative",
-                    }}
-                  >
-                    <Box
+                    <Typography
+                      level="body-sm"
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        transform: isAdded ? "translateY(-40px)" : "translateY(0)",
-                        opacity: isAdded ? 0 : 1,
-                        transition: "all 0.3s ease",
-                        position: "absolute",
+                        color: "rgba(255,255,255,0.6)",
+                        mb: 1,
+                        height: "32px",
+                        overflow: "hidden",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
                       }}
                     >
-                      <AddShoppingCart />
-                      Adicionar ao carrinho
-                    </Box>
-    
+                      {p.descricao}
+                    </Typography>
+
                     <Box
                       sx={{
+                        height: "40px",
                         display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        transform: isAdded ? "translateY(0)" : "translateY(40px)",
-                        opacity: isAdded ? 1 : 0,
-                        transition: "all 0.3s ease",
+                        flexDirection: "column",
+                        justifyContent: "center",
                       }}
                     >
-                      <CheckIcon />
-                      Adicionado!
+                      {p.valorOriginal > (p.valor ?? 0) && (
+                        <Typography
+                          level="body-sm"
+                          sx={{
+                            color: "rgba(255,255,255,0.5)",
+                            textDecoration: "line-through",
+                            fontSize: "0.85rem",
+                          }}
+                        >
+                          {formatarDinheiro(p.valorOriginal)}
+                        </Typography>
+                      )}
+
+                      <Typography
+                        level="title-lg"
+                        sx={{
+                          color: "#fff",
+                          fontWeight: 700,
+                          mt: p.valorOriginal > (p.valor ?? 0) ? 0.3 : 1,
+                        }}
+                      >
+                        {formatarDinheiro(p.valor ?? 0)}
+                      </Typography>
                     </Box>
-                  </Button>
-                </CardContent>
-              </Card>
+
+                    <Button
+                      fullWidth
+                      variant="solid"
+                      sx={{
+                        mt: 1,
+                        bgcolor: "#fff",
+                        color: "#000",
+                        fontWeight: 700,
+                        "&:hover": { bgcolor: "#f5f5f5" },
+                        textTransform: "none",
+                        mb: 1,
+                      }}
+                      onClick={() => router.push(`/compra?produtoId=${p.id}`)}
+                    >
+                      Comprar agora
+                    </Button>
+                    <Button
+                      color="primary"
+                      onClick={() => AdicionarAoCarrinho(p.id, 1)}
+                      sx={{
+                        overflow: "hidden",
+                        position: "relative",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          transform: isAdded
+                            ? "translateY(-40px)"
+                            : "translateY(0)",
+                          opacity: isAdded ? 0 : 1,
+                          transition: "all 0.3s ease",
+                          position: "absolute",
+                        }}
+                      >
+                        <AddShoppingCart />
+                        Adicionar ao carrinho
+                      </Box>
+
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          transform: isAdded
+                            ? "translateY(0)"
+                            : "translateY(40px)",
+                          opacity: isAdded ? 1 : 0,
+                          transition: "all 0.3s ease",
+                        }}
+                      >
+                        <CheckIcon />
+                        Adicionado!
+                      </Box>
+                    </Button>
+                  </CardContent>
+                </Card>
               );
             })}
       </Box>

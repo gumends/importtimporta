@@ -32,6 +32,7 @@ import {
 import { AddShoppingCart } from "@mui/icons-material";
 import CheckIcon from "@mui/icons-material/Check";
 import { CarrinhoService } from "@/services/carrinho/carrinho.service";
+import { CarrinhoResponse, NewCarrinhoDto } from "@/types/carrinhoRespone";
 
 export default function Inicio() {
   useEffect(() => {
@@ -43,21 +44,69 @@ export default function Inicio() {
   const serviceCarrinho = new CarrinhoService();
   const [addedId, setAddedId] = useState<number | null>(null);
 
-  const handleClick = (idProduto: number, quantidade: number) => {
-    const token = sessionStorage.getItem("auth_token") || "";
-    const produto_carrinho = {
-      IdProduto: idProduto,
-      Quantidade: quantidade,
+  const AdicionarAoCarrinho = async (idProduto: number, quantidade: number) => {
+      const token = sessionStorage.getItem("auth_token") || "";
+  
+      if (token) {
+        await serviceCarrinho.postCarrinho(
+          { IdProduto: idProduto, Quantidade: quantidade },
+          token,
+        );
+        setAddedId(idProduto);
+  
+        setTimeout(() => {
+          setAddedId(null);
+        }, 1200);
+        return;
+      }
+  
+      const produto = await service.getProdutoPorId(idProduto);
+  
+      const carrinhoStorage = sessionStorage.getItem("carrinho");
+  
+      const carrinho: CarrinhoResponse = carrinhoStorage
+        ? JSON.parse(carrinhoStorage)
+        : {
+            subtotal: 0,
+            total: 0,
+            taxaEntrega: 20,
+            carrinhos: [],
+          };
+  
+      const itemExistente = carrinho.carrinhos.find(
+        (item) => item.IdProduto === idProduto,
+      );
+  
+      if (itemExistente) {
+        itemExistente.quantidade += quantidade;
+      } else {
+        const novoItem: NewCarrinhoDto = {
+          id: Date.now(),
+          IdProduto: idProduto,
+          IdUsuario: 0,
+          CriadoEm: new Date(),
+          quantidade: quantidade,
+          produto: produto,
+        };
+  
+        carrinho.carrinhos.push(novoItem);
+      }
+  
+      carrinho.subtotal = carrinho.carrinhos.reduce(
+        (acc, item) => acc + (item.produto.valor ?? 0) * item.quantidade,
+        0,
+      );
+  
+      carrinho.total = carrinho.subtotal + carrinho.taxaEntrega;
+  
+      sessionStorage.setItem("carrinho", JSON.stringify(carrinho));
+  
+      setAddedId(idProduto);
+  
+      setTimeout(() => {
+        setAddedId(null);
+      }, 1200);
     };
-
-    serviceCarrinho.postCarrinho(produto_carrinho, token);
-
-    setAddedId(idProduto);
-
-    setTimeout(() => {
-      setAddedId(null);
-    }, 1200);
-  };
 
   const [produtoNovaGeracao, setProdutoNovaGeracao] =
     useState<ProdutoAtual | null>(null);
@@ -343,7 +392,7 @@ export default function Inicio() {
                           Comprar
                         </Button>
                         <Button
-                          onClick={() => handleClick(p.id, 1)}
+                          onClick={() => AdicionarAoCarrinho(p.id, 1)}
                           sx={{
                             mt: 2,
                             display: "flex",
@@ -469,7 +518,7 @@ export default function Inicio() {
                 </Button>
                 <Button
                   color="primary"
-                  onClick={() => handleClick(p.id, 1)}
+                  onClick={() => AdicionarAoCarrinho(p.id, 1)}
                   sx={{
                     overflow: "hidden",
                     position: "relative",
