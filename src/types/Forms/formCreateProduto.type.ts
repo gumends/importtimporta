@@ -1,5 +1,4 @@
 interface InformacoesAdicionais {
-  id: number;
   marca: string;
   armazenamentoInterno: string;
   tipoTela: string;
@@ -16,21 +15,17 @@ interface InformacoesAdicionais {
 }
 
 interface FormularioProduto {
-  id: number;
   nomeProduto: string;
   valorOriginal: string;
-  valorParcelado: string;
   desconto: string;
+  valorParcelado: string;
   descricao: string;
-  tipoProduto: string;
-  novoLancamento: boolean;
-  novaGeracao: boolean;
+  tipoProduto: number;
   disponivel: boolean;
-  quantidade: string;
   mesesGarantia: string;
-  informacoesAdicionais: InformacoesAdicionais;
-  informacoesAdicionaisId: number;
+  quantidade: string;
   color: string;
   colorName: string;
+  informacoesProduto: InformacoesAdicionais;
 }
 

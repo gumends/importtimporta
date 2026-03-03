@@ -24,12 +24,12 @@ import { styled } from "@mui/joy";
 import Alerta from "./Alerta";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ProdutoService } from "@/services/produto/produto.service";
-import { IImagem, Produto } from "@/types/ProdutoNovo.type";
+import { IImagem } from "@/types/ProdutoNovo.type";
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  idProduto: number;
+  idProduto: string;
   onSaved: () => void;
 }
 
@@ -40,257 +40,247 @@ export default function ModalEditarProduto({
   idProduto,
   onSaved,
 }: Props) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  // const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  const produtoService = new ProdutoService();
+  // const produtoService = new ProdutoService();
 
-  const EntradaOculta = styled("input")`
-    clip: rect(0 0 0 0);
-    clip-path: inset(50%);
-    height: 1px;
-    overflow: hidden;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    white-space: nowrap;
-    width: 1px;
-  `;
+  // const EntradaOculta = styled("input")`
+  //   clip: rect(0 0 0 0);
+  //   clip-path: inset(50%);
+  //   height: 1px;
+  //   overflow: hidden;
+  //   position: absolute;
+  //   bottom: 0;
+  //   left: 0;
+  //   white-space: nowrap;
+  //   width: 1px;
+  // `;
 
-  const CaixaImagem = styled("div")({
-    position: "relative",
-    width: "120px",
-    height: "120px",
-    borderRadius: "8px",
-    overflow: "hidden",
-    border: "1px solid #444",
-    cursor: "pointer",
-  });
+  // const CaixaImagem = styled("div")({
+  //   position: "relative",
+  //   width: "120px",
+  //   height: "120px",
+  //   borderRadius: "8px",
+  //   overflow: "hidden",
+  //   border: "1px solid #444",
+  //   cursor: "pointer",
+  // });
 
-  const SobreposicaoHover = styled("div")({
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    background: "rgba(255, 0, 0, 0.4)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    opacity: 0,
-    transition: "opacity 0.3s",
-    "&:hover": {
-      opacity: 1,
-    },
-  });
+  // const SobreposicaoHover = styled("div")({
+  //   position: "absolute",
+  //   top: 0,
+  //   left: 0,
+  //   width: "100%",
+  //   height: "100%",
+  //   background: "rgba(255, 0, 0, 0.4)",
+  //   display: "flex",
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  //   opacity: 0,
+  //   transition: "opacity 0.3s",
+  //   "&:hover": {
+  //     opacity: 1,
+  //   },
+  // });
 
-  const [aba, setAba] = useState(0);
+  // const [aba, setAba] = useState(0);
 
-  const formularioVazio = {
-    id: 0,
-    nomeProduto: "",
-    valorOriginal: "",
-    valorParcelado: "",
-    desconto: "",
-    descricao: "",
-    tipoProduto: "",
-    novoLancamento: false,
-    novaGeracao: false,
-    disponivel: true,
-    mesesGarantia: "",
-    quantidade: "",
-    informacoesAdicionais: {
-      id: 0,
-      marca: "",
-      armazenamentoInterno: "",
-      tipoTela: "",
-      tamanhoTela: "",
-      resolucaoTela: "",
-      tecnologia: "",
-      processador: "",
-      sistemaOperacional: "",
-      cameraTraseira: "",
-      cameraFrontal: "",
-      bateria: "",
-      quantidadeChips: "",
-      material: "",
-    },
-    informacoesAdicionaisId: 0,
-    color: "",
-    colorName: "",
-  };
+  // const formularioVazio = {
+  //   nomeProduto: "",
+  //   valorOriginal: "",
+  //   valorParcelado: "",
+  //   desconto: "",
+  //   descricao: "",
+  //   tipoProduto: 0,
+  //   disponivel: true,
+  //   mesesGarantia: "",
+  //   quantidade: "",
+  //   informacoesProduto: {
+  //     marca: "",
+  //     armazenamentoInterno: "",
+  //     tipoTela: "",
+  //     tamanhoTela: "",
+  //     resolucaoTela: "",
+  //     tecnologia: "",
+  //     processador: "",
+  //     sistemaOperacional: "",
+  //     cameraTraseira: "",
+  //     cameraFrontal: "",
+  //     bateria: "",
+  //     quantidadeChips: "",
+  //     material: "",
+  //   },
+  //   color: "",
+  //   colorName: "",
+  // };
 
-  const [formulario, setFormulario] =
-    useState<FormularioProduto>(formularioVazio);
-  const [imagensApi, setImagensApi] = useState<string[]>([]);
-  const [imagensUpload, setImagensUpload] = useState<File[]>([]);
+  // const [formulario, setFormulario] =
+  //   useState<FormularioProduto>(formularioVazio);
+  // const [imagensApi, setImagensApi] = useState<string[]>([]);
+  // const [imagensUpload, setImagensUpload] = useState<File[]>([]);
 
-  const [alertaAberto, setAlertaAberto] = useState(false);
-  const [alertaMensagem, setAlertaMensagem] = useState("");
-  const [alertaTipo, setAlertaTipo] = useState<
-    "success" | "danger" | "warning" | "primary" | "neutral"
-  >("neutral");
+  // const [alertaAberto, setAlertaAberto] = useState(false);
+  // const [alertaMensagem, setAlertaMensagem] = useState("");
+  // const [alertaTipo, setAlertaTipo] = useState<
+  //   "success" | "danger" | "warning" | "primary" | "neutral"
+  // >("neutral");
 
-  const mostrarAlerta = (msg: string, tipo: TipoAlerta) => {
-    setAlertaMensagem(msg);
-    setAlertaTipo(tipo);
-    setAlertaAberto(true);
-  };
+  // const mostrarAlerta = (msg: string, tipo: TipoAlerta) => {
+  //   setAlertaMensagem(msg);
+  //   setAlertaTipo(tipo);
+  //   setAlertaAberto(true);
+  // };
 
-  function produtoParaFormulario(produto: Produto): FormularioProduto {
-    return {
-      id: produto.id,
-      nomeProduto: produto.nomeProduto,
-      valorOriginal: produto.valorOriginal.toString(),
-      valorParcelado: produto.valorParcelado.toString(),
-      desconto: produto.desconto.toString(),
-      descricao: produto.descricao,
-      tipoProduto: String(produto.tipoProduto),
-      novoLancamento: produto.novoLancamento,
-      novaGeracao: produto.novaGeracao ?? false,
-      disponivel: produto.disponivel,
-      mesesGarantia: produto.mesesGarantia.toString(),
-      informacoesAdicionaisId: produto.informacoesAdicionaisId ?? 0,
-      color: produto.color,
-      colorName: produto.colorName,
-      quantidade: produto.quantidade.toString(),
-      informacoesAdicionais: {
-        id: produto.informacoesAdicionais?.id ?? 0,
-        marca: produto.informacoesAdicionais?.marca ?? "",
-        armazenamentoInterno:
-          produto.informacoesAdicionais?.armazenamentoInterno ?? "",
-        tipoTela: produto.informacoesAdicionais?.tipoTela ?? "",
-        tamanhoTela: produto.informacoesAdicionais?.tamanhoTela ?? "",
-        resolucaoTela: produto.informacoesAdicionais?.resolucaoTela ?? "",
-        tecnologia: produto.informacoesAdicionais?.tecnologia ?? "",
-        processador: produto.informacoesAdicionais?.processador ?? "",
-        sistemaOperacional:
-          produto.informacoesAdicionais?.sistemaOperacional ?? "",
-        cameraTraseira: produto.informacoesAdicionais?.cameraTraseira ?? "",
-        cameraFrontal: produto.informacoesAdicionais?.cameraFrontal ?? "",
-        bateria: produto.informacoesAdicionais?.bateria ?? "",
-        quantidadeChips: produto.informacoesAdicionais?.quantidadeChips ?? "",
-        material: produto.informacoesAdicionais?.material ?? "",
-      },
-    };
-  }
+  // function produtoParaFormulario(produto: FormularioProduto): FormularioProduto {
+  //   return {
+  //     nomeProduto: produto.nomeProduto,
+  //     valorOriginal: produto.valorOriginal.toString(),
+  //     valorParcelado: produto.valorParcelado.toString(),
+  //     desconto: produto.desconto.toString(),
+  //     descricao: produto.descricao,
+  //     tipoProduto: produto.tipoProduto,
+  //     disponivel: produto.disponivel,
+  //     mesesGarantia: produto.mesesGarantia.toString(),
+  //     color: produto.color,
+  //     colorName: produto.colorName,
+  //     quantidade: produto.quantidade.toString(),
+  //     informacoesProduto: {
+  //       marca: produto.informacoesProduto?.marca ?? "",
+  //       armazenamentoInterno:
+  //         produto.informacoesProduto?.armazenamentoInterno ?? "",
+  //       tipoTela: produto.informacoesProduto?.tipoTela ?? "",
+  //       tamanhoTela: produto.informacoesProduto?.tamanhoTela ?? "",
+  //       resolucaoTela: produto.informacoesProduto?.resolucaoTela ?? "",
+  //       tecnologia: produto.informacoesProduto?.tecnologia ?? "",
+  //       processador: produto.informacoesProduto?.processador ?? "",
+  //       sistemaOperacional:
+  //         produto.informacoesProduto?.sistemaOperacional ?? "",
+  //       cameraTraseira: produto.informacoesProduto?.cameraTraseira ?? "",
+  //       cameraFrontal: produto.informacoesProduto?.cameraFrontal ?? "",
+  //       bateria: produto.informacoesProduto?.bateria ?? "",
+  //       quantidadeChips: produto.informacoesProduto?.quantidadeChips ?? "",
+  //       material: produto.informacoesProduto?.material ?? "",
+  //     },
+  //   };
+  // }
 
-  const buscarProduto = async () => {
-    try {
-      const produto = await produtoService.getProdutoPorId(idProduto);
+  // const buscarProduto = async () => {
+  //   try {
+  //     const produto = await produtoService.getProdutoPorId(idProduto);
 
-      setFormulario(produtoParaFormulario(produto));
+  //     setFormulario(produtoParaFormulario(produto));
 
-      setImagensApi(produto.imagens?.map((x: IImagem) => x.caminho) || []);
-      setImagensUpload([]);
-    } catch (err) {
-      mostrarAlerta("Erro ao carregar produto.", "danger");
-    }
-  };
+  //     // setImagensApi(produto.imagens?.map((x: IImagem) => x.caminho) || []);
+  //     setImagensUpload([]);
+  //   } catch (err) {
+  //     mostrarAlerta("Erro ao carregar produto.", "danger");
+  //   }
+  // };
 
-  useEffect(() => {
-    if (open && idProduto) {
-      buscarProduto();
-      setAba(0);
-    }
-  }, [open, idProduto]);
+  // useEffect(() => {
+  //   if (open && idProduto) {
+  //     buscarProduto();
+  //     setAba(0);
+  //   }
+  // }, [open, idProduto]);
 
-  const alterar = <K extends keyof FormularioProduto>(
-    campo: K,
-    valor: FormularioProduto[K]
-  ) => {
-    setFormulario((ant) => ({ ...ant, [campo]: valor }));
-  };
+  // const alterar = <K extends keyof FormularioProduto>(
+  //   campo: K,
+  //   valor: FormularioProduto[K]
+  // ) => {
+  //   setFormulario((ant) => ({ ...ant, [campo]: valor }));
+  // };
 
-  const alterarInfo = <K extends keyof InformacoesAdicionais>(
-    campo: K,
-    valor: InformacoesAdicionais[K]
-  ) => {
-    setFormulario((ant) => ({
-      ...ant,
-      informacoesAdicionais: {
-        ...ant.informacoesAdicionais,
-        [campo]: valor,
-      },
-    }));
-  };
+  // const alterarInfo = <K extends keyof InformacoesAdicionais>(
+  //   campo: K,
+  //   valor: InformacoesAdicionais[K]
+  // ) => {
+  //   setFormulario((ant) => ({
+  //     ...ant,
+  //     informacoesProduto: {
+  //       ...ant.informacoesProduto,
+  //       [campo]: valor,
+  //     },
+  //   }));
+  // };
 
-  const removerImagemApi = (i: number) => {
-    setImagensApi((ant) => ant.filter((_, idx) => idx !== i));
-  };
+  // const removerImagemApi = (i: number) => {
+  //   setImagensApi((ant) => ant.filter((_, idx) => idx !== i));
+  // };
 
-  const removerImagemUpload = (i: number) => {
-    setImagensUpload((ant) => ant.filter((_, idx) => idx !== i));
-  };
+  // const removerImagemUpload = (i: number) => {
+  //   setImagensUpload((ant) => ant.filter((_, idx) => idx !== i));
+  // };
 
-  const validarFormulario = () => {
-    if (imagensApi.length === 0 && imagensUpload.length === 0) return false;
+  // const validarFormulario = () => {
+  //   if (imagensApi.length === 0 && imagensUpload.length === 0) return false;
 
-    return true;
-  };
+  //   return true;
+  // };
 
-  const salvar = async () => {
-    if (!validarFormulario()) {
-      mostrarAlerta(
-        "Por favor, preencha todos os campos obrigatórios.",
-        "danger"
-      );
-      return;
-    }
+  // const salvar = async () => {
+  //   if (!validarFormulario()) {
+  //     mostrarAlerta(
+  //       "Por favor, preencha todos os campos obrigatórios.",
+  //       "danger"
+  //     );
+  //     return;
+  //   }
 
-    const formData = new FormData();
+  //   const formData = new FormData();
 
-    formData.append("Id", formulario.id.toString());
-    formData.append("NomeProduto", formulario.nomeProduto);
-    formData.append("ValorOriginal", formulario.valorOriginal);
-    formData.append("ValorParcelado", formulario.valorParcelado);
-    formData.append("Desconto", formulario.desconto);
-    formData.append("Descricao", formulario.descricao);
-    formData.append("TipoProduto", String(formulario.tipoProduto));
-    formData.append("NovoLancamento", String(formulario.novoLancamento));
-    formData.append("NovaGeracao", String(formulario.novaGeracao));
-    formData.append("Disponivel", String(formulario.disponivel));
-    formData.append("MesesGarantia", formulario.mesesGarantia);
-    formData.append("Quantidade", formulario.quantidade);
-    formData.append(
-      "InformacoesAdicionaisId",
-      formulario.informacoesAdicionaisId.toString()
-    );
-    formData.append("Color", formulario.color);
-    formData.append("ColorName", formulario.colorName);
+  //   formData.append("Id", formulario.id ?? "");
+  //   formData.append("NomeProduto", formulario.nomeProduto);
+  //   formData.append("ValorOriginal", formulario.valorOriginal);
+  //   formData.append("ValorParcelado", formulario.valorParcelado);
+  //   formData.append("Desconto", formulario.desconto);
+  //   formData.append("Descricao", formulario.descricao);
+  //   formData.append("TipoProduto", String(formulario.tipoProduto));
+  //   formData.append("NovoLancamento", String(formulario.novoLancamento));
+  //   formData.append("NovaGeracao", String(formulario.novaGeracao));
+  //   formData.append("Disponivel", String(formulario.disponivel));
+  //   formData.append("MesesGarantia", formulario.mesesGarantia);
+  //   formData.append("Quantidade", formulario.quantidade);
+  //   formData.append(
+  //     "InformacoesAdicionaisId",
+  //     formulario.informacoesAdicionaisId.toString()
+  //   );
+  //   formData.append("Color", formulario.color);
+  //   formData.append("ColorName", formulario.colorName);
 
-    const info = formulario.informacoesAdicionais;
+  //   const info = formulario.informacoesAdicionais;
 
-    Object.entries(info).forEach(([k, v]) => {
-      formData.append(`InformacoesAdicionais.${k}`, v?.toString() ?? "");
-    });
+  //   Object.entries(info).forEach(([k, v]) => {
+  //     formData.append(`InformacoesAdicionais.${k}`, v?.toString() ?? "");
+  //   });
 
-    imagensApi.forEach((url) => {
-      formData.append("imagensExistentes", url);
-    });
+  //   imagensApi.forEach((url) => {
+  //     formData.append("imagensExistentes", url);
+  //   });
 
-    imagensUpload.forEach((img) => formData.append("imagens", img));
+  //   imagensUpload.forEach((img) => formData.append("imagens", img));
 
-    const res = await fetch(`${apiUrl}/produto/${idProduto}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("auth_token")}`,
-      },
-      body: formData,
-    });
+  //   const res = await fetch(`${apiUrl}/produto/${idProduto}`, {
+  //     method: "PUT",
+  //     headers: {
+  //       Authorization: `Bearer ${sessionStorage.getItem("auth_token")}`,
+  //     },
+  //     body: formData,
+  //   });
 
-    if (!res.ok) {
-      mostrarAlerta("Erro ao salvar alterações.", "danger");
-      return;
-    }
+  //   if (!res.ok) {
+  //     mostrarAlerta("Erro ao salvar alterações.", "danger");
+  //     return;
+  //   }
 
-    mostrarAlerta("Produto atualizado com sucesso!", "success");
-    onSaved();
-    onClose();
-  };
+  //   mostrarAlerta("Produto atualizado com sucesso!", "success");
+  //   onSaved();
+  //   onClose();
+  // };
 
   return (
     <>
-      <Modal open={open} onClose={onClose}>
+      {/* <Modal open={open} onClose={onClose}>
         <ModalDialog
           sx={{
             width: 900,
@@ -755,7 +745,7 @@ export default function ModalEditarProduto({
         tipo={alertaTipo}
         aberto={alertaAberto}
         aoFechar={() => setAlertaAberto(false)}
-      />
+      /> */}
     </>
   );
 }

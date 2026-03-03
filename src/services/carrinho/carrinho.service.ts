@@ -40,7 +40,7 @@ export class CarrinhoService {
         return res.json();
     }
 
-    async deleteItemCarrinho(id: number): Promise<CarrinhoRequest> {
+    async deleteItemCarrinho(id: string): Promise<CarrinhoRequest> {
         const res = await fetch(`${this.apiUrl}/carrinho/${id}`, {
             method: "DELETE",
             headers: {

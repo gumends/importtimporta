@@ -94,7 +94,7 @@ export default function AppBar() {
       await sincronizarCarrinhoLocal(token);
 
       const carrinhoApi = await serviceCarrihno.getCarrinho();
-      setQuantidadeCarrinho(carrinhoApi.carrinhos.length);
+      setQuantidadeCarrinho(carrinhoApi.itens.length);
     };
 
     init();

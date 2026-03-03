@@ -40,7 +40,7 @@ export default function Carrinho() {
           subtotal: 0,
           total: 0,
           taxaEntrega: 0,
-          carrinhos: [],
+          itens: [],
         });
       }
 
@@ -49,6 +49,8 @@ export default function Carrinho() {
     service
       .getCarrinho()
       .then((data) => {
+        console.log(data);
+        
         setCarrinhoData(data);
       })
       .catch((error) => {
@@ -56,7 +58,7 @@ export default function Carrinho() {
       });
   };
 
-  const deletarItem = (id: number) => {
+  const deletarItem = (id: string) => {
     const token = sessionStorage.getItem("auth_token");
 
     if (!token) {
@@ -66,10 +68,10 @@ export default function Carrinho() {
 
       const carrinho: CarrinhoResponse = JSON.parse(carrinhoStorage);
 
-      carrinho.carrinhos = carrinho.carrinhos.filter((item) => item.id !== id);
+      carrinho.itens = carrinho.itens.filter((item) => item.id !== id);
 
-      carrinho.subtotal = carrinho.carrinhos.reduce(
-        (acc, item) => acc + (item.produto.valor ?? 0) * item.quantidade,
+      carrinho.subtotal = carrinho.itens.reduce(
+        (acc, item) => acc + (item.valorUnitario ?? 0) * item.quantidade,
         0,
       );
 
@@ -89,8 +91,8 @@ export default function Carrinho() {
     <Container sx={{ display: "flex", width: "100%", gap: 2, py: 4 }}>
       <Box sx={{ width: "100%" }}>
         {carrinhoData &&
-          carrinhoData?.carrinhos.length > 0 &&
-          carrinhoData?.carrinhos.map((item, key) => (
+          carrinhoData?.itens.length > 0 &&
+          carrinhoData?.itens.map((item, key) => (
             <Card
               onClick={() => {}}
               variant="outlined"
@@ -109,21 +111,19 @@ export default function Carrinho() {
                     objectFit: "cover",
                   }}
                   src={
-                    item.produto.imagens
-                      ? item.produto.imagens[0]?.caminho
-                      : "/placeholder.png"
+                    item.imagemUrl
                   }
-                  alt={item.produto.nomeProduto}
+                  alt={item.nomeProduto}
                 />
                 <CardContent>
                   <Typography level="body-lg">
-                    {item.produto.nomeProduto}
+                    {item.nomeProduto}
                   </Typography>
                   <Typography level="body-sm">
-                    {item.produto.descricao}
+                    {item.descricao}
                   </Typography>
                   <Typography level="h2">
-                    {formatarDinheiro(Number(item.produto.valor))}
+                    {formatarDinheiro(Number(item.valorUnitario))}
                   </Typography>
                   <Box
                     sx={{
@@ -148,7 +148,7 @@ export default function Carrinho() {
                       <Plus />
                     </IconButton>
                     <Typography level="body-xs" sx={{ ml: 2 }}>
-                      {item.produto.quantidade} disponiveis
+                      {item.quantidade} disponiveis
                     </Typography>
                   </Box>
                 </CardContent>
@@ -166,7 +166,7 @@ export default function Carrinho() {
               </IconButton>
             </Card>
           ))}
-        {carrinhoData?.carrinhos.length === 0 && (
+        {carrinhoData?.itens.length === 0 && (
           <Typography level="h4" sx={{ textAlign: "center", mt: 4 }}>
             Seu carrinho está vazio.
           </Typography>

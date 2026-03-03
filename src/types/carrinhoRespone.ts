@@ -4,14 +4,15 @@ export interface CarrinhoResponse {
     subtotal: number;
     total: number;
     taxaEntrega: number;
-    carrinhos: NewCarrinhoDto[];
+    itens: NewCarrinhoDto[];
 }
 
 export interface NewCarrinhoDto {
-    id: number;
-    IdProduto: number;
-    IdUsuario: number;
-    CriadoEm: Date;
+    id: string;
+    nomeProduto: string;
+    valorUnitario: number;
     quantidade: number;
-    produto: Produto;
+    totalItem: number;
+    imagemUrl: string;
+    descricao: string;
 }

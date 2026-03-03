@@ -1,5 +1,5 @@
 export interface Produto {
-  id: number;
+  id: string;
   nomeProduto: string;
   valor?: number;
   valorOriginal: number;
@@ -20,7 +20,7 @@ export interface Produto {
 }
 
 export interface Informacoes {
-  id?: number;
+  id?: string;
   marca: string;
   armazenamentoInterno: string | null;
   tipoTela: string | null;

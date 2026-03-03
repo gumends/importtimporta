@@ -207,4 +207,34 @@ export class UserService {
     if (!response.ok) throw new Error("Falha ao editar endereço do usuário");
     return response.json();
   }
+
+  async AlterarSenha(senha: string, token: string): Promise<boolean> {
+    const response = await fetch(
+      `${this.apiUrl}/usuario/alterar_senha`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ senha, token }),
+      }
+    );
+    if (!response.ok) throw new Error("Falha ao alterar senha do usuário");
+    return response.ok;
+  }
+
+  async EsqueciSenha(email: string): Promise<any> {
+    const response = await fetch(
+      `${this.apiUrl}/usuario/esqueci_senha`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      }
+    );
+    if (!response.ok) throw new Error("Falha ao solicitar recuperação de senha");
+    return response.ok;
+  }
 }

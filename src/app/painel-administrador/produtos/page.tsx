@@ -11,6 +11,9 @@ import {
   IconButton,
   Alert,
   Tooltip,
+  Button,
+  Stack,
+  Input,
 } from "@mui/joy";
 import { ProdutosResponse, Produto } from "@/types/ProdutoNovo.type";
 import { PaginationJoy } from "@/app/components/PaginationJoy";
@@ -20,8 +23,8 @@ import { Delete, Edit } from "@mui/icons-material";
 import ConfirmModal from "@/app/components/ConfirmModal";
 import ModalCriarProduto from "@/app/components/ModalCriarProduto";
 import ModalEditarProduto from "@/app/components/ModalEdicaoProduto";
-import LockOutlineIcon from '@mui/icons-material/LockOutline';
-import LockOpenIcon from '@mui/icons-material/LockOpen';
+import LockOutlineIcon from "@mui/icons-material/LockOutline";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
 
 export default function ProdutosPage() {
   const [data, setData] = useState<ProdutosResponse | null>(null);
@@ -33,7 +36,10 @@ export default function ProdutosPage() {
   const produtoService = new ProdutoService();
   const [openConfirm, setOpenConfirm] = useState(false);
   const [openConfirmDesativar, setOpenConfirmDesativar] = useState(false);
-  const [idProdutoToDelete, setIdProdutoToDelete] = useState<number>(0);
+  const [idProdutoToDelete, setIdProdutoToDelete] = useState<string>("");
+  const [nomeFiltro, setNomeFiltro] = useState("");
+  const [precoMinFiltro, setPrecoMinFiltro] = useState("");
+  const [precoMaxFiltro, setPrecoMaxFiltro] = useState("");
 
   const tipos_produtos = {
     1: "Iphones",
@@ -45,8 +51,14 @@ export default function ProdutosPage() {
   const fetchProdutos = async (pagina: number) => {
     try {
       setLoading(true);
-      const res = await produtoService.getProdutos(pagina);
-      console.log(res);
+
+      const res = await produtoService.getProdutos({
+        pagina,
+        nomeProduto: nomeFiltro || undefined,
+        precoMinimo: precoMinFiltro ? Number(precoMinFiltro) : undefined,
+        precoMaximo: precoMaxFiltro ? Number(precoMaxFiltro) : undefined,
+      });
+
       setData(res);
     } catch (err) {
       console.error("Erro ao carregar produtos", err);
@@ -54,15 +66,15 @@ export default function ProdutosPage() {
       setLoading(false);
     }
   };
- 
-  const deletarProduto = async (id: number) => {
+
+  const deletarProduto = async (id: string) => {
     await produtoService.deletarProduto(id).then(() => {
       setOpenConfirmDesativar(false);
       fetchProdutos(page);
     });
   };
 
-  const desativarProduto = async (id: number) => {
+  const desativarProduto = async (id: string) => {
     await produtoService.desativarProduto(id).then(() => {
       setOpenConfirmDesativar(false);
       fetchProdutos(page);
@@ -129,6 +141,57 @@ export default function ProdutosPage() {
                 background: "rgba(255,255,255,0.05)",
               }}
             >
+              <Stack
+                direction="row"
+                spacing={2}
+                sx={{
+                  mb: 3,
+                  flexWrap: "wrap",
+                }}
+              >
+                <Input
+                  placeholder="Pesquisar por nome..."
+                  value={nomeFiltro}
+                  onChange={(e) => setNomeFiltro(e.target.value)}
+                />
+
+                <Input
+                  type="number"
+                  placeholder="Preço mínimo"
+                  value={precoMinFiltro}
+                  onChange={(e) => setPrecoMinFiltro(e.target.value)}
+                />
+
+                <Input
+                  type="number"
+                  placeholder="Preço máximo"
+                  value={precoMaxFiltro}
+                  onChange={(e) => setPrecoMaxFiltro(e.target.value)}
+                />
+
+                <Button
+                  onClick={() => {
+                    setPage(1);
+                    fetchProdutos(1);
+                  }}
+                >
+                  Filtrar
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  color="neutral"
+                  onClick={() => {
+                    setNomeFiltro("");
+                    setPrecoMinFiltro("");
+                    setPrecoMaxFiltro("");
+                    setPage(1);
+                    fetchProdutos(1);
+                  }}
+                >
+                  Limpar
+                </Button>
+              </Stack>
               <Table borderAxis="bothBetween" stripe="even">
                 <thead>
                   <tr>
@@ -184,9 +247,11 @@ export default function ProdutosPage() {
 
                       <td
                         style={{
-                          textAlign: "center",
                           display: "flex",
                           justifyContent: "space-evenly",
+                          height: "100%",
+                          alignItems: "center",
+                          borderBottom: "none",
                         }}
                       >
                         <IconButton
@@ -196,7 +261,10 @@ export default function ProdutosPage() {
                             setModalOpenEditar(true);
                           }}
                         >
-                          <Edit color="warning" style={{ width: 25, height: 25 }} />
+                          <Edit
+                            color="warning"
+                            style={{ width: 25, height: 25 }}
+                          />
                         </IconButton>
                         <IconButton
                           size="sm"
@@ -205,7 +273,9 @@ export default function ProdutosPage() {
                             setOpenConfirm(true);
                           }}
                         >
-                          <Delete style={{ color: "red", width: 25, height: 25 }} />
+                          <Delete
+                            style={{ color: "red", width: 25, height: 25 }}
+                          />
                         </IconButton>
                         <IconButton
                           size="sm"
@@ -214,13 +284,23 @@ export default function ProdutosPage() {
                             setOpenConfirmDesativar(true);
                           }}
                         >
-                          {
-                            p.disponivel ? 
-                            <Tooltip title="Desativar Produto"><LockOutlineIcon style={{ color: "red", width: 25, height: 25 }} /></Tooltip>
-                             : 
-                            <Tooltip title="Ativar Produto"><LockOpenIcon style={{ color: "green", width: 25, height: 25 }} /></Tooltip>
-                          }
-                          
+                          {p.disponivel ? (
+                            <Tooltip title="Desativar Produto">
+                              <LockOutlineIcon
+                                style={{ color: "red", width: 25, height: 25 }}
+                              />
+                            </Tooltip>
+                          ) : (
+                            <Tooltip title="Ativar Produto">
+                              <LockOpenIcon
+                                style={{
+                                  color: "green",
+                                  width: 25,
+                                  height: 25,
+                                }}
+                              />
+                            </Tooltip>
+                          )}
                         </IconButton>
                       </td>
                     </tr>
@@ -244,12 +324,12 @@ export default function ProdutosPage() {
         onClose={() => setModalOpenCriar(false)}
         onSaved={() => fetchProdutos(page)}
       />
-      <ModalEditarProduto
+      {/* <ModalEditarProduto
         open={modalOpenEditar}
         onClose={() => setModalOpenEditar(false)}
         idProduto={produtoEdit?.id ?? 0}
         onSaved={() => fetchProdutos(page)}
-      />
+      /> */}
       <ConfirmModal
         open={openConfirm}
         title="Deletar Produto"

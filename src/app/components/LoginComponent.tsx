@@ -1,27 +1,19 @@
 import * as React from "react";
 import Modal from "@mui/joy/Modal";
 import ModalDialog from "@mui/joy/ModalDialog";
-import {
-  Box,
-  Button,
-  FormLabel,
-  Input,
-  Stack,
-  Typography,
-} from "@mui/joy";
+import { Box, Button, FormLabel, Input, Stack, Typography } from "@mui/joy";
 import { Google } from "@mui/icons-material";
 import { GoogleAuthService } from "@/services/auth/auth.service";
 import { UserService } from "@/services/user/user.service";
 import Alerta from "./Alerta";
 
 export default function LoginComponent({
-    openModal,
-    onClose,
-  }: {
-    openModal: boolean;
-    onClose: () => void;
-  }) {
-
+  openModal,
+  onClose,
+}: {
+  openModal: boolean;
+  onClose: () => void;
+}) {
   const [open, setOpen] = React.useState(false);
   const [alertaAberto, setAlertaAberto] = React.useState(false);
   const [alertaMensagem, setAlertaMensagem] = React.useState("");
@@ -29,7 +21,7 @@ export default function LoginComponent({
     "success" | "danger" | "warning" | "primary" | "neutral"
   >("neutral");
   const [TempoAlerta, setTempoAlerta] = React.useState<number | undefined>(
-    3000
+    3000,
   );
 
   const mostrarAlerta = (msg: string, tipo: TipoAlerta, tempo?: number) => {
@@ -55,11 +47,13 @@ export default function LoginComponent({
 
   const [senhaValida, setSenhaValida] = React.useState(false);
   const [senhaConfirmValida, setSenhaConfirmValida] = React.useState(false);
+  const [recuperarSenha, setRecuperarSenha] = React.useState(false);
+  const [loginUsuario, setLoginUsuario] = React.useState<boolean>(true);
 
   React.useEffect(() => {
     if (senhaConfirm.length > 0) {
       setSenhaConfirmValida(
-        validarSenha(senhaConfirm) && senhaConfirm === senha
+        validarSenha(senhaConfirm) && senhaConfirm === senha,
       );
     }
   }, [senha, senhaConfirm]);
@@ -71,6 +65,19 @@ export default function LoginComponent({
 
     return temTamanhoMinimo && temMaiuscula && temEspecial;
   }
+
+  async function EsqueciMinhaSenha() {
+    try {
+      await userService.EsqueciSenha(email);
+      mostrarAlerta("Link de recuperação enviado para seu email", "success", 5000);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        mostrarAlerta(err.message, "danger", 9000);
+      } else {
+        mostrarAlerta("Erro ao enviar link de recuperação", "danger", 9000);
+      }
+    }
+  } 
 
   async function handleGoogleLogin() {
     const currentUrl = window.location.origin;
@@ -134,7 +141,7 @@ export default function LoginComponent({
       <React.Fragment>
         <Modal open={openModal} onClose={onClose}>
           <ModalDialog sx={{ width: 700 }}>
-            {cadastroUsuario === false && (
+            {loginUsuario && (
               <Box mt={2}>
                 <Typography>Acesse sua conta</Typography>
                 <form
@@ -167,7 +174,6 @@ export default function LoginComponent({
                 </form>
               </Box>
             )}
-
             {cadastroUsuario === true && (
               <Box mt={2}>
                 <Typography sx={{ mb: 2 }}>Criar nova conta</Typography>
@@ -231,8 +237,8 @@ export default function LoginComponent({
                       {senha.length === 0
                         ? ""
                         : senhaValida
-                        ? "Senha válida"
-                        : "A senha deve ter pelo menos 6 caracteres, 1 maiúscula e 1 caractere especial"}
+                          ? "Senha válida"
+                          : "A senha deve ter pelo menos 6 caracteres, 1 maiúscula e 1 caractere especial"}
                     </Typography>
                   </Stack>
 
@@ -254,7 +260,7 @@ export default function LoginComponent({
                         const valor = e.target.value;
                         setSenhaConfirm(valor);
                         setSenhaConfirmValida(
-                          validarSenha(valor) && valor === senha
+                          validarSenha(valor) && valor === senha,
                         );
                       }}
                     />
@@ -269,8 +275,8 @@ export default function LoginComponent({
                       {senhaConfirm.length === 0
                         ? ""
                         : senhaConfirmValida
-                        ? "Senhas coincidem e são válidas"
-                        : "As senhas não coincidem ou não atendem os requisitos"}
+                          ? "Senhas coincidem e são válidas"
+                          : "As senhas não coincidem ou não atendem os requisitos"}
                     </Typography>
                   </Stack>
 
@@ -283,7 +289,7 @@ export default function LoginComponent({
                       fullWidth
                       variant="outlined"
                       sx={{ mr: 2 }}
-                      onClick={() => setCadastroUsuario(false)}
+                      onClick={() => {setCadastroUsuario(false); setLoginUsuario(true); setRecuperarSenha(false)}}
                     >
                       Voltar ao login
                     </Button>
@@ -298,19 +304,60 @@ export default function LoginComponent({
                 </form>
               </Box>
             )}
-            {!cadastroUsuario && (
-              <Box>
-                <Box>
-                  <Typography
-                    sx={{
-                      textAlign: "end",
-                      cursor: "pointer",
-                      "&:hover": { textDecoration: "underline" },
+            {recuperarSenha === true && (
+              <Box mt={2}>
+                <Typography sx={{ mb: 2 }} level="h3">Recuperar Senha</Typography>
+                <Typography sx={{ mb: 2 }}>Digite seu email para recuperar sua senha</Typography>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    EsqueciMinhaSenha();
+                  }}
+                >
+                  <FormLabel sx={{ color: "#fff" }}>Email</FormLabel>
+                  <Input
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
                     }}
-                    onClick={() => setCadastroUsuario(true)}
-                  >
-                    Não tem uma conta? Cadastre-se agora.
-                  </Typography>
+                    placeholder="Digite seu Email"
+                    sx={{ mb: 2 }}
+                  />
+                  <Button sx={{ mt: 3 }} type="submit" fullWidth>
+                    Enviar Link
+                  </Button>
+                </form>
+              </Box>
+            )}
+            {loginUsuario && (
+              <Box>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Box>
+                    <Typography
+                      sx={{
+                        textAlign: "end",
+                        cursor: "pointer",
+                        "&:hover": { textDecoration: "underline" },
+                      }}
+                      onClick={() => {setCadastroUsuario(false); setLoginUsuario(false); setRecuperarSenha(true)}}
+                    >
+                      Esqueci minha senha
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Box>
+                      <Typography
+                        sx={{
+                          textAlign: "end",
+                          cursor: "pointer",
+                          "&:hover": { textDecoration: "underline" },
+                        }}
+                      onClick={() => {setCadastroUsuario(true); setLoginUsuario(false); setRecuperarSenha(false)}}
+                      >
+                        Não tem uma conta? Cadastre-se agora.
+                      </Typography>
+                    </Box>
+                  </Box>
                 </Box>
                 <Box sx={{ mt: 1, display: "flex", gap: 2 }}>
                   <Button

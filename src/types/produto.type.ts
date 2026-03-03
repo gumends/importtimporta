@@ -1,24 +1,23 @@
 export interface Produto {
-  id: number;
+  id: string;
   nomeProduto: string;
-  valor: number;
   valorOriginal: number;
-  valorParcelado: number;
   desconto: number;
+  valor: number;
+  valorParcelado: number;
   descricao: string;
   tipoProduto: number;
-  novoLançamento: boolean;
-  novaGeracao?: boolean;
   disponivel: boolean;
   mesesGarantia: number;
-  informacoesAdicionais: Informacoes | null;
+  quantidade: number;
   color: string;
   colorName: string;
-  imagem: string;
-  imagens: string[] | null;
+  informacoesProdutoId?: number;
+  informacoesProduto: Informacoes;
 }
 
 export interface Informacoes {
+  id: string;
   marca: string;
   armazenamentoInterno: string | null;
   tipoTela: string | null;
@@ -32,8 +31,4 @@ export interface Informacoes {
   bateria: string | null;
   quantidadeChips: string | null;
   material: string | null;
-}
-
-export interface Produtos {
-  produtos: Produto[];
 }

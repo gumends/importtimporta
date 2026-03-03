@@ -19,11 +19,13 @@ import {
   Select,
   Option,
   SvgIcon,
+  Container,
 } from "@mui/joy";
 import { styled } from "@mui/joy";
 import Alerta from "./Alerta";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Cookies from "js-cookie";
+import { ProdutoService } from "@/services/produto/produto.service";
+import { Produto } from "@/types/produto.type";
 interface PropsCriarProduto {
   open: boolean;
   onClose: () => void;
@@ -37,8 +39,8 @@ export default function ModalCriarProduto({
   onClose,
   onSaved,
 }: PropsCriarProduto) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [aba, setAba] = useState(0);
+  const produtoService = new ProdutoService();
 
   const EntradaOculta = styled("input")`
     clip: rect(0 0 0 0);
@@ -80,20 +82,16 @@ export default function ModalCriarProduto({
   });
 
   const formularioVazio = {
-    id: 0,
     nomeProduto: "",
     valorOriginal: "",
     valorParcelado: "",
     desconto: "",
     descricao: "",
-    tipoProduto: "",
-    novoLancamento: false,
-    novaGeracao: false,
+    tipoProduto: 0,
     disponivel: true,
     mesesGarantia: "",
     quantidade: "",
-    informacoesAdicionais: {
-      id: 0,
+    informacoesProduto: {
       marca: "",
       armazenamentoInterno: "",
       tipoTela: "",
@@ -108,7 +106,6 @@ export default function ModalCriarProduto({
       quantidadeChips: "",
       material: "",
     },
-    informacoesAdicionaisId: 0,
     color: "",
     colorName: "",
   };
@@ -149,7 +146,7 @@ export default function ModalCriarProduto({
     setFormulario((anterior) => ({
       ...anterior,
       informacoesAdicionais: {
-        ...anterior.informacoesAdicionais,
+        ...anterior.informacoesProduto,
         [campo]: valor,
       },
     }));
@@ -195,76 +192,32 @@ export default function ModalCriarProduto({
   };
 
   const salvar = async () => {
-    setIsLoading(true);
     if (!validarFormulario()) {
-      mostrarAlerta(
-        "Por favor, preencha todos os campos obrigatórios.",
-        "danger"
-      );
-      setIsLoading(false);
+      mostrarAlerta("Preencha todos os campos obrigatórios e envie ao menos uma imagem.", "warning");
       return;
     }
 
-    const url = `${apiUrl}/produto`;
-    const metodo = "POST";
+    setIsLoading(true);
 
-    const dados = new FormData();
-
-    dados.append("Id", formulario.id.toString());
-    dados.append("NomeProduto", formulario.nomeProduto);
-    dados.append("ValorOriginal", formulario.valorOriginal);
-    dados.append("ValorParcelado", formulario.valorParcelado);
-    dados.append("Desconto", formulario.desconto);
-    dados.append("Descricao", formulario.descricao);
-    dados.append("TipoProduto", String(formulario.tipoProduto));
-    dados.append("NovoLancamento", String(formulario.novoLancamento));
-    dados.append("NovaGeracao", String(formulario.novaGeracao));
-    dados.append("Disponivel", String(formulario.disponivel));
-    dados.append("MesesGarantia", formulario.mesesGarantia);
-    dados.append("Quantidade", formulario.quantidade);
-    dados.append(
-      "InformacoesAdicionaisId",
-      formulario.informacoesAdicionaisId.toString()
-    );
-    dados.append("Color", formulario.color);
-    dados.append("ColorName", formulario.colorName);
-
-    const info = formulario.informacoesAdicionais;
-
-    Object.entries(info).forEach(([k, v]) => {
-      const value =
-        v === null || v === undefined
-          ? ""
-          : typeof v === "object"
-          ? JSON.stringify(v)
-          : String(v);
-      dados.append(`InformacoesAdicionais.${k}`, value);
-    });
-
-    imagensUpload.forEach((img) => dados.append("imagens", img));
-
-    const resposta = await fetch(url, {
-      method: metodo,
-      body: dados,
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    });
-
-    if (!resposta.ok) {
-      mostrarAlerta("Erro ao salvar o produto.", "danger");
-      setIsLoading(false);
-      return;
-    }
-
-    mostrarAlerta("Produto salvo com sucesso!", "success");
-    setIsLoading(false);
-    onSaved();
-    onClose();
+    produtoService.postProduto(formulario, token).then((response) => {
+      produtoService.salvarImagens(response.id, imagensUpload).then(() => {
+        mostrarAlerta("Produto criado com sucesso!", "success");
+        onSaved();
+        onClose();
+      }).catch(() => {
+        mostrarAlerta("Produto criado, mas houve um erro ao salvar as imagens.", "warning");
+        onSaved();
+        onClose();
+      }).finally(() => {
+        setIsLoading(false);
+      });
+    }).catch(() => {
+      mostrarAlerta("Erro ao criar produto. Verifique os dados e tente novamente.", "danger");
+    })
   };
 
   return (
-    <>
+    <Container>
       <Modal open={open} onClose={onClose}>
         <ModalDialog
           sx={{
@@ -423,7 +376,7 @@ export default function ModalCriarProduto({
                     <FormLabel>Tipo do Produto *</FormLabel>
                     <Select
                       value={String(formulario.tipoProduto) || ""}
-                      onChange={(_, v) => alterar("tipoProduto", v ?? "")}
+                      onChange={(_, v) => alterar("tipoProduto", Number(v))}
                     >
                       <Option value="1">iPhone</Option>
                       <Option value="2">Mac</Option>
@@ -454,40 +407,7 @@ export default function ModalCriarProduto({
                     />
                   </FormControl>
                 </Grid>
-
                 <Grid xs={4}>
-                  <FormControl orientation="horizontal">
-                    <FormLabel>Disponível</FormLabel>
-                    <Switch
-                      checked={formulario.disponivel}
-                      onChange={(e) => alterar("disponivel", e.target.checked)}
-                    />
-                  </FormControl>
-                </Grid>
-
-                <Grid xs={4}>
-                  <FormControl orientation="horizontal">
-                    <FormLabel>Novo Lançamento</FormLabel>
-                    <Switch
-                      checked={formulario.novoLancamento}
-                      onChange={(e) =>
-                        alterar("novoLancamento", e.target.checked)
-                      }
-                    />
-                  </FormControl>
-                </Grid>
-
-                <Grid xs={4}>
-                  <FormControl orientation="horizontal">
-                    <FormLabel>Nova Geração</FormLabel>
-                    <Switch
-                      checked={formulario.novaGeracao}
-                      onChange={(e) => alterar("novaGeracao", e.target.checked)}
-                    />
-                  </FormControl>
-                </Grid>
-
-                <Grid xs={6}>
                   <FormControl>
                     <FormLabel>Cor *</FormLabel>
                     <Input
@@ -496,7 +416,7 @@ export default function ModalCriarProduto({
                       startDecorator={
                         <input
                           type="color"
-                          value={formulario.color}
+                          value={formulario.color == "" ? "#000000" : formulario.color}
                           onChange={(e) => alterar("color", e.target.value)}
                           style={{
                             width: "32px",
@@ -511,12 +431,21 @@ export default function ModalCriarProduto({
                   </FormControl>
                 </Grid>
 
-                <Grid xs={6}>
+                <Grid xs={5}>
                   <FormControl>
                     <FormLabel>Nome da Cor *</FormLabel>
                     <Input
                       value={formulario.colorName}
                       onChange={(e) => alterar("colorName", e.target.value)}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid xs={1} sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <FormControl orientation="horizontal">
+                    <FormLabel>Disponível</FormLabel>
+                    <Switch
+                      checked={formulario.disponivel}
+                      onChange={(e) => alterar("disponivel", e.target.checked)}
                     />
                   </FormControl>
                 </Grid>
@@ -529,7 +458,7 @@ export default function ModalCriarProduto({
                   <FormControl>
                     <FormLabel>Marca</FormLabel>
                     <Input
-                      value={formulario.informacoesAdicionais.marca ?? ""}
+                      value={formulario.informacoesProduto.marca ?? ""}
                       onChange={(e) => alterarInfo("marca", e.target.value)}
                     />
                   </FormControl>
@@ -540,7 +469,7 @@ export default function ModalCriarProduto({
                     <FormLabel>Armazenamento Interno</FormLabel>
                     <Input
                       value={
-                        formulario.informacoesAdicionais.armazenamentoInterno ??
+                        formulario.informacoesProduto.armazenamentoInterno ??
                         ""
                       }
                       onChange={(e) =>
@@ -554,7 +483,7 @@ export default function ModalCriarProduto({
                   <FormControl>
                     <FormLabel>Tipo de Tela</FormLabel>
                     <Input
-                      value={formulario.informacoesAdicionais.tipoTela ?? ""}
+                      value={formulario.informacoesProduto.tipoTela ?? ""}
                       onChange={(e) => alterarInfo("tipoTela", e.target.value)}
                     />
                   </FormControl>
@@ -564,7 +493,7 @@ export default function ModalCriarProduto({
                   <FormControl>
                     <FormLabel>Tamanho da Tela</FormLabel>
                     <Input
-                      value={formulario.informacoesAdicionais.tamanhoTela ?? ""}
+                      value={formulario.informacoesProduto.tamanhoTela ?? ""}
                       onChange={(e) =>
                         alterarInfo("tamanhoTela", e.target.value)
                       }
@@ -577,7 +506,7 @@ export default function ModalCriarProduto({
                     <FormLabel>Resolução da Tela</FormLabel>
                     <Input
                       value={
-                        formulario.informacoesAdicionais.resolucaoTela ?? ""
+                        formulario.informacoesProduto.resolucaoTela ?? ""
                       }
                       onChange={(e) =>
                         alterarInfo("resolucaoTela", e.target.value)
@@ -590,7 +519,7 @@ export default function ModalCriarProduto({
                   <FormControl>
                     <FormLabel>Tecnologia</FormLabel>
                     <Input
-                      value={formulario.informacoesAdicionais.tecnologia ?? ""}
+                      value={formulario.informacoesProduto.tecnologia ?? ""}
                       onChange={(e) =>
                         alterarInfo("tecnologia", e.target.value)
                       }
@@ -602,7 +531,7 @@ export default function ModalCriarProduto({
                   <FormControl>
                     <FormLabel>Processador</FormLabel>
                     <Input
-                      value={formulario.informacoesAdicionais.processador ?? ""}
+                      value={formulario.informacoesProduto.processador ?? ""}
                       onChange={(e) =>
                         alterarInfo("processador", e.target.value)
                       }
@@ -615,7 +544,7 @@ export default function ModalCriarProduto({
                     <FormLabel>Sistema Operacional</FormLabel>
                     <Input
                       value={
-                        formulario.informacoesAdicionais.sistemaOperacional ??
+                        formulario.informacoesProduto.sistemaOperacional ??
                         ""
                       }
                       onChange={(e) =>
@@ -630,7 +559,7 @@ export default function ModalCriarProduto({
                     <FormLabel>Câmera Traseira</FormLabel>
                     <Input
                       value={
-                        formulario.informacoesAdicionais.cameraTraseira ?? ""
+                        formulario.informacoesProduto.cameraTraseira ?? ""
                       }
                       onChange={(e) =>
                         alterarInfo("cameraTraseira", e.target.value)
@@ -644,7 +573,7 @@ export default function ModalCriarProduto({
                     <FormLabel>Câmera Frontal</FormLabel>
                     <Input
                       value={
-                        formulario.informacoesAdicionais.cameraFrontal ?? ""
+                        formulario.informacoesProduto.cameraFrontal ?? ""
                       }
                       onChange={(e) =>
                         alterarInfo("cameraFrontal", e.target.value)
@@ -657,7 +586,7 @@ export default function ModalCriarProduto({
                   <FormControl>
                     <FormLabel>Bateria</FormLabel>
                     <Input
-                      value={formulario.informacoesAdicionais.bateria ?? ""}
+                      value={formulario.informacoesProduto.bateria ?? ""}
                       onChange={(e) => alterarInfo("bateria", e.target.value)}
                     />
                   </FormControl>
@@ -668,7 +597,7 @@ export default function ModalCriarProduto({
                     <FormLabel>Quantidade de Chips</FormLabel>
                     <Input
                       value={
-                        formulario.informacoesAdicionais.quantidadeChips ?? ""
+                        formulario.informacoesProduto.quantidadeChips ?? ""
                       }
                       onChange={(e) =>
                         alterarInfo("quantidadeChips", e.target.value)
@@ -681,7 +610,7 @@ export default function ModalCriarProduto({
                   <FormControl>
                     <FormLabel>Material</FormLabel>
                     <Input
-                      value={formulario.informacoesAdicionais.material ?? ""}
+                      value={formulario.informacoesProduto.material ?? ""}
                       onChange={(e) => alterarInfo("material", e.target.value)}
                     />
                   </FormControl>
@@ -724,6 +653,6 @@ export default function ModalCriarProduto({
         aberto={alertaAberto}
         aoFechar={() => setAlertaAberto(false)}
       />
-    </>
+    </Container>
   );
 }
