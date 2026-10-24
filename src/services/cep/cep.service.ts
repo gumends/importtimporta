@@ -1,5 +1,5 @@
 export class CepService {
-  async getCep(cep: string): Promise<any> {
+  async getCep(cep: string): Promise<Record<string, unknown>> {
     const res = await fetch(
       `https://viacep.com.br/ws/${cep}/json/`,
       {

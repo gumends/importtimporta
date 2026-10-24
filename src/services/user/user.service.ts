@@ -224,7 +224,7 @@ export class UserService {
     return response.ok;
   }
 
-  async EsqueciSenha(email: string): Promise<any> {
+  async EsqueciSenha(email: string): Promise<unknown> {
     const response = await fetch(
       `${this.apiUrl}/usuario/esqueci_senha`,
       {
