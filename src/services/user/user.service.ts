@@ -45,7 +45,7 @@ export class UserService {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Erro ao fazer login");
+      throw new Error(data.message || "Erro ao criar conta");
     }
 
     sessionStorage.setItem("auth_token", data.token);
@@ -87,7 +87,7 @@ export class UserService {
     return await response.json();
   }
 
-  async toggleUserStatus(id: number) {
+  async toggleUserStatus(id: string) {
     const response = await fetch(
       `${this.apiUrl}/usuario/toggle_status?id=${id}`,
       {
@@ -102,7 +102,7 @@ export class UserService {
     return response;
   }
 
-  async toggleUserAccess(id: number) {
+  async toggleUserAccess(id: string) {
     const response = await fetch(
       `${this.apiUrl}/usuario/toggle_acesso?id=${id}`,
       {
@@ -134,7 +134,7 @@ export class UserService {
 
   async BuscaEnderecosUsuario(): Promise<Endereco[]> {
     const response = await fetch(
-      `${this.apiUrl}/usuario/enderecos`,
+      `${this.apiUrl}/endereco`,
       {
         method: "GET",
         headers: {
@@ -147,13 +147,14 @@ export class UserService {
     return response.json();
   }
 
-  async ExcluirEndereco(id: number): Promise<Endereco[]> {
+  async ExcluirEndereco(id: string): Promise<Endereco[]> {
     const response = await fetch(
-      `${this.apiUrl}/usuario/endereco?id=${id}`,
+      `${this.apiUrl}/endereco?id=${id}`,
       {
         method: "DELETE",
         headers: {
           Accept: "application/json",
+          Authorization: "Bearer " + sessionStorage.getItem("auth_token"),
         },
       }
     );
@@ -163,7 +164,7 @@ export class UserService {
 
   async CriarEndereco(endereco: EnderecoRequest): Promise<Endereco> {
     const response = await fetch(
-      `${this.apiUrl}/usuario/endereco`,
+      `${this.apiUrl}/endereco`,
       {
         method: "POST",
         headers: {
@@ -177,9 +178,9 @@ export class UserService {
     return response.json();
   }
 
-  async BuscarEnderecoPorId(id: number): Promise<Endereco> {
+  async BuscarEnderecoPorId(id: string): Promise<Endereco> {
     const response = await fetch(
-      `${this.apiUrl}/usuario/endereco?id=${id}`,
+      `${this.apiUrl}/endereco/${id}`,
       {
         method: "GET",
         headers: {
@@ -192,9 +193,9 @@ export class UserService {
     return response.json();
   }
 
-  async EditarEndereco(id: number, endereco: EnderecoRequest): Promise<Endereco> {
+  async EditarEndereco(id: string, endereco: EnderecoRequest): Promise<Endereco> {
     const response = await fetch(
-      `${this.apiUrl}/usuario/endereco?id=${id}`,
+      `${this.apiUrl}/endereco?id=${id}`,
       {
         method: "PUT",
         headers: {

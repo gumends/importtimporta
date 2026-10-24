@@ -31,7 +31,7 @@ export default function UsuariosPage() {
   const userService = new UserService();
   const [openConfirmStatus, setOpenConfirmStatus] = useState(false);
   const [openConfirmAcesso, setOpenConfirmAcesso] = useState(false);
-  const [idUsuario, setIdUsuario] = useState<number>(0);
+  const [idUsuario, setIdUsuario] = useState<string>("");
 
   const fetchUsuarios = async (pagina: number) => {
     try {
@@ -45,7 +45,7 @@ export default function UsuariosPage() {
     }
   };
 
-  const toggleStatusUsuario = async (id: number) => {
+  const toggleStatusUsuario = async (id: string) => {
     try {
       await userService.toggleUserStatus(id);
     } catch (err) {
@@ -56,7 +56,7 @@ export default function UsuariosPage() {
     }
   };
 
-  const toggleStatusAcesso = async (id: number) => {
+  const toggleStatusAcesso = async (id: string) => {
     try {
       await userService.toggleUserAccess(id);
     } catch (err) {
@@ -155,7 +155,7 @@ export default function UsuariosPage() {
                       </td>
                       <td>
                         {
-                          TipoUsuario.find((t) => t.tipo.toString() == u.role)
+                          TipoUsuario.find((t) => t.tipo.toString() === String(u.role))
                             ?.nome
                         }
                       </td>
@@ -173,8 +173,8 @@ export default function UsuariosPage() {
                               setOpenConfirmAcesso(true);
                             }}
                           >
-                            <Tooltip title={u.role == "1" ? "Regredir Permissão" : "Promover"} variant="solid">
-                              {u.role == "2" ? (
+                            <Tooltip title={u.role === 1 ? "Regredir Permissão" : "Promover"} variant="solid">
+                              {u.role === 2 ? (
                                 <ArrowCircleUpIcon
                                   color="primary"
                                   style={{ width: 25, height: 25 }}

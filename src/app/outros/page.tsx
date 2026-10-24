@@ -9,7 +9,6 @@ import {
   CardOverflow,
   AspectRatio,
   Button,
-  Input,
   Stack,
   Skeleton,
 } from "@mui/joy";
@@ -17,6 +16,14 @@ import { useRouter } from "next/navigation";
 import { ProdutoService } from "@/services/produto/produto.service";
 import { formatarDinheiro } from "@/utils/mascara_dinheiro";
 import { Produto } from "@/types/ProdutoNovo.type";
+import FiltroProdutosCategoria from "@/app/components/produtos/FiltroProdutosCategoria";
+import {
+  produtosConteudoSx,
+  produtosGridSx,
+  produtosPaginaFlexSx,
+  produtosPaginaLayoutSx,
+  produtosSidebarSx,
+} from "@/app/components/produtos/produtosGridSx";
 
 export default function ProdutosLista() {
   const router = useRouter();
@@ -29,27 +36,29 @@ export default function ProdutosLista() {
   const [precoMaximo, setPrecoMaximo] = useState<number | undefined>();
 
   const [loading, setLoading] = useState(true);
+  const [erroCarregar, setErroCarregar] = useState(false);
 
   const produtoService = new ProdutoService();
   const tipoProduto = 4;
 
-  const carregarProdutos = async () => {
+  const carregarProdutos = async (paginaAlvo = pagina) => {
     setLoading(true);
-
-    const resp = await produtoService.getProdutosPorTipo(
-      tipoProduto,
-      pagina,
-      8
-    );
-
-    console.log(resp);
-
-    setProdutos(resp.itens);
-    setTotalPaginas(resp.totalPaginas);
-
-    setTimeout(() => {
+    setErroCarregar(false);
+    try {
+      const resp = await produtoService.getProdutosPorTipo(
+        tipoProduto,
+        paginaAlvo,
+        8,
+      );
+      setProdutos(resp?.itens ?? []);
+      setTotalPaginas(resp?.totalPaginas ?? 0);
+    } catch {
+      setProdutos([]);
+      setTotalPaginas(0);
+      setErroCarregar(true);
+    } finally {
       setLoading(false);
-    }, 400);
+    }
   };
 
   useEffect(() => {
@@ -61,91 +70,37 @@ export default function ProdutosLista() {
     await carregarProdutos();
   };
 
+  const limparFiltros = async () => {
+    setNomeProduto("");
+    setPrecoMinimo(undefined);
+    setPrecoMaximo(undefined);
+    setPagina(1);
+    await carregarProdutos(1);
+  };
+
   return (
-    <Box
-      sx={{
-        color: "#fff",
-        minHeight: "100vh",
-        py: 6,
-        px: { xs: 2, md: 6 },
-      }}
-    >
-      <Typography
-        level="h2"
-        sx={{
-          fontWeight: 600,
-          textAlign: "center",
-          mb: 4,
-          color: "#fff",
-        }}
-      >
-        Outros produtos disponíveis
-      </Typography>
+    <Box sx={produtosPaginaLayoutSx}>
+      <Box sx={produtosPaginaFlexSx}>
+        <Box sx={produtosSidebarSx}>
+          <FiltroProdutosCategoria
+            nomeProduto={nomeProduto}
+            precoMinimo={precoMinimo}
+            precoMaximo={precoMaximo}
+            onNomeChange={setNomeProduto}
+            onPrecoMinChange={setPrecoMinimo}
+            onPrecoMaxChange={setPrecoMaximo}
+            onAplicar={aplicarFiltros}
+            onLimpar={limparFiltros}
+            loading={loading}
+          />
+        </Box>
 
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          gap: 2,
-          mb: 5,
-          justifyContent: "center",
-        }}
-      >
-        <Input
-          placeholder="Buscar por nome"
-          variant="soft"
-          value={nomeProduto}
-          onChange={(e) => setNomeProduto(e.target.value)}
-          sx={{ minWidth: 200 }}
-        />
+        <Box sx={produtosConteudoSx}>
+          <Typography level="h2" sx={{ fontWeight: 600, mb: 4, color: "#fff" }}>
+            Outros produtos disponíveis
+          </Typography>
 
-        <Input
-          placeholder="Preço mínimo"
-          type="number"
-          variant="soft"
-          value={precoMinimo ?? ""}
-          onChange={(e) =>
-            setPrecoMinimo(e.target.value ? Number(e.target.value) : undefined)
-          }
-          sx={{ minWidth: 150 }}
-        />
-
-        <Input
-          placeholder="Preço máximo"
-          type="number"
-          variant="soft"
-          value={precoMaximo ?? ""}
-          onChange={(e) =>
-            setPrecoMaximo(e.target.value ? Number(e.target.value) : undefined)
-          }
-          sx={{ minWidth: 150 }}
-        />
-
-        <Button
-          onClick={aplicarFiltros}
-          variant="solid"
-          sx={{
-            bgcolor: "#fff",
-            color: "#000",
-            fontWeight: 700,
-            "&:hover": { bgcolor: "#f5f5f5" },
-          }}
-        >
-          Aplicar filtros
-        </Button>
-      </Box>
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "repeat(1, 1fr)",
-            sm: "repeat(2, 1fr)",
-            md: "repeat(3, 1fr)",
-            lg: "repeat(4, 1fr)",
-          },
-          gap: 4,
-        }}
-      >
+          <Box sx={produtosGridSx}>
         {loading
           ? Array.from({ length: 8 }).map((_, i) => (
               <Card
@@ -155,7 +110,6 @@ export default function ProdutosLista() {
                   bgcolor: "#121212",
                   borderColor: "#1f1f1f",
                   borderRadius: "xl",
-                  minWidth: "300px",
                   height: "530px",
                   display: "flex",
                   flexDirection: "column",
@@ -202,7 +156,6 @@ export default function ProdutosLista() {
                   borderColor: "#1f1f1f",
                   borderRadius: "xl",
                   transition: "all 0.3s ease",
-                  minWidth: "300px",
                   height: "530px",
                   display: "flex",
                   flexDirection: "column",
@@ -316,40 +269,59 @@ export default function ProdutosLista() {
                 </CardContent>
               </Card>
             ))}
+
+        {!loading && produtos.length === 0 && (
+          <Box sx={{ gridColumn: "1 / -1", textAlign: "center", py: 8, px: 2 }}>
+            <Typography level="h4" sx={{ mb: 1 }}>
+              {erroCarregar
+                ? "Não foi possível carregar os produtos"
+                : "Nenhum produto nesta categoria ainda"}
+            </Typography>
+            <Typography sx={{ opacity: 0.65, mb: 2 }}>
+              {erroCarregar
+                ? "Verifique se a API está rodando em localhost:5083."
+                : "Em breve novidades nesta categoria."}
+            </Typography>
+            <Button variant="soft" onClick={() => void carregarProdutos(pagina)}>
+              Tentar novamente
+            </Button>
+          </Box>
+        )}
+          </Box>
+
+          {!loading && totalPaginas > 1 && (
+            <Stack
+              direction="row"
+              justifyContent="center"
+              alignItems="center"
+              spacing={2}
+              sx={{ mt: 6 }}
+            >
+              <Button
+                variant="outlined"
+                color="neutral"
+                onClick={() => setPagina((p) => Math.max(1, p - 1))}
+                disabled={pagina === 1}
+              >
+                Anterior
+              </Button>
+
+              <Typography level="body-md" sx={{ color: "#fff" }}>
+                Página {pagina} de {totalPaginas}
+              </Typography>
+
+              <Button
+                variant="outlined"
+                color="neutral"
+                onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
+                disabled={pagina === totalPaginas}
+              >
+                Próxima
+              </Button>
+            </Stack>
+          )}
+        </Box>
       </Box>
-
-      {/* PAGINAÇÃO (esconde enquanto carrega) */}
-      {!loading && totalPaginas > 1 && (
-        <Stack
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-          spacing={2}
-          sx={{ mt: 6 }}
-        >
-          <Button
-            variant="outlined"
-            color="neutral"
-            onClick={() => setPagina((p) => Math.max(1, p - 1))}
-            disabled={pagina === 1}
-          >
-            Anterior
-          </Button>
-
-          <Typography level="body-md" sx={{ color: "#fff" }}>
-            Página {pagina} de {totalPaginas}
-          </Typography>
-
-          <Button
-            variant="outlined"
-            color="neutral"
-            onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
-            disabled={pagina === totalPaginas}
-          >
-            Próxima
-          </Button>
-        </Stack>
-      )}
     </Box>
   );
 }

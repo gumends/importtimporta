@@ -34,10 +34,10 @@ export default function ProfilePage() {
   const [editarOpen, setEditarOpen] = useState(false);
   const [enderecos, setEnderecos] = useState<Endereco[]>([]);
   const [openConfirmExcluirEndereco, setOpenConfirmExcluirEndereco] = useState(false);
-  const [idEndereco, setIdEndereco] = useState<number>(0);
+  const [idEndereco, setIdEndereco] = useState<string>("");
   const [openCriarEndereco, setOpenCriarEndereco] = useState(false);
   const [openEndereco, setOpenEndereco] = useState(false);
-  const [enderecoEditId, setEnderecoEditId] = useState<number | undefined>();
+  const [enderecoEditId, setEnderecoEditId] = useState<string | undefined>();
   const maskCep = (value: string) => {
     const onlyNumbers = value.replace(/\D/g, "");
     return onlyNumbers
@@ -60,7 +60,7 @@ export default function ProfilePage() {
     }
   }
 
-  const excluirEndereco = async (id: number) => {
+  const excluirEndereco = async (id: string) => {
     try {
       await userService.ExcluirEndereco(id);
       setOpenConfirmExcluirEndereco(false);

@@ -80,25 +80,42 @@ export default function LoginComponent({
   } 
 
   async function handleGoogleLogin() {
-    const currentUrl = window.location.origin;
-    const url = await googleAuth.getGoogleLoginUrl(currentUrl);
+    try {
+      const apiOrigin = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
+      const currentUrl = window.location.origin;
+      const url = await googleAuth.getGoogleLoginUrl(currentUrl);
 
-    const popup = window.open(url, "googleLogin", "width=500,height=600");
-
-    const listener = (event: MessageEvent) => {
-      if (event.origin !== process.env.NEXT_PUBLIC_API_URL) return;
-
-      const { token } = event.data;
-
-      if (token) {
-        sessionStorage.setItem("auth_token", token);
-        window.removeEventListener("message", listener);
-        popup?.close();
-        window.location.reload();
+      const popup = window.open(url, "googleLogin", "width=500,height=600");
+      if (!popup) {
+        mostrarAlerta(
+          "O navegador bloqueou a janela do Google. Permita pop-ups para este site.",
+          "warning",
+          9000,
+        );
+        return;
       }
-    };
 
-    window.addEventListener("message", listener);
+      const listener = (event: MessageEvent) => {
+        if (apiOrigin && event.origin !== apiOrigin) return;
+
+        const { token } = event.data;
+
+        if (token) {
+          sessionStorage.setItem("auth_token", token);
+          window.removeEventListener("message", listener);
+          popup.close();
+          window.location.reload();
+        }
+      };
+
+      window.addEventListener("message", listener);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        mostrarAlerta(err.message, "danger", 12000);
+      } else {
+        mostrarAlerta("Erro ao iniciar login com Google", "danger", 9000);
+      }
+    }
   }
 
   const entrar = async () => {

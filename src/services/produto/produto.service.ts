@@ -3,11 +3,20 @@ import { Produto, ProdutosResponse } from "@/types/ProdutoNovo.type";
 export class ProdutoService {
   private readonly apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
+  private get apiBase(): string {
+    if (!this.apiUrl) {
+      throw new Error(
+        "API não configurada. Defina NEXT_PUBLIC_API_URL no .env.local (ex.: http://localhost:5083).",
+      );
+    }
+    return this.apiUrl;
+  }
+
   async postProduto(
     produto: FormularioProduto,
     token: string,
   ): Promise<Produto> {
-    const res = await fetch(`${this.apiUrl}/produto`, {
+    const res = await fetch(`${this.apiBase}/produto`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -23,16 +32,36 @@ export class ProdutoService {
     return res.json();
   }
 
+  async buscarProdutosPorNome(termo: string, limite = 8): Promise<ProdutosResponse> {
+    const q = termo.trim();
+    if (q.length < 2) {
+      return {
+        itens: [],
+        paginaAtual: 1,
+        tamanhoPagina: limite,
+        totalItens: 0,
+        totalPaginas: 0,
+      };
+    }
+
+    return this.getProdutos({
+      pagina: 1,
+      nomeProduto: q,
+      tamanhoPagina: limite,
+    });
+  }
+
   async getProdutos(params: {
     pagina: number;
     nomeProduto?: string;
     precoMinimo?: number;
     precoMaximo?: number;
+    tamanhoPagina?: number;
   }) {
     const query = new URLSearchParams();
 
     query.append("pagina", params.pagina.toString());
-    query.append("tamanhoPagina", "10");
+    query.append("tamanhoPagina", String(params.tamanhoPagina ?? 10));
 
     if (params.nomeProduto) query.append("nomeProduto", params.nomeProduto);
 
@@ -42,13 +71,13 @@ export class ProdutoService {
     if (params.precoMaximo !== undefined)
       query.append("precoMaximo", params.precoMaximo.toString());
 
-    const response = await fetch(`${this.apiUrl}/produto?${query.toString()}`);
+    const response = await fetch(`${this.apiBase}/produto?${query.toString()}`);
 
     return response.json();
   }
 
-  async getProdutoPorId(id: string): Promise<FormularioProduto> {
-    const res = await fetch(`${this.apiUrl}/produto/${id}`, {
+  async getProdutoPorId(id: string): Promise<Produto> {
+    const res = await fetch(`${this.apiBase}/produto/${id}`, {
       cache: "no-store",
     });
 
@@ -60,7 +89,7 @@ export class ProdutoService {
   }
 
   async criarProduto(produto: Produto, token: string): Promise<Produto> {
-    const res = await fetch(`${this.apiUrl}/produto`, {
+    const res = await fetch(`${this.apiBase}/produto`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -76,26 +105,31 @@ export class ProdutoService {
     return res.json();
   }
 
-  async atualizarProduto(produto: Produto, token: string): Promise<Produto> {
-    const res = await fetch(`${this.apiUrl}/produto`, {
+  async atualizarProdutoFormData(
+    id: string,
+    formData: FormData,
+  ): Promise<void> {
+    const token = sessionStorage.getItem("auth_token");
+    const res = await fetch(`${this.apiBase}/produto/${id}`, {
       method: "PUT",
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token ?? ""}`,
       },
-      body: JSON.stringify(produto),
+      body: formData,
     });
 
     if (!res.ok) {
-      throw new Error("Erro ao atualizar produto");
+      const err = await res.json().catch(() => ({}));
+      const msg =
+        (err as { message?: string }).message ??
+        "Erro ao atualizar produto (verifique se você é admin e fez login de novo).";
+      throw new Error(msg);
     }
-
-    return res.json();
   }
 
   async getProdutosPromocao(pagina = 1, limite = 2): Promise<ProdutosResponse> {
     const res = await fetch(
-      `${this.apiUrl}/produto/promocao?pagina=${pagina}&tamanhoPagina=${limite}`,
+      `${this.apiBase}/produto/promocao?pagina=${pagina}&tamanhoPagina=${limite}`,
       { cache: "no-store" },
     );
 
@@ -112,7 +146,7 @@ export class ProdutoService {
     limite = 2,
   ): Promise<ProdutosResponse> {
     const res = await fetch(
-      `${this.apiUrl}/produto/tipo/${tipoProduto}?pagina=${pagina}&tamanhoPagina=${limite}`,
+      `${this.apiBase}/produto/tipo/${tipoProduto}?pagina=${pagina}&tamanhoPagina=${limite}`,
       { cache: "no-store" },
     );
 
@@ -125,7 +159,7 @@ export class ProdutoService {
 
   async getProdutosVariados(quantidade: number): Promise<Produto[]> {
     const res = await fetch(
-      `${this.apiUrl}/produto/variados?quantidade=${quantidade}`,
+      `${this.apiBase}/produto/variados?quantidade=${quantidade}`,
       { cache: "no-store" },
     );
 
@@ -139,7 +173,7 @@ export class ProdutoService {
   }
 
   async deletarProduto(id: string) {
-    const res = await fetch(`${this.apiUrl}/produto/${id}`, {
+    const res = await fetch(`${this.apiBase}/produto/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${sessionStorage.getItem("auth_token")}`,
@@ -147,14 +181,18 @@ export class ProdutoService {
     });
 
     if (!res.ok) {
-      throw new Error("Erro ao deletar produto");
+      const err = await res.json().catch(() => ({}));
+      throw new Error(
+        (err as { message?: string }).message ??
+          "Erro ao deletar produto (403: faça logout e login de novo como admin).",
+      );
     }
 
     return res;
   }
 
   async desativarProduto(id: string) {
-    const res = await fetch(`${this.apiUrl}/produto/ativa_desativa/${id}`, {
+    const res = await fetch(`${this.apiBase}/produto/desativar/${id}`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${sessionStorage.getItem("auth_token")}`,
@@ -162,7 +200,28 @@ export class ProdutoService {
     });
 
     if (!res.ok) {
-      throw new Error("Erro ao deletar produto");
+      const err = await res.json().catch(() => ({}));
+      throw new Error(
+        (err as { message?: string }).message ?? "Erro ao desativar produto",
+      );
+    }
+
+    return res;
+  }
+
+  async ativarProduto(id: string) {
+    const res = await fetch(`${this.apiBase}/produto/ativar/${id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("auth_token")}`,
+      },
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(
+        (err as { message?: string }).message ?? "Erro ao ativar produto",
+      );
     }
 
     return res;
@@ -176,7 +235,7 @@ export class ProdutoService {
     });
 
     const response = await fetch(
-      `${this.apiUrl}/produto/SalvarImagens?idProduto=${idProduto}`,
+      `${this.apiBase}/produto/SalvarImagens?idProduto=${idProduto}`,
       {
         method: "POST",
         body: formData,

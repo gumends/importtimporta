@@ -19,7 +19,7 @@ export default function Footer() {
   return (
     <Box
       sx={{
-        bgcolor: "#0a0a0a",
+        bgcolor: "#000",
         pt: 6,
         pb: 3,
         borderTop: "1px solid rgba(255,255,255,0.1)",

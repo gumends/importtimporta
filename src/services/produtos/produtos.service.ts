@@ -1,5 +1,4 @@
 import { ModelosOption, ProdutoAtual } from "@/types/produtoAtual.type";
-import _ from "lodash";
 
 export async function getProduto(
   id: number

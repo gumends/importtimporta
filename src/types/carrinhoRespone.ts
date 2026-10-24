@@ -9,6 +9,7 @@ export interface CarrinhoResponse {
 
 export interface NewCarrinhoDto {
     id: string;
+    idProduto?: string;
     nomeProduto: string;
     valorUnitario: number;
     quantidade: number;

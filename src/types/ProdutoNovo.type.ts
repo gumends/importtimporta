@@ -39,7 +39,7 @@ export interface Informacoes {
 export interface IImagem {
   caminho: string;
   descricao: string;
-  produtoId: number;
+  produtoId: string;
 }
 
 export interface ProdutosResponse {

@@ -17,11 +17,16 @@ export default function ModalInicial() {
       setVisible(false);
       document.body.style.overflow = prevOverflow || "";
     }, 2400);
+    const tFailSafe = setTimeout(() => {
+      setVisible(false);
+      document.body.style.overflow = prevOverflow || "";
+    }, 5000);
 
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
+      clearTimeout(tFailSafe);
       document.body.style.overflow = prevOverflow || "";
     };
   }, []);

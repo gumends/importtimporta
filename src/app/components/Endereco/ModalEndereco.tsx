@@ -16,7 +16,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onSaved: () => void;
-  enderecoId?: number;
+  enderecoId?: string;
 }
 
 export default function ModalEndereco({

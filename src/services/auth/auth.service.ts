@@ -8,25 +8,58 @@ export class GoogleAuthService {
   private apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   async getGoogleLoginUrl(state: string): Promise<string> {
+    if (!this.apiUrl) {
+      throw new Error(
+        "API não configurada. Defina NEXT_PUBLIC_API_URL no .env.local.",
+      );
+    }
+
     const res = await fetch(
-      `${this.apiUrl}/auth/google-url?state=${encodeURIComponent(state)}`
+      `${this.apiUrl}/auth/google-url?state=${encodeURIComponent(state)}`,
     );
-    if (!res.ok) throw new Error("Não foi possível gerar URL de login Google");
-    const data = await res.json();
+
+    const data = (await res.json().catch(() => ({}))) as {
+      auth?: string;
+      message?: string;
+    };
+
+    if (!res.ok) {
+      throw new Error(
+        data.message ||
+          "Não foi possível gerar URL de login Google. Verifique a configuração OAuth na API.",
+      );
+    }
+
+    if (!data.auth?.includes("client_id=") || /client_id=&/.test(data.auth)) {
+      throw new Error(
+        "Google OAuth sem Client ID na API. Configure Authentication:Google no backend.",
+      );
+    }
+
     return data.auth;
   }
 
-  async me(): Promise<Usuario> {
+  async me(): Promise<Usuario | null> {
     const sessionToken = sessionStorage.getItem("auth_token");
-    const res = await fetch(`${this.apiUrl}/auth/me`, {
-      method: "POST",
-      credentials: "include",
-      body: JSON.stringify({ sessionToken }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    return await res.json();
+    if (!sessionToken) return null;
+
+    try {
+      const res = await fetch(`${this.apiUrl}/auth/me`, {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify({ sessionToken }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) return null;
+
+      const user = (await res.json()) as Usuario;
+      return user?.email ? user : null;
+    } catch {
+      return null;
+    }
   }
 
   async logout(): Promise<void> {
@@ -40,6 +73,12 @@ export class GoogleAuthService {
   }
 
   async login(email: string, senha: string) {
+    if (!this.apiUrl) {
+      throw new Error(
+        "API não configurada. Defina NEXT_PUBLIC_API_URL no .env.local (ex.: http://localhost:5083).",
+      );
+    }
+
     const response = await fetch(`${this.apiUrl}/auth/login`, {
       method: "POST",
       credentials: "include",

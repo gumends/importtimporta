@@ -9,7 +9,6 @@ import {
   CardOverflow,
   AspectRatio,
   Button,
-  Input,
   Stack,
   Skeleton,
 } from "@mui/joy";
@@ -17,10 +16,15 @@ import { useRouter } from "next/navigation";
 import { ProdutoService } from "@/services/produto/produto.service";
 import { formatarDinheiro } from "@/utils/mascara_dinheiro";
 import { Produto } from "@/types/ProdutoNovo.type";
-import { AddShoppingCart } from "@mui/icons-material";
-import { CheckIcon } from "lucide-react";
-import { CarrinhoService } from "@/services/carrinho/carrinho.service";
-import { CarrinhoResponse, NewCarrinhoDto } from "@/types/carrinhoRespone";
+import BotaoAdicionarCarrinho from "@/app/components/BotaoAdicionarCarrinho";
+import FiltroProdutosCategoria from "@/app/components/produtos/FiltroProdutosCategoria";
+import {
+  produtosConteudoSx,
+  produtosGridSx,
+  produtosPaginaFlexSx,
+  produtosPaginaLayoutSx,
+  produtosSidebarSx,
+} from "@/app/components/produtos/produtosGridSx";
 
 export default function ProdutosLista() {
   const router = useRouter();
@@ -33,96 +37,29 @@ export default function ProdutosLista() {
   const [precoMaximo, setPrecoMaximo] = useState<number | undefined>();
 
   const [loading, setLoading] = useState(true);
+  const [erroCarregar, setErroCarregar] = useState(false);
 
   const produtoService = new ProdutoService();
   const tipoProduto = 1;
 
-  const [addedId, setAddedId] = useState<number | null>(null);
-
-  const serviceCarrinho = new CarrinhoService();
-  const service = new ProdutoService();
-
-  const AdicionarAoCarrinho = async (idProduto: number, quantidade: number) => {
-    const token = sessionStorage.getItem("auth_token") || "";
-
-    if (token) {
-      await serviceCarrinho.postCarrinho(
-        { IdProduto: idProduto, Quantidade: quantidade },
-        token,
-      );
-      setAddedId(idProduto);
-
-      setTimeout(() => {
-        setAddedId(null);
-      }, 1200);
-      return;
-    }
-
-    const produto = await service.getProdutoPorId(idProduto);
-
-    const carrinhoStorage = sessionStorage.getItem("carrinho");
-
-    const carrinho: CarrinhoResponse = carrinhoStorage
-      ? JSON.parse(carrinhoStorage)
-      : {
-          subtotal: 0,
-          total: 0,
-          taxaEntrega: 20,
-          carrinhos: [],
-        };
-
-    const itemExistente = carrinho.carrinhos.find(
-      (item) => item.IdProduto === idProduto,
-    );
-
-    if (itemExistente) {
-      itemExistente.quantidade += quantidade;
-    } else {
-      const novoItem: NewCarrinhoDto = {
-        id: Date.now(),
-        IdProduto: idProduto,
-        IdUsuario: 0,
-        CriadoEm: new Date(),
-        quantidade: quantidade,
-        produto: produto,
-      };
-
-      carrinho.carrinhos.push(novoItem);
-    }
-
-    carrinho.subtotal = carrinho.carrinhos.reduce(
-      (acc, item) => acc + (item.produto.valor ?? 0) * item.quantidade,
-      0,
-    );
-
-    carrinho.total = carrinho.subtotal + carrinho.taxaEntrega;
-
-    sessionStorage.setItem("carrinho", JSON.stringify(carrinho));
-
-    setAddedId(idProduto);
-
-    setTimeout(() => {
-      setAddedId(null);
-    }, 1200);
-  };
-
-  const carregarProdutos = async () => {
+  const carregarProdutos = async (paginaAlvo = pagina) => {
     setLoading(true);
-
-    const resp = await produtoService.getProdutosPorTipo(
-      tipoProduto,
-      pagina,
-      8,
-    );
-
-    console.log(resp);
-
-    setProdutos(resp.itens);
-    setTotalPaginas(resp.totalPaginas);
-
-    setTimeout(() => {
+    setErroCarregar(false);
+    try {
+      const resp = await produtoService.getProdutosPorTipo(
+        tipoProduto,
+        paginaAlvo,
+        8,
+      );
+      setProdutos(resp?.itens ?? []);
+      setTotalPaginas(resp?.totalPaginas ?? 0);
+    } catch {
+      setProdutos([]);
+      setTotalPaginas(0);
+      setErroCarregar(true);
+    } finally {
       setLoading(false);
-    }, 400);
+    }
   };
 
   useEffect(() => {
@@ -134,91 +71,44 @@ export default function ProdutosLista() {
     await carregarProdutos();
   };
 
+  const limparFiltros = async () => {
+    setNomeProduto("");
+    setPrecoMinimo(undefined);
+    setPrecoMaximo(undefined);
+    setPagina(1);
+    await carregarProdutos(1);
+  };
+
   return (
-    <Box
-      sx={{
-        color: "#fff",
-        minHeight: "100vh",
-        py: 6,
-        px: { xs: 2, md: 6 },
-      }}
-    >
-      <Typography
-        level="h2"
-        sx={{
-          fontWeight: 600,
-          textAlign: "center",
-          mb: 4,
-          color: "#fff",
-        }}
-      >
-        iPhones disponíveis
-      </Typography>
+    <Box sx={produtosPaginaLayoutSx}>
+      <Box sx={produtosPaginaFlexSx}>
+        <Box sx={produtosSidebarSx}>
+          <FiltroProdutosCategoria
+            nomeProduto={nomeProduto}
+            precoMinimo={precoMinimo}
+            precoMaximo={precoMaximo}
+            onNomeChange={setNomeProduto}
+            onPrecoMinChange={setPrecoMinimo}
+            onPrecoMaxChange={setPrecoMaximo}
+            onAplicar={aplicarFiltros}
+            onLimpar={limparFiltros}
+            loading={loading}
+          />
+        </Box>
 
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          gap: 2,
-          mb: 5,
-          justifyContent: "center",
-        }}
-      >
-        <Input
-          placeholder="Buscar por nome"
-          variant="soft"
-          value={nomeProduto}
-          onChange={(e) => setNomeProduto(e.target.value)}
-          sx={{ minWidth: 200 }}
-        />
+        <Box sx={produtosConteudoSx}>
+          <Typography
+            level="h2"
+            sx={{
+              fontWeight: 600,
+              mb: 4,
+              color: "#fff",
+            }}
+          >
+            iPhones disponíveis
+          </Typography>
 
-        <Input
-          placeholder="Preço mínimo"
-          type="number"
-          variant="soft"
-          value={precoMinimo ?? ""}
-          onChange={(e) =>
-            setPrecoMinimo(e.target.value ? Number(e.target.value) : undefined)
-          }
-          sx={{ minWidth: 150 }}
-        />
-
-        <Input
-          placeholder="Preço máximo"
-          type="number"
-          variant="soft"
-          value={precoMaximo ?? ""}
-          onChange={(e) =>
-            setPrecoMaximo(e.target.value ? Number(e.target.value) : undefined)
-          }
-          sx={{ minWidth: 150 }}
-        />
-
-        <Button
-          onClick={aplicarFiltros}
-          variant="solid"
-          sx={{
-            bgcolor: "#fff",
-            color: "#000",
-            fontWeight: 700,
-            "&:hover": { bgcolor: "#f5f5f5" },
-          }}
-        >
-          Aplicar filtros
-        </Button>
-      </Box>
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "repeat(1, 1fr)",
-            sm: "repeat(2, 1fr)",
-            md: "repeat(3, 1fr)",
-            lg: "repeat(4, 1fr)",
-          },
-          gap: 4,
-        }}
-      >
+          <Box sx={produtosGridSx}>
         {loading
           ? Array.from({ length: 8 }).map((_, i) => (
               <Card
@@ -228,8 +118,7 @@ export default function ProdutosLista() {
                   bgcolor: "#121212",
                   borderColor: "#1f1f1f",
                   borderRadius: "xl",
-                  minWidth: "300px",
-                  height: "530px",
+                  minHeight: 480,
                   display: "flex",
                   flexDirection: "column",
                 }}
@@ -267,8 +156,6 @@ export default function ProdutosLista() {
               </Card>
             ))
           : produtos.map((p) => {
-              const isAdded = addedId === p.id;
-
               return (
                 <Card
                   key={p.id}
@@ -278,11 +165,10 @@ export default function ProdutosLista() {
                     borderColor: "#1f1f1f",
                     borderRadius: "xl",
                     transition: "all 0.3s ease",
-                    minWidth: "300px",
-                    height: "540px",
+                    height: "100%",
                     display: "flex",
                     flexDirection: "column",
-                    justifyContent: "space-between",
+                    overflow: "hidden",
                     "&:hover": {
                       transform: "translateY(-6px)",
                       boxShadow: "0 8px 25px rgba(255, 255, 255, 0.2)",
@@ -293,9 +179,7 @@ export default function ProdutosLista() {
                     <AspectRatio ratio="1" sx={{ bgcolor: "#000" }}>
                       <img
                         src={
-                          Array.isArray(p.imagens)
-                            ? p.imagens[0].caminho
-                            : p.imagens || undefined
+                          p.imagens?.[0]?.caminho ?? ""
                         }
                         alt={p.nomeProduto}
                         loading="lazy"
@@ -310,21 +194,22 @@ export default function ProdutosLista() {
 
                   <CardContent
                     sx={{
-                      flexGrow: 1,
+                      flex: 1,
                       display: "flex",
                       flexDirection: "column",
+                      gap: 1,
+                      p: 2,
+                      minHeight: 0,
                     }}
                   >
                     <Typography
                       level="title-md"
                       sx={{
                         color: "#fff",
-                        fontWeight: 500,
-                        mb: 1,
+                        fontWeight: 600,
                         overflow: "hidden",
                         whiteSpace: "nowrap",
                         textOverflow: "ellipsis",
-                        height: "24px",
                       }}
                     >
                       {p.nomeProduto}
@@ -333,9 +218,9 @@ export default function ProdutosLista() {
                     <Typography
                       level="body-sm"
                       sx={{
-                        color: "rgba(255,255,255,0.6)",
-                        mb: 1,
-                        height: "32px",
+                        color: "rgba(255,255,255,0.65)",
+                        lineHeight: 1.35,
+                        minHeight: "2.7em",
                         overflow: "hidden",
                         display: "-webkit-box",
                         WebkitLineClamp: 2,
@@ -345,14 +230,7 @@ export default function ProdutosLista() {
                       {p.descricao}
                     </Typography>
 
-                    <Box
-                      sx={{
-                        height: "40px",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                      }}
-                    >
+                    <Box sx={{ py: 0.5 }}>
                       {p.valorOriginal > (p.valor ?? 0) && (
                         <Typography
                           level="body-sm"
@@ -360,6 +238,7 @@ export default function ProdutosLista() {
                             color: "rgba(255,255,255,0.5)",
                             textDecoration: "line-through",
                             fontSize: "0.85rem",
+                            lineHeight: 1.2,
                           }}
                         >
                           {formatarDinheiro(p.valorOriginal)}
@@ -371,108 +250,86 @@ export default function ProdutosLista() {
                         sx={{
                           color: "#fff",
                           fontWeight: 700,
-                          mt: p.valorOriginal > (p.valor ?? 0) ? 0.3 : 1,
+                          lineHeight: 1.2,
                         }}
                       >
                         {formatarDinheiro(p.valor ?? 0)}
                       </Typography>
                     </Box>
 
-                    <Button
-                      fullWidth
-                      variant="solid"
-                      sx={{
-                        mt: 1,
-                        bgcolor: "#fff",
-                        color: "#000",
-                        fontWeight: 700,
-                        "&:hover": { bgcolor: "#f5f5f5" },
-                        textTransform: "none",
-                        mb: 1,
-                      }}
-                      onClick={() => router.push(`/compra?produtoId=${p.id}`)}
-                    >
-                      Comprar agora
-                    </Button>
-                    <Button
-                      color="primary"
-                      onClick={() => AdicionarAoCarrinho(p.id, 1)}
-                      sx={{
-                        overflow: "hidden",
-                        position: "relative",
-                      }}
-                    >
-                      <Box
+                    <Box sx={{ mt: "auto", display: "flex", flexDirection: "column", gap: 1, pt: 1 }}>
+                      <Button
+                        fullWidth
+                        variant="solid"
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 1,
-                          transform: isAdded
-                            ? "translateY(-40px)"
-                            : "translateY(0)",
-                          opacity: isAdded ? 0 : 1,
-                          transition: "all 0.3s ease",
-                          position: "absolute",
+                          bgcolor: "#fff",
+                          color: "#000",
+                          fontWeight: 700,
+                          "&:hover": { bgcolor: "#f5f5f5" },
+                          textTransform: "none",
                         }}
+                        onClick={() => router.push(`/compra?produtoId=${p.id}`)}
                       >
-                        <AddShoppingCart />
-                        Adicionar ao carrinho
-                      </Box>
-
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 1,
-                          transform: isAdded
-                            ? "translateY(0)"
-                            : "translateY(40px)",
-                          opacity: isAdded ? 1 : 0,
-                          transition: "all 0.3s ease",
-                        }}
-                      >
-                        <CheckIcon />
-                        Adicionado!
-                      </Box>
-                    </Button>
+                        Comprar agora
+                      </Button>
+                      <BotaoAdicionarCarrinho idProduto={p.id} />
+                    </Box>
                   </CardContent>
                 </Card>
               );
             })}
+        {!loading && produtos.length === 0 && (
+          <Box sx={{ gridColumn: "1 / -1", textAlign: "center", py: 8, px: 2 }}>
+            <Typography level="h4" sx={{ mb: 1 }}>
+              {erroCarregar
+                ? "Não foi possível carregar os produtos"
+                : "Nenhum iPhone nesta listagem"}
+            </Typography>
+            <Typography sx={{ opacity: 0.65, mb: 2 }}>
+              {erroCarregar
+                ? "Verifique se a API está rodando em localhost:5083."
+                : "Ajuste os filtros ou volte mais tarde."}
+            </Typography>
+            <Button variant="soft" onClick={() => void carregarProdutos(pagina)}>
+              Tentar novamente
+            </Button>
+          </Box>
+        )}
+          </Box>
+
+          {!loading && totalPaginas > 1 && (
+            <Stack
+              direction="row"
+              justifyContent="center"
+              alignItems="center"
+              spacing={2}
+              sx={{ mt: 6 }}
+            >
+              <Button
+                variant="outlined"
+                color="neutral"
+                onClick={() => setPagina((p) => Math.max(1, p - 1))}
+                disabled={pagina === 1}
+              >
+                Anterior
+              </Button>
+
+              <Typography level="body-md" sx={{ color: "#fff" }}>
+                Página {pagina} de {totalPaginas}
+              </Typography>
+
+              <Button
+                variant="outlined"
+                color="neutral"
+                onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
+                disabled={pagina === totalPaginas}
+              >
+                Próxima
+              </Button>
+            </Stack>
+          )}
+        </Box>
       </Box>
-
-      {/* PAGINAÇÃO (esconde enquanto carrega) */}
-      {!loading && totalPaginas > 1 && (
-        <Stack
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-          spacing={2}
-          sx={{ mt: 6 }}
-        >
-          <Button
-            variant="outlined"
-            color="neutral"
-            onClick={() => setPagina((p) => Math.max(1, p - 1))}
-            disabled={pagina === 1}
-          >
-            Anterior
-          </Button>
-
-          <Typography level="body-md" sx={{ color: "#fff" }}>
-            Página {pagina} de {totalPaginas}
-          </Typography>
-
-          <Button
-            variant="outlined"
-            color="neutral"
-            onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
-            disabled={pagina === totalPaginas}
-          >
-            Próxima
-          </Button>
-        </Stack>
-      )}
     </Box>
   );
 }

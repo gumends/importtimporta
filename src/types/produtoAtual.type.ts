@@ -1,5 +1,7 @@
 export interface ProdutoAtual {
   id: number;
+  /** GUID do produto real na API (tabela produtos) */
+  catalogoProdutoId?: string;
   nomeProduto: string;
   valor: number;
   valorOriginal: number;
@@ -40,5 +42,5 @@ export interface ModelosOption {
   color: string;
   image: string;
   colorName: string;
-  idProduto: number;
+  idProduto: string;
 }

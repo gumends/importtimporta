@@ -1,8 +1,8 @@
 export interface Endereco {
-  id: number
-  cep: number
-  logradouro: string
-  numero: number
-  complemento: string
-  idUsuario: number
+  id: string;
+  cep: number;
+  logradouro: string;
+  numero: number;
+  complemento: string;
+  idUsuario: string;
 }

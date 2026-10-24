@@ -10,8 +10,15 @@ import {
   AspectRatio,
   Button,
   Stack,
-  Input,
 } from "@mui/joy";
+import FiltroProdutosCategoria from "@/app/components/produtos/FiltroProdutosCategoria";
+import {
+  produtosConteudoSx,
+  produtosGridSx,
+  produtosPaginaFlexSx,
+  produtosPaginaLayoutSx,
+  produtosSidebarSx,
+} from "@/app/components/produtos/produtosGridSx";
 import { useRouter } from "next/navigation";
 import { ProdutoService } from "@/services/produto/produto.service";
 import { Produto } from "@/types/ProdutoNovo.type";
@@ -41,9 +48,9 @@ export default function ProdutosListaBase({
 
   const carregarProdutos = async () => {
     const data = await produtoService.getProdutosPorTipo(
+      tipoProduto,
       pagina,
       itensPorPagina,
-      tipoProduto,
     );
 
     setProdutos(data.itens);
@@ -59,55 +66,42 @@ export default function ProdutosListaBase({
     await carregarProdutos();
   };
 
+  const limparFiltros = async () => {
+    setNomeProduto("");
+    setPrecoMinimo(undefined);
+    setPrecoMaximo(undefined);
+    setPagina(1);
+    const data = await produtoService.getProdutosPorTipo(
+      tipoProduto,
+      1,
+      itensPorPagina,
+    );
+    setProdutos(data.itens);
+    setTotalPaginas(data.totalPaginas);
+  };
+
   return (
-    <Box sx={{ color: "#fff", minHeight: "100vh", py: 6, px: { xs: 2, md: 6 } }}>
-      <Typography level="h2" sx={{ fontWeight: 600, textAlign: "center", mb: 4 }}>
-        {titulo}
-      </Typography>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          gap: 2,
-          mb: 5,
-          justifyContent: "center",
-        }}
-      >
-        <Input
-          placeholder="Buscar por nome"
-          value={nomeProduto}
-          onChange={(e) => setNomeProduto(e.target.value)}
-        />
+    <Box sx={produtosPaginaLayoutSx}>
+      <Box sx={produtosPaginaFlexSx}>
+        <Box sx={produtosSidebarSx}>
+          <FiltroProdutosCategoria
+            nomeProduto={nomeProduto}
+            precoMinimo={precoMinimo}
+            precoMaximo={precoMaximo}
+            onNomeChange={setNomeProduto}
+            onPrecoMinChange={setPrecoMinimo}
+            onPrecoMaxChange={setPrecoMaximo}
+            onAplicar={aplicarFiltros}
+            onLimpar={limparFiltros}
+          />
+        </Box>
 
-        <Input
-          placeholder="Preço mínimo"
-          type="number"
-          value={precoMinimo ?? ""}
-          onChange={(e) => setPrecoMinimo(Number(e.target.value) || undefined)}
-        />
+        <Box sx={produtosConteudoSx}>
+          <Typography level="h2" sx={{ fontWeight: 600, mb: 4 }}>
+            {titulo}
+          </Typography>
 
-        <Input
-          placeholder="Preço máximo"
-          type="number"
-          value={precoMaximo ?? ""}
-          onChange={(e) => setPrecoMaximo(Number(e.target.value) || undefined)}
-        />
-
-        <Button onClick={aplicarFiltros}>Aplicar filtros</Button>
-      </Box>
-
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "repeat(1, 1fr)",
-            sm: "repeat(2, 1fr)",
-            md: "repeat(3, 1fr)",
-            lg: "repeat(4, 1fr)",
-          },
-          gap: 4,
-        }}
-      >
+          <Box sx={produtosGridSx}>
         {produtos.length > 0 ? (
           produtos.map((p) => (
             <Card key={p.id} variant="outlined" sx={{ bgcolor: "#121212" }}>
@@ -161,30 +155,31 @@ export default function ProdutosListaBase({
             Nenhum produto encontrado.
           </Typography>
         )}
+          </Box>
+
+          <Stack direction="row" justifyContent="center" spacing={2} mt={6}>
+            <Button
+              variant="outlined"
+              onClick={() => setPagina((n) => Math.max(1, n - 1))}
+              disabled={pagina === 1}
+            >
+              Anterior
+            </Button>
+
+            <Typography>
+              Página {pagina} de {totalPaginas}
+            </Typography>
+
+            <Button
+              variant="outlined"
+              onClick={() => setPagina((n) => Math.min(totalPaginas, n + 1))}
+              disabled={pagina === totalPaginas}
+            >
+              Próxima
+            </Button>
+          </Stack>
+        </Box>
       </Box>
-
-      {/* PAGINAÇÃO */}
-      <Stack direction="row" justifyContent="center" spacing={2} mt={6}>
-        <Button
-          variant="outlined"
-          onClick={() => setPagina((n) => Math.max(1, n - 1))}
-          disabled={pagina === 1}
-        >
-          Anterior
-        </Button>
-
-        <Typography>
-          Página {pagina} de {totalPaginas}
-        </Typography>
-
-        <Button
-          variant="outlined"
-          onClick={() => setPagina((n) => Math.min(totalPaginas, n + 1))}
-          disabled={pagina === totalPaginas}
-        >
-          Próxima
-        </Button>
-      </Stack>
     </Box>
   );
 }

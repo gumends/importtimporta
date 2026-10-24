@@ -9,7 +9,6 @@ import {
   Stack,
   Divider,
   Input,
-  Chip,
   Modal,
   ModalDialog,
   ModalClose,
@@ -28,12 +27,11 @@ import {
 import { ProdutoService } from "@/services/produto/produto.service";
 import { Produto as p, ProdutosResponse } from "@/types/ProdutoNovo.type";
 import ModalEditarProduto from "../components/ModalEdicaoProduto";
-import { jwtDecode } from "jwt-decode";
 import { JwtPayload } from "@/types/JwtPayload.type";
-import { AddShoppingCart } from "@mui/icons-material";
-import { CheckIcon } from "lucide-react";
-import { CarrinhoService } from "@/services/carrinho/carrinho.service";
-import { CarrinhoRequest } from "@/types/carrinhoRequest";
+import { decodeJwtSafe, isJwtFormat } from "@/utils/jwt";
+import { isUuidProduto, resolverProdutoIdCatalogo } from "@/utils/produtoId";
+import BotaoAdicionarCarrinho from "@/app/components/BotaoAdicionarCarrinho";
+import { useRouter } from "next/navigation";
 
 interface ResponseParcela {
   valorOriginal: number;
@@ -42,7 +40,21 @@ interface ResponseParcela {
   juros: number;
 }
 
+function mapProdutoApi(data: unknown): p {
+  const raw = data as Record<string, unknown>;
+  const info =
+    raw.informacoesAdicionais ?? raw.informacoesProduto ?? null;
+  const imagens = Array.isArray(raw.imagens) ? raw.imagens : [];
+
+  return {
+    ...(raw as p),
+    informacoesAdicionais: info as p["informacoesAdicionais"],
+    imagens: imagens as p["imagens"],
+  };
+}
+
 export default function Produto() {
+  const router = useRouter();
   const [produto, setProduto] = React.useState<p | null>(null);
   const [variant, setVariant] = React.useState<
     ModalDialogProps["variant"] | undefined
@@ -58,62 +70,64 @@ export default function Produto() {
   const [data, setData] = React.useState<ProdutosResponse | null>(null);
   const [page, setPage] = React.useState(1);
   const [admin, setAdmin] = React.useState(false);
-  const [isAdded, setIsAdded] = React.useState<boolean>(false);
-
-  const serviceCarrinho = new CarrinhoService();
-
   const fetchProdutos = async (pagina: number) => {
     try {
-      const res = await service.getProdutos(pagina);
-      console.log(res);
+      const res = await service.getProdutos({ pagina });
       setData(res);
     } catch (err) {
       console.error("Erro ao carregar produtos", err);
-    } finally {
-      console.log("");
     }
-  };
-
-  const handleClick = () => {
-    const token = sessionStorage.getItem("auth_token") || "";
-    const produto_carrinho: CarrinhoRequest = {
-      IdProduto: Number(produto?.id),
-      Quantidade: 1,
-    };
-
-    serviceCarrinho.postCarrinho(produto_carrinho, token);
-
-    setIsAdded(true);
-
-    setTimeout(() => {
-      setIsAdded(false);
-    }, 1200);
   };
 
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const produtoParam = urlParams.get("produtoId");
+    const rawId = urlParams.get("produtoId");
+    const catalogoId = resolverProdutoIdCatalogo(rawId);
 
-    if (produtoParam) {
-      const produtoId = parseInt(produtoParam, 10);
-
-      service.getProdutoPorId(produtoId).then((prod) => {
-        if (prod) {
-          console.log("teste", prod);
-          setImagemPrincipal(prod.imagens?.[0].caminho ?? "/placeholder.png");
-          setProduto(prod);
-        }
-      });
+    if (!catalogoId) {
+      router.replace("/inicio");
+      return;
     }
 
+    if (rawId && rawId !== catalogoId && !isUuidProduto(rawId)) {
+      router.replace(`/compra?produtoId=${catalogoId}`);
+      return;
+    }
+
+    let cancelado = false;
+
+    service
+      .getProdutoPorId(catalogoId)
+      .then((raw) => {
+        if (cancelado) return;
+        const prod = mapProdutoApi(raw);
+        if (prod?.id && isUuidProduto(String(prod.id))) {
+          setImagemPrincipal(
+            prod.imagens?.[0]?.caminho ?? "/placeholder.png",
+          );
+          setProduto(prod);
+        } else {
+          router.replace("/inicio");
+        }
+      })
+      .catch(() => {
+        if (!cancelado) router.replace("/inicio");
+      });
+
     const token = sessionStorage.getItem("auth_token");
-    if (token !== "" && token !== null) {
-      const decoded = jwtDecode<JwtPayload>(token ?? "");
-      if (decoded.role === "Admin") {
+    if (token && !isJwtFormat(token)) {
+      sessionStorage.removeItem("auth_token");
+    } else {
+      const decoded = decodeJwtSafe<JwtPayload>(token);
+      if (decoded?.role === "Admin") {
         setAdmin(true);
       }
     }
-  }, []);
+
+    return () => {
+      cancelado = true;
+    };
+  }, [router]);
 
   if (!produto) {
     return (
@@ -139,250 +153,215 @@ export default function Produto() {
     )}`;
   };
 
+  const temDesconto =
+    produto.desconto > 0 && produto.valorOriginal > (produto.valor ?? 0);
+  const imagensLista = produto.imagens ?? [];
+
   return (
-    <Box
-      sx={{
-        bgcolor: "#0a0a0a",
-        color: "#fff",
-        width: "100%",
-      }}
-    >
+    <Box sx={{ bgcolor: "#0a0a0a", color: "#fff", width: "100%", pb: 6 }}>
       <Container
         maxWidth="lg"
         sx={{
-          height: "100%",
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          justifyContent: "center",
-          alignItems: "center",
-          px: 4,
-          gap: 4,
-          mt: 10,
+          pt: { xs: 3, md: 5 },
+          px: { xs: 2.5, md: 3 },
         }}
       >
         <Box
           sx={{
-            flex: 1,
-            height: "100%",
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+            gap: { xs: 4, md: 6, lg: 8 },
+            alignItems: "start",
           }}
         >
-          <Typography
-            sx={{
-              mb: 2,
-              fontSize: { xs: "1.3rem", md: "2.2rem" },
-              color: "#fff",
-            }}
-          >
-            {produto.nomeProduto}
-          </Typography>
-          <Box
-            component="img"
-            src={imagemPrincipal}
-            alt={produto.nomeProduto}
-            sx={{
-              width: "100%",
-              objectFit: "contain",
-              animation: "fadeIn 1s ease-in-out",
-              "@keyframes fadeIn": {
-                from: { opacity: 0 },
-                to: { opacity: 1 },
-              },
-            }}
-          />
-          {produto.imagens && produto.imagens.length > 0 && (
+          <Box>
+            <Typography
+              sx={{
+                fontSize: { xs: "1.5rem", md: "1.875rem" },
+                fontWeight: 600,
+                letterSpacing: "-0.02em",
+                mb: 3,
+              }}
+            >
+              {produto.nomeProduto}
+            </Typography>
+
             <Box
               sx={{
                 display: "flex",
-                flexWrap: "nowrap",
-                overflowX: "auto",
-                justifyContent: "space-between",
-                alignItems: "center",
-                gap: 1,
-                mt: 2,
-                maxWidth: "100%",
-              }}
-            >
-              {produto.imagens.map((imagem, index) => (
-                <Box
-                  key={index}
-                  component="img"
-                  src={imagem.caminho}
-                  alt={`${produto.nomeProduto} - imagem ${index + 1}`}
-                  sx={{
-                    width: 100,
-                    height: 100,
-                    objectFit: "contain",
-                    cursor: "pointer",
-                    borderRadius: 10,
-                    border:
-                      imagem === produto.imagens?.[index]
-                        ? "2px solid rgba(255, 255, 255, 0.25)"
-                        : "2px solid transparent",
-                    bgcolor: "rgba(255,255,255,0.05)",
-                    transition: "border-color 0.3s",
-                    "&:hover": {
-                      borderColor: "rgba(255,255,255,0.3)",
-                    },
-                  }}
-                  onClick={() => setImagemPrincipal(imagem.caminho)}
-                />
-              ))}
-            </Box>
-          )}
-        </Box>
-        <Box
-          sx={{
-            flex: 1,
-          }}
-        >
-          <Typography
-            sx={{
-              textAlign: "justify",
-              color: "#aaa",
-              fontSize: "1.2rem",
-              lineHeight: 1.8,
-              maxWidth: 900,
-              mx: "auto",
-            }}
-          >
-            {produto.descricao}
-          </Typography>
-          {produto.desconto > 0 && (
-            <Typography
-              sx={{
-                textAlign: "left",
-                textDecoration: "line-through",
-                color: "#777",
-                fontSize: "1.5rem",
-              }}
-            >
-              {formatarDinheiro(produto.valorOriginal)}
-            </Typography>
-          )}
-          <Typography
-            sx={{
-              fontSize: "2.2rem",
-              fontWeight: 800,
-              color: "#fff",
-              textAlign: "left",
-            }}
-          >
-            {formatarDinheiro(produto.valor ?? 0)}
-          </Typography>
-          <Typography
-            sx={{
-              fontSize: "0.9rem",
-              color: "#fff",
-              mb: 1,
-              textAlign: "left",
-            }}
-          >
-            À vista no PIX com{" "}
-            <b>
-              {((1.07 - 1) * 100).toFixed(0)}% de desconto
-            </b>
-          </Typography>
-          <Typography sx={{ mb: 4, color: "#ccc", textAlign: "left" }}>
-            {formatarDinheiro(produto.valorParcelado * 1.07)}{" "}
-            em até <b>5x</b> de{" "}
-            {formatarDinheiro(
-              (produto.valorParcelado * 1.07) / 5
-            )}{" "}
-            sem juros
-          </Typography>
-          <Stack spacing={2} sx={{ mb: 4 }}>
-            <Button
-              onClick={handleComprar}
-              sx={{
-                bgcolor: "#fff",
-                color: "#000",
-                fontWeight: 700,
-                "&:hover": { bgcolor: "#f5f5f5" },
-                textTransform: "none",
-              }}
-            >
-              COMPRAR AGORA
-            </Button>
-            <Button
-              onClick={() => handleClick()}
-              sx={{
-                mt: 2,
-                display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                position: "relative",
-                overflow: "hidden",
+                minHeight: { xs: 280, md: 360 },
               }}
             >
               <Box
+                component="img"
+                src={imagemPrincipal}
+                alt={produto.nomeProduto}
                 sx={{
-                  position: "absolute",
-                  transition: "all 0.3s ease",
-                  transform: isAdded ? "scale(0)" : "scale(1)",
-                  opacity: isAdded ? 0 : 1,
+                  width: "100%",
+                  maxWidth: 440,
+                  maxHeight: { xs: "45vh", md: "50vh" },
+                  objectFit: "contain",
                 }}
-              >
-                <AddShoppingCart /> Adicionar ao carrinho
-              </Box>
-              <Box
-                sx={{
-                  position: "absolute",
-                  transition: "all 0.3s ease",
-                  transform: isAdded ? "scale(1)" : "scale(0)",
-                  opacity: isAdded ? 1 : 0,
-                }}
-              >
-                <CheckIcon />
-              </Box>
-            </Button>
-            {admin && (
-              <Button
-                variant="soft"
-                sx={{
-                  borderColor: "#fff",
-                  color: "#fff",
-                  fontWeight: 600,
-                  textTransform: "none",
-                  "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
-                }}
-                onClick={() => {
-                  setProdutoEdit(produto);
-                  setModalOpen(true);
-                }}
-              >
-                ADMINISTRAR PRODUTO
-              </Button>
+              />
+            </Box>
+
+            {imagensLista.length > 1 && (
+              <Stack direction="row" spacing={1.25} sx={{ mt: 2.5 }}>
+                {imagensLista.map((imagem, index) => {
+                  const ativa = imagem.caminho === imagemPrincipal;
+                  return (
+                    <Box
+                      key={`${imagem.caminho}-${index}`}
+                      component="button"
+                      type="button"
+                      aria-label={`Ver imagem ${index + 1}`}
+                      onClick={() => setImagemPrincipal(imagem.caminho)}
+                      sx={{
+                        width: 56,
+                        height: 56,
+                        p: 0.5,
+                        border: "none",
+                        borderBottom: ativa
+                          ? "2px solid #fff"
+                          : "2px solid transparent",
+                        bgcolor: "transparent",
+                        cursor: "pointer",
+                        opacity: ativa ? 1 : 0.55,
+                        "&:hover": { opacity: 1 },
+                      }}
+                    >
+                      <Box
+                        component="img"
+                        src={imagem.caminho}
+                        alt=""
+                        sx={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "contain",
+                        }}
+                      />
+                    </Box>
+                  );
+                })}
+              </Stack>
             )}
+          </Box>
+
+          <Stack spacing={2.5} sx={{ pt: { md: 5 } }}>
+            <Typography
+              sx={{
+                color: "rgba(255,255,255,0.65)",
+                fontSize: "1rem",
+                lineHeight: 1.65,
+              }}
+            >
+              {produto.descricao}
+            </Typography>
+
+            <Box>
+              {temDesconto && (
+                <Typography
+                  sx={{
+                    textDecoration: "line-through",
+                    color: "rgba(255,255,255,0.4)",
+                    fontSize: "1rem",
+                  }}
+                >
+                  {formatarDinheiro(produto.valorOriginal)}
+                </Typography>
+              )}
+              <Typography
+                sx={{
+                  fontSize: "1.75rem",
+                  fontWeight: 600,
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                {formatarDinheiro(produto.valor ?? 0)}
+              </Typography>
+              <Typography level="body-sm" sx={{ mt: 1, color: "rgba(255,255,255,0.5)" }}>
+                PIX à vista · 7% de desconto
+              </Typography>
+              <Typography level="body-sm" sx={{ color: "rgba(255,255,255,0.45)" }}>
+                ou 5x de{" "}
+                {formatarDinheiro((produto.valorParcelado * 1.07) / 5)} sem juros
+              </Typography>
+            </Box>
+
+            <Stack spacing={1.25} sx={{ maxWidth: 320 }}>
+              <Button
+                onClick={handleComprar}
+                fullWidth
+                sx={{
+                  bgcolor: "#fff",
+                  color: "#000",
+                  fontWeight: 600,
+                  borderRadius: "8px",
+                  "&:hover": { bgcolor: "#e8e8e8" },
+                }}
+              >
+                Comprar agora
+              </Button>
+              {produto.id && (
+                <BotaoAdicionarCarrinho
+                  idProduto={produto.id}
+                  sx={{ borderRadius: "8px" }}
+                />
+              )}
+              {admin && (
+                <Button
+                  variant="plain"
+                  fullWidth
+                  sx={{ color: "rgba(255,255,255,0.7)", fontSize: "0.875rem" }}
+                  onClick={() => {
+                    setProdutoEdit(produto);
+                    setModalOpen(true);
+                  }}
+                >
+                  Administrar produto
+                </Button>
+              )}
+            </Stack>
+
+            <Typography
+              level="body-sm"
+              sx={{
+                color: produto.disponivel
+                  ? "rgba(120, 200, 140, 0.9)"
+                  : "rgba(255, 120, 120, 0.9)",
+              }}
+            >
+              {produto.disponivel ? "Em estoque" : "Indisponível"}
+            </Typography>
           </Stack>
-          <Chip color={produto.disponivel ? "success" : "danger"}>
-            {produto.disponivel ? "Produto Disponivel" : "Produto Indisponivel"}
-          </Chip>
         </Box>
-      </Container>
-      <Container>
-        <Divider sx={{ mt: 7, mb: 5, bgcolor: "rgba(255,255,255,0.12)" }} />
+
+        <Divider sx={{ my: 6, borderColor: "rgba(255,255,255,0.08)" }} />
 
         <Typography
           sx={{
-            textAlign: "center",
-            color: "#fff",
-            fontSize: "1.8rem",
-            fontWeight: 700,
-            mb: 3,
+            fontSize: "0.75rem",
+            fontWeight: 600,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "rgba(255,255,255,0.45)",
+            mb: 2.5,
           }}
         >
-          Descrição do produto
+          Especificações
         </Typography>
 
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-            gap: 3,
-            color: "#ccc",
-            fontSize: "1rem",
-            lineHeight: 1.8,
-            mb: 8,
+            gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+            gap: 1.5,
+            color: "rgba(255,255,255,0.55)",
+            fontSize: "0.9rem",
+            lineHeight: 1.6,
+            maxWidth: 720,
           }}
         >
           {produto.informacoesAdicionais?.marca && (
@@ -460,6 +439,11 @@ export default function Produto() {
           <Typography>
             Garantia: <b>{produto.mesesGarantia} meses</b>
           </Typography>
+          {produto.colorName && (
+            <Typography>
+              Cor · {produto.colorName}
+            </Typography>
+          )}
         </Box>
       </Container>
       <Modal open={!!variant} onClose={() => setVariant(undefined)}>
@@ -513,7 +497,7 @@ export default function Produto() {
       <ModalEditarProduto
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        idProduto={produtoEdit?.id ?? 0}
+        idProduto={produtoEdit?.id ?? ""}
         onSaved={() => fetchProdutos(page)}
       />
     </Box>

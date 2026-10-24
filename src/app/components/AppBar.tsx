@@ -4,17 +4,17 @@ import {
   Box,
   Sheet,
   Button,
-  Input,
   Container,
   Typography,
   Badge,
 } from "@mui/joy";
-import { Search, Menu as M } from "lucide-react";
+import { Menu as M } from "lucide-react";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { ExitToApp, Person } from "@mui/icons-material";
 import LoginComponent from "./LoginComponent";
+import BuscaProdutoHeader from "./BuscaProdutoHeader";
 import { GoogleAuthService } from "@/services/auth/auth.service";
 import { MenuResponse } from "@/types/menus.type";
 import { UserService } from "@/services/user/user.service";
@@ -23,11 +23,13 @@ import Menu from "@mui/joy/Menu";
 import MenuItem from "@mui/joy/MenuItem";
 import MenuButton from "@mui/joy/MenuButton";
 import IconButton from "@mui/joy/IconButton";
-import { CarrinhoService } from "@/services/carrinho/carrinho.service";
+import {
+  CARRINHO_ATUALIZADO_EVENT,
+  CarrinhoService,
+} from "@/services/carrinho/carrinho.service";
 
 export default function AppBar() {
   const router = useRouter();
-  const [busca, setBusca] = React.useState("");
   const [pagina, setPagina] = React.useState("");
   const [openMenu, setOpenMenu] = React.useState(false);
   const [logado, setLogado] = React.useState(false);
@@ -38,7 +40,6 @@ export default function AppBar() {
   const googleAuth = new GoogleAuthService();
   const userService = new UserService();
 
-  const inputRef = useRef<HTMLDivElement | null>(null);
   const serviceCarrihno = new CarrinhoService();
 
   const menu = [
@@ -53,51 +54,63 @@ export default function AppBar() {
   };
 
   async function getMenus(email: string) {
-    const response: MenuResponse = await userService.GetMenus(email);
-    setMenus(response);
+    try {
+      const response: MenuResponse = await userService.GetMenus(email);
+      setMenus(Array.isArray(response) ? response : []);
+    } catch {
+      setMenus([]);
+    }
   }
 
-  const sincronizarCarrinhoLocal = async (token: string) => {
-    const carrinhoStorage = sessionStorage.getItem("carrinho");
-
-    if (!carrinhoStorage) return;
-
-    const carrinhoLocal = JSON.parse(carrinhoStorage);
-
-    if (!carrinhoLocal?.carrinhos?.length) return;
-
-    for (const item of carrinhoLocal.carrinhos) {
-      await serviceCarrihno.postCarrinho(
-        {
-          IdProduto: item.IdProduto,
-          Quantidade: item.quantidade,
-        },
-        token,
-      );
+  const atualizarContagemCarrinho = async () => {
+    try {
+      const q = await serviceCarrihno.contarItens();
+      setQuantidadeCarrinho(q);
+    } catch {
+      setQuantidadeCarrinho(CarrinhoService.getQuantidadeItensLocal());
     }
-
-    sessionStorage.removeItem("carrinho");
   };
 
   useEffect(() => {
     const init = async () => {
-      const res = await googleAuth.me();
+      try {
+        const res = await googleAuth.me();
 
-      if (!res || !res.email) return;
+        if (!res?.email) {
+          await atualizarContagemCarrinho();
+          return;
+        }
 
-      getMenus(res.email);
-      setLogado(true);
+        setLogado(true);
+        await getMenus(res.email);
 
-      const token = sessionStorage.getItem("auth_token");
-      if (!token) return;
+        const token = sessionStorage.getItem("auth_token");
+        if (token) {
+          try {
+            await serviceCarrihno.sincronizarCarrinhoLocalComApi(token);
+          } catch {
+            /* API indisponível ou token expirado — não bloqueia a loja */
+          }
+        }
 
-      await sincronizarCarrinhoLocal(token);
-
-      const carrinhoApi = await serviceCarrihno.getCarrinho();
-      setQuantidadeCarrinho(carrinhoApi.itens.length);
+        await atualizarContagemCarrinho();
+      } catch {
+        setLogado(false);
+        setMenus([]);
+        setQuantidadeCarrinho(CarrinhoService.getQuantidadeItensLocal());
+      }
     };
 
-    init();
+    void init();
+  }, []);
+
+  useEffect(() => {
+    const onCarrinhoAtualizado = () => {
+      void atualizarContagemCarrinho();
+    };
+    window.addEventListener(CARRINHO_ATUALIZADO_EVENT, onCarrinhoAtualizado);
+    return () =>
+      window.removeEventListener(CARRINHO_ATUALIZADO_EVENT, onCarrinhoAtualizado);
   }, []);
 
   useEffect(() => {
@@ -105,23 +118,22 @@ export default function AppBar() {
   }, []);
 
   return (
-    <Container
-      maxWidth="lg"
+    <Box
+      component="header"
       sx={{
-        position: "relative",
-        mt: 2,
-        pb: { xs: 2, md: 0 },
+        width: "100%",
+        alignSelf: "stretch",
+        bgcolor: "#000",
+        borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+        pt: { xs: 1.5, md: 2 },
+        pb: { xs: 2, md: 2 },
       }}
     >
-      <Sheet
-        variant="soft"
+      <Container maxWidth="lg" sx={{ position: "relative", px: { xs: 2, md: 3 } }}>
+      <Box
         sx={{
-          borderRadius: "xl",
-          p: 1.5,
-          backdropFilter: "blur(20px)",
-          background: "rgba(15, 15, 15, 0.8)",
-          border: "1px solid rgba(255, 255, 255, 0.08)",
-          boxShadow: "0 0 10px rgba(0,0,0,0.3)",
+          p: { xs: 0.5, md: 1 },
+          bgcolor: "transparent",
         }}
       >
         <Box
@@ -165,38 +177,13 @@ export default function AppBar() {
             ))}
           </Box>
           <Box
-            ref={inputRef}
             sx={{
               display: "flex",
               alignItems: "center",
               gap: 1,
-              position: "relative",
             }}
           >
-            <Input
-              placeholder="Buscar produto..."
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              size="sm"
-              variant="soft"
-              sx={{
-                width: 450,
-                bgcolor: "rgba(0,0,0,0.5)",
-                color: "#fff",
-                borderRadius: "md",
-                "& input::placeholder": { color: "rgba(255,255,255,0.5)" },
-              }}
-            />
-            <IconButton
-              size="sm"
-              variant="soft"
-              sx={{
-                bgcolor: "rgba(255,255,255,0.08)",
-                "&:hover": { bgcolor: "rgba(255,255,255,0.15)" },
-              }}
-            >
-              <Search size={18} color="#fff" />
-            </IconButton>
+            <BuscaProdutoHeader largura={450} size="sm" />
             <LoginComponent
               openModal={openModal}
               onClose={() => setOpenModal(false)}
@@ -299,46 +286,11 @@ export default function AppBar() {
               />
             </Box>
           </Box>
-          <Box
-            ref={inputRef}
-            sx={{
-              width: "100%",
-              px: 1,
-              display: "flex",
-              gap: 1,
-              position: "relative",
-            }}
-          >
-            <Input
-              placeholder="Buscar produto..."
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              variant="soft"
-              size="md"
-              sx={{
-                flexGrow: 1,
-                bgcolor: "rgba(0,0,0,0.5)",
-                color: "#fff",
-                borderRadius: "md",
-                "& input::placeholder": {
-                  color: "rgba(255,255,255,0.5)",
-                },
-              }}
-            />
-
-            <IconButton
-              size="md"
-              variant="soft"
-              sx={{
-                bgcolor: "rgba(255,255,255,0.08)",
-                "&:hover": { bgcolor: "rgba(255,255,255,0.2)" },
-              }}
-            >
-              <Search size={20} color="#fff" />
-            </IconButton>
+          <Box sx={{ width: "100%", px: 1 }}>
+            <BuscaProdutoHeader fullWidth size="md" />
           </Box>
         </Box>
-      </Sheet>
+      </Box>
       {openMenu && (
         <>
           <Box
@@ -456,6 +408,7 @@ export default function AppBar() {
           </Sheet>
         </>
       )}
-    </Container>
+      </Container>
+    </Box>
   );
 }

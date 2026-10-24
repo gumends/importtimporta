@@ -1,4 +1,4 @@
 export interface CarrinhoRequest {
-    IdProduto: number;
-    Quantidade: number;
+  idProduto: string;
+  quantidade: number;
 }

@@ -28,34 +28,37 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR">
-      <CssVarsProvider defaultMode="dark" modeStorageKey="theme-mode">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-          style={{
-            margin: 0,
-            padding: 0,
-            minHeight: "100vh",
-            backgroundColor: "#0a0a0a",
-            color: "#f8fafc",
-          }}
-        >
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{
+          margin: 0,
+          padding: 0,
+          minHeight: "100vh",
+          backgroundColor: "#000",
+          color: "#f8fafc",
+        }}
+      >
+        <CssVarsProvider defaultMode="dark">
           <Box
             sx={{
               minHeight: "100vh",
               display: "flex",
               flexDirection: "column",
-              alignItems: "center",
+              alignItems: "stretch",
+              width: "100%",
               overflowX: "hidden",
-              bgcolor: "#0a0a0a",
+              bgcolor: "#000",
               color: "#fff",
             }}
           >
             <AppBar />
-            {children}
+            <Box component="main" sx={{ flex: 1, width: "100%" }}>
+              {children}
+            </Box>
+            <Footer />
           </Box>
-          <Footer />
-        </body>
-      </CssVarsProvider>
+        </CssVarsProvider>
+      </body>
     </html>
   );
 }
