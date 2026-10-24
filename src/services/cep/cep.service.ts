@@ -1,5 +1,15 @@
+export interface ViaCepResponse {
+  cep?: string;
+  logradouro?: string;
+  complemento?: string;
+  bairro?: string;
+  localidade?: string;
+  uf?: string;
+  erro?: boolean;
+}
+
 export class CepService {
-  async getCep(cep: string): Promise<Record<string, unknown>> {
+  async getCep(cep: string): Promise<ViaCepResponse> {
     const res = await fetch(
       `https://viacep.com.br/ws/${cep}/json/`,
       {
